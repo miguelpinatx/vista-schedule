@@ -548,9 +548,11 @@ details.card>summary::before{content:"▸ ";color:var(--muted)}details.card[open
       <div class="row"><input type="text" id="newStore" placeholder="New store"><button class="btn" id="addStore">Add</button></div>
     </div>
     <div class="card" id="pinCard">
-      <h2 class="sec">PINs</h2>
-      <div class="note">Anyone opening the page must enter a PIN. The <b>staff PIN</b> opens everything managers need. The <b>admin PIN</b> also opens Staffing guide and Settings. Leave both blank to turn the PIN off. The PIN keeps out people who only have the link; it isn't bank-level security.</div>
-      <div class="row"><label class="field"><span>Staff PIN</span><input type="password" id="pinStaff" autocomplete="new-password" placeholder="new PIN"></label><label class="field"><span>Admin PIN</span><input type="password" id="pinAdmin" autocomplete="new-password" placeholder="new PIN"></label><button class="btn primary" id="pinSave">Save PINs</button><button class="btn" id="pinOff">Turn PIN off</button></div>
+      <h2 class="sec">PINs &amp; store access</h2>
+      <div class="note">With PINs on, everyone must enter a PIN. The <b>admin PIN</b> opens everything: all stores, Dashboard, Staffing guide and Settings. A <b>store PIN</b> opens only that store's schedule and staff. Type a new PIN only where you want to set or change one.</div>
+      <div class="row"><label class="field"><span>Admin PIN</span><input type="password" id="pinAdmin" autocomplete="new-password" placeholder="new PIN"></label></div>
+      <div class="row" id="pinStores"></div>
+      <div class="row"><button class="btn primary" id="pinSave">Save PINs</button><button class="btn" id="pinOff">Turn PINs off</button></div>
       <div class="note" id="pinState"></div>
     </div>
     <div class="card">
@@ -582,6 +584,7 @@ details.card>summary::before{content:"▸ ";color:var(--muted)}details.card[open
 (function(){
 "use strict";
 /* ---------- Supabase backend (GitHub version) ---------- */
+let LOCK=null;// store name when a store PIN is used
 function supaBackend(sb){
   const T="docs";
   const subs={};// collection -> [cb]
@@ -601,13 +604,13 @@ function supaBackend(sb){
     loadCol(col).then(o=>{caches[col]=o;emitCol(col)}).catch(showErr)}
   const err=e=>{throw{code:"unavailable",message:e&&e.message||String(e)}};
   return{
-    subCfg(cb){const k="config/main";(docSubs[k]=docSubs[k]||[]).push(cb);getDoc("config","main").then(cb).catch(showErr)},
-    subStaff(cb){subCol("staff",cb)},
-    subGuides(cb){subCol("guides",cb)},
+    subCfg(cb0){const cb=c=>cb0(LOCK&&c?{...c,stores:[LOCK]}:c);const k="config/main";(docSubs[k]=docSubs[k]||[]).push(cb);getDoc("config","main").then(cb).catch(showErr)},
+    subStaff(cb){subCol("staff",o=>cb(LOCK?Object.fromEntries(Object.entries(o).filter(([k,v])=>v&&v.store===LOCK)):o))},
+    subGuides(cb){subCol("guides",o=>cb(LOCK?Object.fromEntries(Object.entries(o).filter(([k,v])=>v&&v.store===LOCK)):o))},
     subTasks(cb){subCol("tasks",cb)},
     subSched(k,cb){const kk="schedules/"+k;const f=d=>cb(d);(docSubs[kk]=docSubs[kk]||[]).push(f);getDoc("schedules",k).then(cb).catch(showErr);return()=>{docSubs[kk]=(docSubs[kk]||[]).filter(x=>x!==f)}},
-    async saveCfg(c){try{await put("config","main",c);(docSubs["config/main"]||[]).forEach(f=>f(c))}catch(e){err(e)}},
-    async saveStaff(id,o){try{await put("staff",id,o);if(caches.staff){caches.staff[id]=o;emitCol("staff")}}catch(e){err(e)}},
+    async saveCfg(c){if(LOCK)err({message:"Only the admin can change settings."});try{await put("config","main",c);(docSubs["config/main"]||[]).forEach(f=>f(c))}catch(e){err(e)}},
+    async saveStaff(id,o){if(LOCK&&o&&o.store!==LOCK)o={...o,store:LOCK};try{await put("staff",id,o);if(caches.staff){caches.staff[id]=o;emitCol("staff")}}catch(e){err(e)}},
     async delStaff(id){try{await del("staff",id);if(caches.staff){delete caches.staff[id];emitCol("staff")}}catch(e){err(e)}},
     async saveGuide(id,o){try{if(o)await put("guides",id,o);else await del("guides",id);if(caches.guides){if(o)caches.guides[id]=o;else delete caches.guides[id];emitCol("guides")}}catch(e){err(e)}},
     async saveTask(id,o){try{await put("tasks",id,o);if(caches.tasks){caches.tasks[id]=o;emitCol("tasks")}}catch(e){err(e)}},
@@ -620,15 +623,18 @@ function supaBackend(sb){
 /* ---------- PIN gate (GitHub version) ---------- */
 async function sha(t){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("vista:"+t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
 function pinGate(cfg){return new Promise(res=>{
-  const pins=(cfg&&cfg.pins)||{};if(!pins.staff&&!pins.admin)return res("admin");
+  const pins=(cfg&&cfg.pins)||{};const stores=pins.stores||{};
+  if(!pins.admin)return res({lvl:"admin",open:true});
+  const check=h=>{if(h===pins.admin)return{lvl:"admin"};const st=Object.keys(stores).find(k=>stores[k]===h&&(cfg.stores||[]).includes(k));return st?{lvl:"store",store:st}:null};
   let saved=null;try{saved=JSON.parse(localStorage.getItem("vsb-pin")||"null")}catch(e){}
-  if(saved&&((saved.lvl==="admin"&&saved.h===pins.admin)||(saved.lvl==="staff"&&saved.h===pins.staff)))return res(saved.lvl);
-  const g=document.createElement("div");g.className="scrim";g.innerHTML=`<form class="modal" style="width:min(380px,100%)"><h3>Vista Schedule Builder</h3><div class="ctx">Enter the PIN to continue.</div><input type="password" inputmode="numeric" id="pinIn" autocomplete="off" style="font-size:22px;letter-spacing:.3em;text-align:center"><div class="note" id="pinErr" style="color:var(--bad-fg)"></div><button class="btn primary big" type="submit">Open</button></form>`;
+  const r0=saved&&saved.h&&check(saved.h);if(r0)return res(r0);
+  const g=document.createElement("div");g.className="scrim";g.innerHTML=`<form class="modal" style="width:min(380px,100%)"><h3>Vista Schedule Builder</h3><div class="ctx">Enter your store PIN to continue.</div><input type="password" inputmode="numeric" id="pinIn" autocomplete="off" style="font-size:22px;letter-spacing:.3em;text-align:center"><div class="note" id="pinErr" style="color:var(--bad-fg)"></div><button class="btn primary big" type="submit">Open</button></form>`;
   document.body.appendChild(g);const inp=g.querySelector("#pinIn");setTimeout(()=>inp.focus(),0);
-  g.querySelector("form").onsubmit=async e=>{e.preventDefault();const h=await sha(inp.value.trim());const lvl=h===pins.admin?"admin":h===pins.staff?"staff":null;
-    if(!lvl){g.querySelector("#pinErr").textContent="That PIN didn't work. Try again.";inp.select();return}
-    try{localStorage.setItem("vsb-pin",JSON.stringify({lvl,h}))}catch(e){}g.remove();res(lvl)};
+  g.querySelector("form").onsubmit=async e=>{e.preventDefault();const h=await sha(inp.value.trim());const r=check(h);
+    if(!r){g.querySelector("#pinErr").textContent="That PIN didn't work. Try again.";inp.select();return}
+    try{localStorage.setItem("vsb-pin",JSON.stringify({h}))}catch(e){}g.remove();res(r)};
 })}
+function signOut(){try{localStorage.removeItem("vsb-pin")}catch(e){}location.reload()}
 
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAYS_ES=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
@@ -767,7 +773,8 @@ async function boot(){
   if(window.SUPABASE_URL&&window.supabase){
     const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
     let c0=null;try{const r=await sb.from("docs").select("data").eq("collection","config").eq("id","main").maybeSingle();c0=r.data&&r.data.data}catch(e){}
-    const lvl=await pinGate(c0);S.canEdit=lvl==="admin";S._realCanEdit=S.canEdit;S.readOnly=false;
+    const acc=await pinGate(c0);S.canEdit=acc.lvl==="admin";S._realCanEdit=S.canEdit;S.readOnly=false;LOCK=acc.store||null;if(LOCK){S.store=LOCK;if(S.tab==="dash")S.tab="build"}
+    if(!acc.open){const so=document.createElement("button");so.className="btn sm";so.textContent="Sign out";so.style.marginLeft="12px";so.onclick=signOut;const br=document.querySelector(".brand");if(br)br.appendChild(so)}
     realBackend=supaBackend(sb);S.mode="shared";attach(realBackend);return;
   }
   let db=null;
@@ -793,7 +800,7 @@ function resub(){if(unsubSched)unsubSched();if(!S.store)return;S.sched=null;unsu
 /* ---------- render ---------- */
 function renderAll(){if(typeof renderChat==="function")renderChat();renderNotes();renderMode();renderBanner();renderControls();renderGrid();renderStaff();renderGuide();renderSettings();renderGoals();renderPrint();renderWizard();if(S.tab==="dash"){if(DASH.week!==ymd(S.week))loadDash();else renderDash()}}
 function renderMode(){
-  $("#modeLine").textContent=S.mode==="sample"?"Sample crew — nothing is saved":S.mode==="shared"?"Saved for everyone with this link":S.mode==="local"?"Saved on this device only":"Loading…";
+  $("#modeLine").textContent=S.mode==="sample"?"Sample crew — nothing is saved":S.mode==="shared"?(LOCK?LOCK+" store":"Saved for everyone with this link"):S.mode==="local"?"Saved on this device only":"Loading…";
 }
 function renderBanner(){
   let h="";
@@ -809,7 +816,7 @@ function renderControls(){
   $("#weekLbl").innerHTML=`Week ${weekNo(S.week,S.cfg.wkOffset)}<small>${rangeLabel(S.week)}</small>`;
   $("#jumpDate").value=ymd(S.week);
   document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));
-  if(!S.canEdit&&(S.tab==="guide"||S.tab==="settings"))S.tab="build";
+  if(!S.canEdit&&(S.tab==="guide"||S.tab==="settings"))S.tab="build";if(LOCK&&S.tab==="dash")S.tab="build";$("#tab-dash").hidden=!!LOCK;
   ["build","schedule","staff","dash","guide","settings"].forEach(t=>$("#view-"+t).hidden=t!==S.tab);
   $("#tab-guide").hidden=!S.canEdit;$("#tab-settings").hidden=!S.canEdit;
   $("#mainBar").hidden=S.tab==="build";
@@ -1264,7 +1271,10 @@ function wireWizard(){
 const goalFor=(st,G)=>{const g=(S.cfg.goals||{})[st];if(!g)return 0;return G?+((g.dept||{})[G])||0:+g.total||0};
 function goalPill(h,goal){if(!goal)return"";const d=h-goal;const pct=Math.abs(d)/goal*100;
   return `<span class="gpill ${d>0.5?"over":d< -0.5?"under":"ok"}">${d>0.5?fmtH(Math.round(d))+" over":d< -0.5?fmtH(Math.round(-d))+" under":"on goal"}${pct>=1?` (${Math.round(pct)}%)`:""}</span>`}
-function renderPinState(){const el=$("#pinState");if(!el)return;const p=S.cfg.pins||{};el.textContent=p.staff||p.admin?`PIN is on (${[p.staff?"staff":"",p.admin?"admin":""].filter(Boolean).join(" + ")}).`:"PIN is off: anyone with the link can open the page."}
+function renderPinState(){const el=$("#pinState");if(!el)return;const p=S.cfg.pins||{};const st=p.stores||{};
+  const box=$("#pinStores");if(box&&!box.contains(document.activeElement))box.innerHTML=S.cfg.stores.map(s=>`<label class="field"><span>${esc(s)} PIN</span><input type="password" autocomplete="new-password" data-pinstore="${esc(s)}" placeholder="${st[s]?"set · type to change":"not set"}"></label>`).join("");
+  const missing=S.cfg.stores.filter(s=>!st[s]);
+  el.textContent=p.admin?`PINs are on. ${missing.length?"No PIN yet for: "+missing.join(", ")+" (those stores can't sign in).":"Every store has a PIN."}`:"PINs are off: anyone with the link sees every store."}
 function renderGoals(){renderPinState();
   const slot=$("#goalsSlot");if(!slot||slot.contains(document.activeElement))return;const groups=wGroups();const G=S.cfg.goals||{};
   slot.innerHTML=`<div style="overflow-x:auto"><table class="gtable" style="min-width:${180+S.cfg.stores.length*92}px"><thead><tr><th>Weekly hours goal</th>${S.cfg.stores.map(s=>`<th>${esc(s)}</th>`).join("")}</tr></thead><tbody>
@@ -1592,7 +1602,7 @@ function bulkConfirm(kind){
 }
 function renderStaff(){
   const list=S.q?Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&matchQ(s.name)).sort((a,b)=>a.name.localeCompare(b.name)):crew();
-  $("#staffHead").textContent=S.q?"Search results, all stores ("+list.length+")":(S.dept==="__all"?"":S.dept+" · ")+S.store+" staff ("+list.length+")";
+  $("#staffHead").textContent=S.q?(LOCK?"Search results (":"Search results, all stores (")+list.length+")":(S.dept==="__all"?"":S.dept+" · ")+S.store+" staff ("+list.length+")";
   $("#addStaff").disabled=S.readOnly;$("#pasteBtn").disabled=S.readOnly;$("#selBtn").disabled=S.readOnly||!list.length;
   const vis=new Set(list.map(x=>x.id));for(const id of [...SEL.ids])if(!vis.has(id)||!S.staff[id])SEL.ids.delete(id);
   if(S.readOnly)SEL.on=false;
@@ -1950,9 +1960,15 @@ $("#addStore").onclick=()=>{const v=$("#newStore").value.trim();if(!v||S.cfg.sto
 document.addEventListener("change",e=>{const t=e.target;if(t.dataset&&t.dataset.goal!=null&&t.closest("#goalsSlot")){const st=t.dataset.goal,g=t.dataset.g,v=parseFloat(t.value);const goals=JSON.parse(JSON.stringify(S.cfg.goals||{}));const o=goals[st]=goals[st]||{};
   if(g){o.dept=o.dept||{};if(v>0)o.dept[g]=v;else delete o.dept[g]}else{if(v>0)o.total=v;else delete o.total}
   setTimeout(()=>backend.saveCfg({...S.cfg,goals}).then(()=>toast("Goal saved")).catch(showErr),0)}});
-if($("#pinSave")){$("#pinSave").onclick=async()=>{const a=$("#pinStaff").value.trim(),b=$("#pinAdmin").value.trim();if(!a&&!b){toast("Type a staff PIN, an admin PIN, or both.");return}if(!b&&!(S.cfg.pins&&S.cfg.pins.admin)){toast("Set an admin PIN too, so you can still reach Settings.");return}
-  const pins={...(S.cfg.pins||{})};if(a)pins.staff=await sha(a);if(b)pins.admin=await sha(b);await backend.saveCfg({...S.cfg,pins});try{localStorage.setItem("vsb-pin",JSON.stringify({lvl:"admin",h:pins.admin}))}catch(e){}$("#pinStaff").value="";$("#pinAdmin").value="";toast("PINs saved")};
-  $("#pinOff").onclick=async()=>{const c={...S.cfg};delete c.pins;await backend.saveCfg(c);toast("PIN turned off")}}
+if($("#pinSave")){$("#pinSave").onclick=async()=>{const old=S.cfg.pins||{};const pins={admin:old.admin,stores:{...(old.stores||{})}};
+  const a=$("#pinAdmin").value.trim();if(a)pins.admin=await sha(a);
+  for(const el of document.querySelectorAll("[data-pinstore]")){const v=el.value.trim();if(v)pins.stores[el.dataset.pinstore]=await sha(v)}
+  if(!pins.admin){toast("Set an admin PIN first, so you can still reach Settings.");return}
+  const hs=Object.values(pins.stores);if(hs.includes(pins.admin)){toast("A store PIN can't be the same as the admin PIN.");return}
+  if(new Set(hs).size!==hs.length){toast("Each store needs its own PIN.");return}
+  await backend.saveCfg({...S.cfg,pins});try{localStorage.setItem("vsb-pin",JSON.stringify({h:pins.admin}))}catch(e){}
+  $("#pinAdmin").value="";document.querySelectorAll("[data-pinstore]").forEach(el=>el.value="");toast("PINs saved")};
+  $("#pinOff").onclick=async()=>{if(!confirm("Turn PINs off? Anyone with the link will see every store."))return;const c={...S.cfg};delete c.pins;await backend.saveCfg(c);toast("PINs turned off")}}
 $("#mealDeduct").onchange=e=>backend.saveCfg({...S.cfg,mealDeduct:e.target.checked}).catch(showErr);
 $("#maxDays").onchange=e=>backend.saveCfg({...S.cfg,maxDays:Math.max(1,Math.min(7,+e.target.value||5))}).catch(showErr);
 $("#wkOffset").onchange=e=>backend.saveCfg({...S.cfg,wkOffset:Math.round(+e.target.value||0)}).catch(showErr);
