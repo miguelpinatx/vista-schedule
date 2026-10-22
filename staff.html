@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Vista Work Schedule</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
+<style>
+:root{--bg:#f6f5f9;--surface:#fff;--surface2:#f0eef5;--ink:#1e1830;--muted:#676079;--line:#e1dcea;--brand:#834B9E;--brand-ink:#fff;
+  --am-bg:#fff1c2;--am-fg:#6b4d00;--mid-bg:#d6ecfa;--mid-fg:#08507f;--pm-bg:#eadcf3;--pm-fg:#5a2b73;--off-fg:#9a93a8;--me:#fff7d6;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;--f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 var(--f-body)}
+.wrap{max-width:1100px;margin:0 auto;padding:16px 16px calc(32px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.logo{width:40px;height:40px;border-radius:10px;background:var(--brand);display:grid;place-items:center;flex:none}
+h1{font-family:var(--f-display);font-weight:800;font-size:28px;line-height:1;margin:0}
+.sub{color:var(--muted);font-size:13px}
+.spacer{flex:1}
+.lang{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
+.lang button{border:0;background:none;padding:6px 12px;font:600 13px var(--f-body);color:var(--muted);cursor:pointer}
+.lang button[aria-pressed=true]{background:var(--brand);color:#fff}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:14px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+select,input{font:16px var(--f-body);padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);min-width:0}
+.weeks{display:flex;gap:6px;flex-wrap:wrap}
+.weeks button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font:600 14px var(--f-body);cursor:pointer;color:var(--ink)}
+.weeks button[aria-pressed=true]{background:var(--brand);border-color:var(--brand);color:#fff}
+.weeks small{display:block;font-weight:500;font-size:12px;opacity:.8}
+.tabs{display:flex;gap:6px}
+.tabs button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font:600 14px var(--f-body);cursor:pointer;color:var(--ink)}
+.tabs button[aria-selected=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+h2{font-family:var(--f-display);font-size:22px;margin:0 0 8px}
+.meta{color:var(--muted);font-size:13px;margin-bottom:10px}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:center;font-size:14px;white-space:nowrap}
+th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+th small{display:block;font-weight:500;text-transform:none;letter-spacing:0}
+td.n,th.n{text-align:left;position:sticky;left:0;background:var(--surface);font-weight:600;white-space:normal;min-width:130px}
+tr.me td{background:var(--me)}
+.sh{display:inline-block;border-radius:7px;padding:3px 7px;font-weight:600;font-size:13px}
+.am{background:var(--am-bg);color:var(--am-fg)}.mid{background:var(--mid-bg);color:var(--mid-fg)}.pm{background:var(--pm-bg);color:var(--pm-fg)}
+.off{color:var(--off-fg);font-size:12px;font-weight:600}
+.today{outline:2px solid var(--brand);outline-offset:-2px}
+.mine{background:var(--surface);border:2px solid var(--brand);border-radius:14px;padding:14px;margin-bottom:14px}
+.mine h2{margin-bottom:4px}
+.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-top:10px}
+.day{border:1px solid var(--line);border-radius:10px;padding:8px 4px;text-align:center;min-height:64px}
+.day b{display:block;font-size:12px;color:var(--muted);text-transform:uppercase}
+.day .sh{display:block;margin-top:4px;padding:4px 2px;font-size:12px;white-space:normal}
+.day.t{border-color:var(--brand);border-width:2px}
+.dlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.dl{border:1px solid var(--line);border-radius:12px;padding:10px}
+.dl h3{margin:0 0 6px;font-size:15px}
+.dl div{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-top:1px dashed var(--line);font-size:14px}
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+.empty h2{color:var(--ink)}
+@media (max-width:620px){.days{grid-template-columns:repeat(4,minmax(0,1fr))}h1{font-size:24px}}
+@media print{.bar,.lang,.tabs,.mine{display:none}body{background:#fff}.card{border:0;padding:0}table{min-width:0}.sh{background:none!important;color:#000!important;padding:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3" fill="none" stroke="#fff" stroke-width="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M8.5 15l2.2 2.2 4.8-4.8" fill="none" stroke="#FEC938" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div><h1 id="title">Work schedule</h1><div class="sub" id="sub"></div></div>
+    <div class="spacer"></div>
+    <div class="lang" role="group" aria-label="Language"><button data-lang="en">English</button><button data-lang="es">Español</button></div>
+  </header>
+  <div id="app"><div class="empty"><h2 id="loading">Loading…</h2></div></div>
+</div>
+<script>
+(function(){"use strict";
+const SUPABASE_URL="https://httiqzrqpwfqpgctlmey.supabase.co",KEY="sb_publishable_hk5V9IDwfCfQPSJKJqaBeg_Bq_QX7vi";
+const T={en:{title:"Work schedule",loading:"Loading…",week:"Week",find:"Find your name",findPh:"Type your name…",me:"Your week",notMe:"Not you?",byPerson:"Everyone",byDay:"By day",off:"OFF",none:"—",pickStore:"Which store?",noStore:"Ask your manager for your store's schedule link.",nothing:"No final schedule yet",nothingSub:"Your manager hasn't marked a week final yet. Check back soon.",updated:"Final · updated",noneDay:"No one scheduled",days:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],daysL:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],thisWeek:"This week",nextWeek:"Next week",print:"Print",notFound:"No one with that name this week.",err:"Couldn't load the schedule. Check your connection and refresh.",nm:"Name"},
+ es:{title:"Horario de trabajo",loading:"Cargando…",week:"Semana",find:"Busca tu nombre",findPh:"Escribe tu nombre…",me:"Tu semana",notMe:"¿No eres tú?",byPerson:"Todos",byDay:"Por día",off:"LIBRE",none:"—",pickStore:"¿Qué tienda?",noStore:"Pide a tu gerente el enlace del horario de tu tienda.",nothing:"Todavía no hay horario final",nothingSub:"Tu gerente aún no ha marcado una semana como final. Vuelve pronto.",updated:"Final · actualizado",noneDay:"Nadie programado",days:["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"],daysL:["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"],thisWeek:"Esta semana",nextWeek:"Próxima semana",print:"Imprimir",notFound:"Nadie con ese nombre esta semana.",err:"No se pudo cargar el horario. Revisa tu conexión y actualiza.",nm:"Nombre"}};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ls={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const params=new URLSearchParams(location.search);const store=params.get("store");
+let lang=ls.get("vsb-lang")||((navigator.language||"").toLowerCase().startsWith("es")?"es":"en");
+let loaded=false,weeks=[],cur=null,view="person",q="",me=store?ls.get("vsb-me-"+store):null;
+const t=k=>T[lang][k];
+function toMin(s){const m=/^(\d{1,2}):(\d{2})/.exec(s||"");return m?+m[1]*60+ +m[2]:null}
+function fmtT(s){const m=toMin(s);if(m==null)return"";let h=Math.floor(m/60)%24,mm=m%60;const ap=h<12?"a":"p";h=h%12||12;return h+(mm?":"+String(mm).padStart(2,"0"):"")+ap}
+const cls=s=>{const m=toMin(s);return m<600?"am":m<780?"mid":"pm"};
+const pd=s=>{const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const md=d=>d.toLocaleDateString(lang==="es"?"es-MX":"en-US",{month:"short",day:"numeric"});
+const today=new Date();today.setHours(0,0,0,0);
+const norm=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+function cell(v){return v==="off"?`<span class="off">${t("off")}</span>`:Array.isArray(v)?`<span class="sh ${cls(v[0])}">${fmtT(v[0])}–${fmtT(v[1])}</span>`:`<span class="off">${t("none")}</span>`}
+function weekLabel(w){const s=pd(w.weekStart),diff=Math.round((s-addD(today,-today.getDay()))/864e5);return diff===0?t("thisWeek"):diff===7?t("nextWeek"):md(s)+" – "+md(addD(s,6))}
+function render(){
+  document.documentElement.lang=lang;document.querySelectorAll("[data-lang]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.lang===lang)));
+  $("#title").textContent=t("title");$("#sub").textContent=store||"";document.title=(store?store+" · ":"")+t("title");
+  const app=$("#app");
+  if(!store){app.innerHTML=`<div class="empty"><h2>${t("pickStore")}</h2><p>${t("noStore")}</p></div>`;return}
+  if(!loaded){app.innerHTML=`<div class="empty"><h2>${t("loading")}</h2></div>`;return}
+  if(!weeks.length){app.innerHTML=`<div class="empty"><h2>${t("nothing")}</h2><p>${t("nothingSub")}</p></div>`;return}
+  const w=weeks.find(x=>x.weekStart===cur)||weeks[0];const s=pd(w.weekStart);
+  const dayDates=[0,1,2,3,4,5,6].map(i=>addD(s,i));const tIdx=dayDates.findIndex(d=>+d===+today);
+  const names=[...new Set(w.rows.map(r=>r.name))].sort();
+  const mine=me&&w.rows.filter(r=>r.name===me);
+  let h=`<div class="bar"><div><div class="sub" style="margin-bottom:4px;font-weight:600">${t("week")}</div><div class="weeks">${weeks.map(x=>`<button data-week="${x.weekStart}" aria-pressed="${x.weekStart===w.weekStart}">${esc(weekLabel(x))}<small>${md(pd(x.weekStart))} – ${md(addD(pd(x.weekStart),6))}</small></button>`).join("")}</div></div>
+    <label class="f" style="flex:1;min-width:200px">${t("find")}<input id="q" list="nl" placeholder="${t("findPh")}" value="${esc(q)}" autocomplete="off"><datalist id="nl">${names.map(n=>`<option value="${esc(n)}">`).join("")}</datalist></label></div>`;
+  if(mine&&mine.length){h+=`<div class="mine"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><h2>${t("me")} · ${esc(me)}</h2><div class="spacer"></div><button class="lnk" data-notme style="border:0;background:none;color:var(--brand);font:600 14px var(--f-body);cursor:pointer;text-decoration:underline">${t("notMe")}</button></div>
+    ${mine.map(r=>`<div class="days">${r.days.map((v,i)=>`<div class="day ${i===tIdx?"t":""}"><b>${t("days")[i]} ${dayDates[i].getDate()}</b>${v==="off"?`<span class="off" style="display:block;margin-top:6px">${t("off")}</span>`:Array.isArray(v)?`<span class="sh ${cls(v[0])}">${fmtT(v[0])}–${fmtT(v[1])}</span>`:`<span class="off" style="display:block;margin-top:6px">${t("none")}</span>`}</div>`).join("")}</div>`).join("")}</div>`}
+  h+=`<div class="card"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px"><div class="tabs" role="tablist"><button role="tab" data-view="person" aria-selected="${view==="person"}">${t("byPerson")}</button><button role="tab" data-view="day" aria-selected="${view==="day"}">${t("byDay")}</button></div><div class="spacer"></div><span class="meta" style="margin:0">${t("updated")} ${new Date(w.at).toLocaleDateString(lang==="es"?"es-MX":"en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</span><button class="tabs" style="border:0;background:none;padding:0" onclick="print()"><span style="border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-weight:600;display:inline-block">${t("print")}</span></button></div>`;
+  const nq=me&&norm(q)===norm(me)?"":norm(q);const rows=w.rows.filter(r=>!nq||norm(r.name).includes(nq));
+  if(view==="person"){
+    if(!rows.length)h+=`<p class="meta">${t("notFound")}</p>`;
+    const depts=[...new Set(rows.map(r=>r.dept))];
+    h+=depts.map(dp=>`<h2 style="margin-top:6px">${esc(dp)}</h2><div class="tw"><table><thead><tr><th class="n">${t("nm")}</th>${dayDates.map((d,i)=>`<th class="${i===tIdx?"today":""}">${t("days")[i]}<small>${md(d)}</small></th>`).join("")}</tr></thead><tbody>${rows.filter(r=>r.dept===dp).map(r=>`<tr class="${r.name===me?"me":""}"><td class="n">${esc(r.name)}</td>${r.days.map((v,i)=>`<td class="${i===tIdx?"today":""}">${cell(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`).join("");
+  }else{
+    h+=`<div class="dlist">${dayDates.map((d,i)=>{const on=rows.filter(r=>Array.isArray(r.days[i])).sort((a,b)=>toMin(a.days[i][0])-toMin(b.days[i][0]));
+      return `<div class="dl ${i===tIdx?"today":""}"><h3>${t("daysL")[i]} · ${md(d)}</h3>${on.length?on.map(r=>`<div style="${r.name===me?"background:var(--me)":""}"><span>${esc(r.name)} <span class="meta">${esc(r.dept)}</span></span>${cell(r.days[i])}</div>`).join(""):`<p class="meta">${t("noneDay")}</p>`}</div>`}).join("")}</div>`;
+  }
+  h+=`</div>`;app.innerHTML=h;
+  const qi=$("#q");if(qi){qi.oninput=e=>{q=e.target.value;const exact=names.find(n=>norm(n)===norm(q));if(exact){me=exact;ls.set("vsb-me-"+store,me)}const pos=e.target.selectionStart;render();const n=$("#q");n.focus();try{n.setSelectionRange(pos,pos)}catch(x){}}}
+}
+document.addEventListener("click",e=>{const l=e.target.closest("[data-lang]");if(l){lang=l.dataset.lang;ls.set("vsb-lang",lang);render();return}
+  const w=e.target.closest("[data-week]");if(w){cur=w.dataset.week;render();return}
+  const v=e.target.closest("[data-view]");if(v){view=v.dataset.view;render();return}
+  if(e.target.closest("[data-notme]")){me=null;q="";ls.set("vsb-me-"+store,"");render();setTimeout(()=>{const n=$("#q");if(n)n.focus()},0)}});
+async function load(){
+  if(!store){render();return}
+  try{const sb=window.supabase.createClient(SUPABASE_URL,KEY);
+    const {data,error}=await sb.from("docs").select("data").eq("collection","published").eq("data->>store",store);if(error)throw error;
+    const ws=addD(today,-today.getDay());const min=+addD(ws,-7);
+    weeks=data.map(r=>r.data).filter(w=>w&&w.weekStart&&+pd(w.weekStart)>=min).sort((a,b)=>a.weekStart.localeCompare(b.weekStart));
+    loaded=true;if(!cur){const c=weeks.find(w=>+pd(w.weekStart)===+ws)||weeks.find(w=>+pd(w.weekStart)>+ws)||weeks[weeks.length-1];cur=c&&c.weekStart}
+    render();
+  }catch(e){$("#app").innerHTML=`<div class="empty"><h2>${t("err")}</h2></div>`}
+}
+render();load();
+})();
+</script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}.btn.good{background:var(--good-bg);color:var(--good-fg);border-color:var(--good-line)}.btn.warn{background:var(--warn-bg);color:var(--warn-fg);border-color:#e9c45a}#finalSlot{display:contents}</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
 <script>const SUPABASE_URL="https://httiqzrqpwfqpgctlmey.supabase.co";const SUPABASE_ANON_KEY="sb_publishable_hk5V9IDwfCfQPSJKJqaBeg_Bq_QX7vi";
 window.SUPABASE_URL=SUPABASE_URL;window.SUPABASE_ANON_KEY=SUPABASE_ANON_KEY;</script>
@@ -472,7 +472,7 @@ details.card>summary::before{content:"▸ ";color:var(--muted)}details.card[open
       <button class="btn" id="genBtn"><svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2l1.8 4.7L16.5 8.5l-4.7 1.8L10 15l-1.8-4.7L3.5 8.5l4.7-1.8z" fill="currentColor"/><path d="M16 13l.7 1.8 1.8.7-1.8.7L16 18l-.7-1.8-1.8-.7 1.8-.7z" fill="currentColor"/></svg>Fill automatically</button>
       <button class="btn" id="copyPrev">Copy last week</button>
       <button class="btn" id="clearWeek">Clear week</button>
-      <button class="btn primary" id="printBtn">Print schedule</button>
+      <button class="btn" id="printBtn">Print schedule</button><span id="finalSlot"></span>
     </div>
   </div>
 
@@ -617,7 +617,10 @@ function supaBackend(sb){
     async getSched(k){return getDoc("schedules",k)},
     async setSched(k,doc){try{await put("schedules",k,doc);(docSubs["schedules/"+k]||[]).forEach(f=>f(doc))}catch(e){err(e)}},
     async setCell(k,meta,sid,d,v){try{const{data,error}=await sb.rpc("set_cell",{p_id:k,p_meta:meta,p_sid:sid,p_day:String(d),p_val:v});if(error)throw error;(docSubs["schedules/"+k]||[]).forEach(f=>f(data))}catch(e){err(e)}},
-    async getTraffic(st){return getDoc("traffic",skey(st))}
+    async getTraffic(st){return getDoc("traffic",skey(st))},
+    async getPub(k){return getDoc("published",k)},
+    async savePub(k,o){try{await put("published",k,o)}catch(e){err(e)}},
+    async delPub(k){try{await del("published",k)}catch(e){err(e)}}
   };
 }
 /* ---------- PIN gate (GitHub version) ---------- */
@@ -635,6 +638,29 @@ function pinGate(cfg){return new Promise(res=>{
     try{localStorage.setItem("vsb-pin",JSON.stringify({h}))}catch(e){}g.remove();res(r)};
 })}
 function signOut(){try{localStorage.removeItem("vsb-pin")}catch(e){}location.reload()}
+
+/* ---------- Final schedules for employees (GitHub version) ---------- */
+function pubSnapshot(){const rows=[];for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;
+  const days=DAYS.map((x,d)=>{const v=cellVal(id,d);return v&&v.off?"off":v&&v.s?[v.s,v.e]:null});if(!days.some(x=>Array.isArray(x)))continue;rows.push({name:p.name,dept:grp(p.dept),days})}
+  rows.sort((a,b)=>a.dept.localeCompare(b.dept)||a.name.localeCompare(b.name));return rows}
+function pubState(){if(!S.pub)return"none";return JSON.stringify(S.pub.rows)===JSON.stringify(pubSnapshot())?"same":"changed"}
+function staffLink(st){return location.origin+location.pathname.replace(/[^/]*$/,"")+"staff.html?store="+encodeURIComponent(st)}
+function finalBtnHTML(){if(!backend||!backend.getPub)return"";const st=pubState();
+  return st==="none"?`<button class="btn primary" data-final="go">Mark final &amp; share</button>`:st==="same"?`<button class="btn good" data-final="info">✓ Final · shared</button>`:`<button class="btn warn" data-final="go">Update final (changes not shared)</button>`}
+function updFinal(){const el=$("#finalSlot");if(el)el.innerHTML=finalBtnHTML()}
+async function loadPub(){if(!backend||!backend.getPub)return;const k=key();try{const d=await backend.getPub(k);if(k===key()){S.pub=d;updFinal();if(W&&W.step===5)renderWizard()}}catch(e){}}
+function shareModal(msg){const link=staffLink(S.store);
+  openModal(`<h3>${msg||"Schedule shared"}</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)} (${rangeLabel(S.week)})</div>
+  <p class="note">Employees open this link to see every week marked final for ${esc(S.store)}. No PIN needed. Edits you make later stay private until you click <b>Update final</b>.</p>
+  <div class="row"><input type="text" readonly value="${esc(link)}" id="shareLink" style="flex:1;min-width:0"><button class="btn primary" data-final="copy">Copy link</button></div>
+  <div class="row" style="margin-top:10px"><button class="btn" data-final="unpub">Take this week down</button><div class="spacer"></div><a class="btn" href="${esc(link)}" target="_blank" rel="noopener">Open employee view</a><button class="btn" data-close>Done</button></div>`)}
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-final]");if(!b)return;const a=b.dataset.final;
+  if(a==="go"){const was=!!S.pub;const rows=pubSnapshot();if(!rows.length){toast("No shifts on this week yet.");return}
+    const doc={store:S.store,weekStart:ymd(S.week),at:new Date().toISOString(),rows};
+    try{await backend.savePub(key(),doc);S.pub=doc;updFinal();renderWizard();shareModal(was?"Final schedule updated":"Schedule marked final")}catch(x){showErr(x)}return}
+  if(a==="info"){shareModal("This week is final");return}
+  if(a==="copy"){const v=$("#shareLink").value;try{await navigator.clipboard.writeText(v);toast("Link copied")}catch(x){$("#shareLink").select();toast("Press Ctrl+C to copy")}return}
+  if(a==="unpub"){try{await backend.delPub(key());S.pub=null;updFinal();renderWizard();closeModal();toast("Taken down. Employees no longer see this week.")}catch(x){showErr(x)}return}});
 
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAYS_ES=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
@@ -795,7 +821,7 @@ function attach(b){
   b.subGuides(o=>{S.guides=o;renderAll()});
   if(b.subTasks)b.subTasks(o=>{S.tasks=o;if(!document.activeElement||!document.activeElement.dataset||!document.activeElement.dataset.task)renderAll()});
 }
-function resub(){if(unsubSched)unsubSched();if(!S.store)return;S.sched=null;unsubSched=backend.subSched(key(),d=>{S.sched=d;renderGrid();renderPrint();renderWizard()})}
+function resub(){if(unsubSched)unsubSched();if(!S.store)return;S.sched=null;S.pub=null;loadPub();unsubSched=backend.subSched(key(),d=>{S.sched=d;renderGrid();renderPrint();renderWizard();updFinal()})}
 
 /* ---------- render ---------- */
 function renderAll(){if(typeof renderChat==="function")renderChat();renderNotes();renderMode();renderBanner();renderControls();renderGrid();renderStaff();renderGuide();renderSettings();renderGoals();renderPrint();renderWizard();if(S.tab==="dash"){if(DASH.week!==ymd(S.week))loadDash();else renderDash()}}
@@ -1201,7 +1227,7 @@ function wStep5(){
     ${W.editTasks?"":`<button class="btn sm" data-wtask="edit">Edit for ${esc(S.store)}</button>`}</div>
     ${W.editTasks?taskEditorHTML("store",S.store,grp(S.dept))+`<div class="row"><button class="btn primary sm" data-wtask="save">Save duties</button><button class="btn sm" data-wtask="cancel">Cancel</button>${tasksFor(S.store,grp(S.dept))._custom?`<button class="btn sm" data-wtask="reset">Use company list</button>`:""}</div>`
       :(dutiesBox(S.store,grp(S.dept))?`<div class="pv tprev">${dutiesBox(S.store,grp(S.dept))}</div>`:`<p class="note">No duties yet. Tap <b>Edit for ${esc(S.store)}</b> to add them.</p>`)}</div>
-  <div class="row" style="margin-top:6px"><button class="btn" id="wPrint">Print schedule</button><button class="btn" data-wnext-dept>Schedule another department</button><button class="btn" data-goto-tab="dash">See dashboard</button></div>`;
+  <div class="row" style="margin-top:6px">${finalBtnHTML()}<button class="btn" id="wPrint">Print schedule</button><button class="btn" data-wnext-dept>Schedule another department</button><button class="btn" data-goto-tab="dash">See dashboard</button></div>`;
 }
 function wSummaryHTML(){
   const ppl=wPeople();const dH=[0,0,0,0,0,0,0],dP=[0,0,0,0,0,0,0];let tH=0,tD=0;
