@@ -1,5 +1,10 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}.btn.good{background:var(--good-bg);color:var(--good-fg);border-color:var(--good-line)}.btn.warn{background:var(--warn-bg);color:var(--warn-fg);border-color:#e9c45a}#finalSlot{display:contents}</style>
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}.btn.good{background:var(--good-bg);color:var(--good-fg);border-color:var(--good-line)}.btn.warn{background:var(--warn-bg);color:var(--warn-fg);border-color:#e9c45a}#finalSlot{display:contents}
+.budget{gap:8px}.bhead{font-size:15px}.bo{color:var(--bad-fg)}.bu{color:var(--good-fg)}
+.btab{border-collapse:collapse;width:100%;min-width:640px}.btab th,.btab td{padding:6px 5px;text-align:center;border-bottom:1px solid var(--line);font-size:14px}.btab th{font-size:12px;color:var(--muted);text-transform:uppercase}.btab td:first-child{text-align:left;font-weight:600;white-space:nowrap}
+.btab input{width:100%;min-width:70px;max-width:110px;text-align:right}
+.issues summary{cursor:pointer;list-style:revert}.issues .isec{margin-top:8px}.iitem{padding:6px 8px;border-left:3px solid var(--warn-fg);background:var(--surface2);border-radius:6px;margin-top:4px;cursor:default}.iitem.bad{border-left-color:var(--bad-fg)}.iitem[data-tdept]{cursor:pointer}.issues.ok{border-color:var(--good-line);background:var(--good-bg)}
+#budgetSlot,#issuesSlot{margin-bottom:10px}@media print{#budgetSlot,#issuesSlot{display:none}}</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
 <script>const SUPABASE_URL="https://httiqzrqpwfqpgctlmey.supabase.co";const SUPABASE_ANON_KEY="sb_publishable_hk5V9IDwfCfQPSJKJqaBeg_Bq_QX7vi";
 window.SUPABASE_URL=SUPABASE_URL;window.SUPABASE_ANON_KEY=SUPABASE_ANON_KEY;</script>
@@ -498,6 +503,8 @@ tr.sumg td{background:var(--surface2);font-weight:700;font-size:13px;text-transf
       <div class="tabs vtog" role="group" aria-label="Color by"><button data-color="avail" aria-pressed="true">Color: availability</button><button data-color="time" aria-pressed="false">Color: time of day</button></div>
       <div class="tabs vtog" role="group" aria-label="Schedule view"><button data-view="person" aria-pressed="true">By employee</button><button data-view="shift" aria-pressed="false">By shift</button></div>
     </div>
+    <div id="budgetSlot"></div>
+    <div id="issuesSlot"></div>
     <div id="gridSlot"></div>
     <div id="sumSlot"></div>
     <div id="notesSlot" style="display:flex;flex-direction:column;gap:10px;margin-top:6px"></div>
@@ -550,6 +557,11 @@ tr.sumg td{background:var(--surface2);font-weight:700;font-size:13px;text-transf
       <h2 class="sec">Stores</h2>
       <div class="chips" id="storeChips"></div>
       <div class="row"><input type="text" id="newStore" placeholder="New store"><button class="btn" id="addStore">Add</button></div>
+    </div>
+    <div class="card" id="payCard">
+      <h2 class="sec">Payroll goals</h2>
+      <div class="note">Payroll budget = each day's sales goal × the store's payroll %. Hour budget = payroll budget ÷ blended hourly rate. Store managers enter their sales goals on the Full schedule tab. Leave a store blank to turn the budget off there.</div>
+      <div id="payRows"></div>
     </div>
     <div class="card" id="pinCard">
       <h2 class="sec">PINs &amp; store access</h2>
@@ -624,7 +636,9 @@ function supaBackend(sb){
     async getTraffic(st){return getDoc("traffic",skey(st))},
     async getPub(k){return getDoc("published",k)},
     async savePub(k,o){try{await put("published",k,o)}catch(e){err(e)}},
-    async delPub(k){try{await del("published",k)}catch(e){err(e)}}
+    async delPub(k){try{await del("published",k)}catch(e){err(e)}},
+    async getSales(k){return getDoc("sales",k)},
+    async saveSales(k,o){try{await put("sales",k,o)}catch(e){err(e)}}
   };
 }
 /* ---------- PIN gate (GitHub version) ---------- */
@@ -665,6 +679,60 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-fina
   if(a==="info"){shareModal("This week is final");return}
   if(a==="copy"){const v=$("#shareLink").value;try{await navigator.clipboard.writeText(v);toast("Link copied")}catch(x){$("#shareLink").select();toast("Press Ctrl+C to copy")}return}
   if(a==="unpub"){try{await backend.delPub(key());S.pub=null;updFinal();renderWizard();closeModal();toast("Taken down. Employees no longer see this week.")}catch(x){showErr(x)}return}});
+
+/* ---------- Payroll budget + issues (GitHub version) ---------- */
+const money=n=>"$"+Math.round(n).toLocaleString();
+function payCfg(st){const p=(S.cfg.payroll||{})[st||S.store];return p&&+p.rate>0&&+p.pct>0?{rate:+p.rate,pct:+p.pct}:null}
+async function loadSales(){if(!backend||!backend.getSales)return;const k=key();try{const d=await backend.getSales(k);if(k===key()){S.sales=d||{store:S.store,weekStart:ymd(S.week),days:[]};renderPay()}}catch(e){}}
+function storeDayHours(){const h=[0,0,0,0,0,0,0];for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;for(let d=0;d<7;d++){const v=cellVal(id,d);if(v&&v.s&&!v.off)h[d]+=hoursOf(v,S.cfg)}}return h}
+function payCalc(){const P=payCfg();if(!P)return null;const sales=DAYS.map((x,d)=>+((S.sales&&S.sales.days&&S.sales.days[d])||0));
+  const hrs=storeDayHours();const bud=sales.map(x=>x*P.pct/100/P.rate);const sum=a=>a.reduce((x,y)=>x+y,0);
+  return{P,sales,hrs,bud,tS:sum(sales),tH:sum(hrs),tB:sum(bud)}}
+function openByDay(G){const g=guideFor(S.store,G);if(!g)return null;const cnt=g.slots.map(()=>[0,0,0,0,0,0,0]);
+  for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store||!inGrp(p,G))continue;for(let d=0;d<7;d++){const v=cellVal(id,d);if(v&&v.s&&!v.off&&shG(p,v)===G){const i=slotOf(g,v);if(i>=0)cnt[i][d]++}}}
+  return DAYS.map((x,d)=>g.slots.reduce((a,sl,i)=>a+Math.max(0,(+(sl.need&&sl.need[d])||0)-cnt[i][d]),0))}
+function issuesList(){const out=[];
+  const groups=new Set();for(const p of Object.values(S.staff))if(p&&!p._pending&&p.store===S.store)gsetOf(p).forEach(G=>{if(S.dept==="__all"||G===grp(S.dept))groups.add(G)});
+  for(const G of [...groups].sort((a,b)=>deptOrder(a)-deptOrder(b))){const o=openByDay(G);if(!o)continue;const n=o.reduce((a,b)=>a+b,0);
+    if(n)out.push({g:"staff",G,bad:true,t:`<b>${esc(G)}</b>: ${n} open spot${n===1?"":"s"} vs. guide <span class="note">(${o.map((x,d)=>x?DAYS[d]+" "+x:"").filter(Boolean).join(", ")})</span>`})}
+  const ppl=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&grpMatch(s)).sort((a,b)=>deptOrder(grp(a.dept))-deptOrder(grp(b.dept))||a.name.localeCompare(b.name));
+  for(const p of ppl){const r=rowStats(p);const fl=[...r.flags];if(p.type==="FT"&&r.h===0)fl.unshift(["FT with no shifts",""]);
+    if(fl.length)out.push({g:"hours",G:grp(p.dept),bad:fl.some(f=>f[1]==="bad"),t:`<b>${esc(p.name)}</b> <span class="note">${esc(grp(p.dept))} · ${fmtH(r.h)} h · ${r.days} days</span> ${fl.map(([t,c])=>`<span class="flag ${c}">${esc(t)}</span>`).join(" ")}`})}
+  const C=payCalc();if(C&&C.tS>0){const r1=x=>fmtH(Math.round(x*10)/10);const od=C.hrs.map((h,d)=>C.sales[d]>0&&h>C.bud[d]+0.5?DAYS[d]+" +"+r1(h-C.bud[d]):"").filter(Boolean);
+    if(C.tH>C.tB+0.5||od.length)out.push({g:"budget",bad:C.tH>C.tB+0.5,t:`<b>${C.tH>C.tB+0.5?r1(C.tH-C.tB)+" hrs over budget this week":"Week is on budget"}</b> · ${(C.tH*C.P.rate/C.tS*100).toFixed(1)}% of sales vs ${C.P.pct}% goal${od.length?` <span class="note">· over on ${od.join(", ")}</span>`:""}`})}
+  return out}
+function budgetHTML(){const C=payCalc();if(!C)return S.canEdit&&backend.getSales?`<div class="banner info">No payroll goal for ${esc(S.store)} yet. Set a blended rate and payroll % in <b>Settings → Payroll goals</b>.</div>`:"";
+  const r1=x=>fmtH(Math.round(x*10)/10);const has=C.tS>0;const pctNow=has?C.tH*C.P.rate/C.tS*100:0;const over=C.tH-C.tB;
+  const diff=(h,b,s)=>!s?`<span class="note">—</span>`:h>b+0.5?`<b class="bo">+${r1(h-b)}</b>`:`<b class="bu">${h<b-0.5?"−"+r1(b-h):"on"}</b>`;
+  const head=has?`Scheduled <b>${r1(C.tH)} hrs</b> (${money(C.tH*C.P.rate)}) vs budget <b>${r1(C.tB)} hrs</b> (${money(C.tB*C.P.rate)}) · ${over>0.5?`<b class="bo">${r1(over)} hrs over</b>`:over<-0.5?`<b class="bu">${r1(-over)} hrs under</b>`:"<b>on budget</b>"} · <b class="${pctNow>C.P.pct+0.05?"bo":"bu"}">${pctNow.toFixed(1)}%</b> of sales`:`Enter this week's sales goal for each day to see the hour budget.`;
+  return `<div class="card budget"><div class="row"><div><div class="ptitle">Payroll budget · ${esc(S.store)} · all departments</div><div class="note">Goal ${C.P.pct}% of sales · $${C.P.rate}/hr blended · budget hrs = sales × ${C.P.pct}% ÷ $${C.P.rate}</div></div><div class="spacer"></div><button class="btn sm" data-sales-copy>Use last week's sales goals</button></div>
+  <div class="bhead">${head}</div>
+  <div style="overflow-x:auto"><table class="btab"><thead><tr><th></th>${DAYS.map(d=>`<th>${d}</th>`).join("")}<th>Week</th></tr></thead><tbody>
+  <tr><td>Sales goal</td>${C.sales.map((x,d)=>`<td><input type="number" min="0" step="100" inputmode="numeric" data-sales="${d}" value="${x||""}" placeholder="$" ${S.readOnly?"disabled":""}></td>`).join("")}<td><b>${money(C.tS)}</b></td></tr>
+  <tr><td>Budget hrs</td>${C.bud.map((b,d)=>`<td>${C.sales[d]?r1(b):"—"}</td>`).join("")}<td><b>${has?r1(C.tB):"—"}</b></td></tr>
+  <tr><td>Scheduled hrs</td>${C.hrs.map(h=>`<td>${r1(h)}</td>`).join("")}<td><b>${r1(C.tH)}</b></td></tr>
+  <tr><td>Over / under</td>${C.hrs.map((h,d)=>`<td>${diff(h,C.bud[d],C.sales[d])}</td>`).join("")}<td>${diff(C.tH,C.tB,C.tS)}</td></tr>
+  </tbody></table></div></div>`}
+function issuesHTML(){const L=issuesList();if(!S.store)return"";
+  const bad=L.filter(x=>x.bad).length;const sec=(k,title)=>{const xs=L.filter(x=>x.g===k);return xs.length?`<div class="isec"><div class="ptitle">${title} (${xs.length})</div>${xs.map(x=>`<div class="iitem ${x.bad?"bad":""}" ${x.G?`data-tdept="${esc(x.G)}" role="button" tabindex="0"`:""}>${x.t}</div>`).join("")}</div>`:""};
+  if(!L.length)return `<div class="card issues ok"><b>✓ No issues.</b> <span class="note">Staffing guide covered, hours within the rules${payCfg()?" and on budget":""}.</span></div>`;
+  return `<details class="card issues" ${ISS_OPEN?"open":""}><summary><b>Issues to fix before marking final</b> <span class="flag ${bad?"bad":""}">${L.length}</span> <span class="note">${bad} need attention${S.dept==="__all"?"":" · "+esc(grp(S.dept))+" only"}</span></summary>
+  ${sec("budget","Budget")}${sec("staff","Staffing")}${sec("hours","Hours & rules")}<div class="note">Tap a department or person to show only that department.</div></details>`}
+let ISS_OPEN=true;
+function renderPay(){const b=$("#budgetSlot"),i=$("#issuesSlot");if(!b||!i)return;if(!S.store||S.tab!=="schedule"){b.innerHTML="";i.innerHTML="";return}
+  const ae=document.activeElement;const foc=ae&&ae.dataset&&ae.dataset.sales;if(!(foc!=null&&b.contains(ae)))b.innerHTML=budgetHTML();else{const t=document.createElement("div");t.innerHTML=budgetHTML();const nb=t.querySelector(".bhead"),ob=b.querySelector(".bhead");if(nb&&ob)ob.innerHTML=nb.innerHTML;const nt=t.querySelectorAll(".btab tbody tr"),ot=b.querySelectorAll(".btab tbody tr");for(let r=1;r<nt.length;r++)if(ot[r])ot[r].innerHTML=nt[r].innerHTML;const w=t.querySelector(".btab tbody tr td:last-child"),ow=b.querySelector(".btab tbody tr td:last-child");if(w&&ow)ow.innerHTML=w.innerHTML}
+  const d=i.querySelector("details");if(d)ISS_OPEN=d.open;i.innerHTML=issuesHTML()}
+async function saveSalesDays(days){const doc={store:S.store,weekStart:ymd(S.week),days,at:new Date().toISOString()};S.sales=doc;renderPay();try{await backend.saveSales(key(),doc)}catch(e){showErr(e)}}
+document.addEventListener("input",e=>{const t=e.target;if(t.dataset&&t.dataset.sales!=null&&S.sales){const days=[...(S.sales.days||[])];for(let d=0;d<7;d++)days[d]=+days[d]||0;days[+t.dataset.sales]=Math.max(0,+t.value||0);S.sales={...S.sales,days};renderPay()}});
+document.addEventListener("change",e=>{const t=e.target;
+  if(t.dataset&&t.dataset.sales!=null){const days=DAYS.map((x,d)=>+((S.sales&&S.sales.days&&S.sales.days[d])||0));days[+t.dataset.sales]=Math.max(0,+t.value||0);saveSalesDays(days);return}
+  if(t.dataset&&t.dataset.payStore){const st=t.dataset.payStore,k=t.dataset.k;const pay=JSON.parse(JSON.stringify(S.cfg.payroll||{}));const o=pay[st]||{};const v=parseFloat(t.value);if(v>0)o[k]=v;else delete o[k];if(Object.keys(o).length)pay[st]=o;else delete pay[st];
+    setTimeout(()=>backend.saveCfg({...S.cfg,payroll:pay}).then(()=>toast("Payroll goal saved for "+st)).catch(showErr),0)}});
+document.addEventListener("click",async e=>{if(e.target.closest("[data-sales-copy]")){const prev=new Date(S.week);prev.setDate(prev.getDate()-7);const k=S.store.replace(/[^A-Za-z0-9_-]/g,"_")+"_"+ymd(prev);
+  try{const d=await backend.getSales(k);if(!d||!(d.days||[]).some(x=>+x>0)){toast("No sales goals saved for last week.");return}saveSalesDays(DAYS.map((x,i)=>+d.days[i]||0));toast("Copied last week's sales goals")}catch(x){showErr(x)}}});
+document.addEventListener("keydown",e=>{const it=e.target.closest&&e.target.closest(".iitem[data-tdept]");if(it&&(e.key==="Enter"||e.key===" ")){e.preventDefault();it.click()}});
+function renderPayCfg(){const el=$("#payRows");if(!el||el.contains(document.activeElement))return;const pay=S.cfg.payroll||{};
+  el.innerHTML=`<table class="btab" style="max-width:520px"><thead><tr><th style="text-align:left">Store</th><th>Blended rate ($/hr)</th><th>Payroll goal (% of sales)</th></tr></thead><tbody>${S.cfg.stores.map(st=>{const p=pay[st]||{};return `<tr><td style="text-align:left"><b>${esc(st)}</b></td><td><input type="number" min="0" step="0.25" data-pay-store="${esc(st)}" data-k="rate" value="${p.rate||""}" placeholder="—"></td><td><input type="number" min="0" max="100" step="0.1" data-pay-store="${esc(st)}" data-k="pct" value="${p.pct||""}" placeholder="—"></td></tr>`}).join("")}</tbody></table>`}
 
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAYS_ES=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
@@ -831,7 +899,7 @@ function attach(b){
   b.subGuides(o=>{S.guides=o;renderAll()});
   if(b.subTasks)b.subTasks(o=>{S.tasks=o;if(!document.activeElement||!document.activeElement.dataset||!document.activeElement.dataset.task)renderAll()});
 }
-function resub(){if(unsubSched)unsubSched();if(!S.store)return;S.sched=null;S.pub=null;loadPub();unsubSched=backend.subSched(key(),d=>{S.sched=d;renderGrid();renderPrint();renderWizard();updFinal()})}
+function resub(){if(unsubSched)unsubSched();if(!S.store)return;S.sched=null;S.pub=null;loadPub();S.sales=null;loadSales();unsubSched=backend.subSched(key(),d=>{S.sched=d;renderGrid();renderPrint();renderWizard();updFinal()})}
 
 /* ---------- render ---------- */
 function renderAll(){if(typeof renderChat==="function")renderChat();renderNotes();renderMode();renderBanner();renderControls();renderGrid();renderStaff();renderGuide();renderSettings();renderGoals();renderPrint();renderWizard();if(S.tab==="dash"){if(DASH.week!==ymd(S.week))loadDash();else renderDash()}}
@@ -901,7 +969,7 @@ function renderSum(){const el=$("#sumSlot");if(!el)return;if(!S.store||S.tab!=="
     .sort((a,b)=>deptOrder(grp(a.dept))-deptOrder(grp(b.dept))||grp(a.dept).localeCompare(grp(b.dept))||a.name.localeCompare(b.name));
   el.innerHTML=`<div style="margin-top:12px">${summaryHTML(ppl,S.dept==="__all")}</div>`;
   const t=el.querySelector(".ptitle");if(t)t.textContent="Employee summary · hours & days"+(S.dept==="__all"?"":" · "+grp(S.dept));}
-function renderGrid(){renderSum();
+function renderGrid(){renderSum();renderPay();
   const slot=$("#gridSlot");if(!S.store){slot.innerHTML="";return}
   document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===S.view)));
   document.querySelectorAll("[data-color]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.color===S.colorBy)));
@@ -1322,7 +1390,7 @@ function renderPinState(){const el=$("#pinState");if(!el)return;const p=S.cfg.pi
   const box=$("#pinStores");if(box&&!box.contains(document.activeElement))box.innerHTML=S.cfg.stores.map(s=>`<label class="field"><span>${esc(s)} PIN</span><input type="password" autocomplete="new-password" data-pinstore="${esc(s)}" placeholder="${st[s]?"set · type to change":"not set"}"></label>`).join("");
   const missing=S.cfg.stores.filter(s=>!st[s]);
   el.textContent=p.admin?`PINs are on. ${missing.length?"No PIN yet for: "+missing.join(", ")+" (those stores can't sign in).":"Every store has a PIN."}`:"PINs are off: anyone with the link sees every store."}
-function renderGoals(){renderPinState();
+function renderGoals(){renderPinState();renderPayCfg();
   const slot=$("#goalsSlot");if(!slot||slot.contains(document.activeElement))return;const groups=wGroups();const G=S.cfg.goals||{};
   slot.innerHTML=`<div style="overflow-x:auto"><table class="gtable" style="min-width:${180+S.cfg.stores.length*92}px"><thead><tr><th>Weekly hours goal</th>${S.cfg.stores.map(s=>`<th>${esc(s)}</th>`).join("")}</tr></thead><tbody>
   <tr><td style="text-align:left"><b>Whole store</b></td>${S.cfg.stores.map(s=>`<td><input type="number" min="0" step="0.5" style="width:80px" data-goal="${esc(s)}" data-g="" value="${(G[s]&&G[s].total)||""}" placeholder="—" ${S.canEdit?"":"disabled"}></td>`).join("")}</tr>
