@@ -442,6 +442,60 @@ tr.sumg td{background:var(--surface2);font-weight:700;font-size:13px;text-transf
   .week .lbl{font-size:17px}
   .grid th.who{width:150px}
 }
+
+/* ---- simple mode (Oct 2026) ---- */
+header.top{align-items:center}
+.tabs.mainnav{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:2px 0 12px;background:none;padding:0}
+.tabs.mainnav .navbig{font-size:17px;font-weight:700;padding:12px 20px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);display:inline-flex;gap:8px;align-items:center;min-height:52px;box-shadow:none}
+.tabs.mainnav .navbig[aria-selected="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+.tabs.mainnav .navbig:hover{border-color:var(--brand)}
+.tabs.mainnav .ni{font-size:20px;line-height:1}
+.tabs.mainnav .navsp{flex:1}
+.tabs.mainnav .navsm{font-size:13px;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface2);color:var(--muted)}
+.tabs.mainnav .navsm[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.langtog{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
+.langtog button{border:0;background:none;padding:8px 14px;font-weight:600;color:var(--muted);cursor:pointer}
+.langtog button[aria-pressed="true"]{background:var(--brand);color:#fff}
+.wprog{font-size:15px;color:var(--muted)}
+.qlist{display:flex;flex-direction:column;gap:12px}
+.qcard{border:2px solid var(--line);border-radius:14px;padding:14px 16px;background:var(--surface);display:flex;flex-direction:column;gap:8px}
+.qcard.done{border-color:var(--good-line);background:#f6fbf7}
+.qname{font-size:18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.qok{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--good-fg);color:#fff;font-size:14px}
+.qq{font-weight:700;font-size:15px;margin-top:4px}
+.qsub{font-size:13px;color:var(--muted)}
+.qbtns{display:flex;flex-wrap:wrap;gap:8px}
+.qb{border:2px solid var(--line);background:#fff;border-radius:10px;padding:10px 16px;font-weight:600;font-size:15px;cursor:pointer;color:var(--ink);display:flex;flex-direction:column;align-items:flex-start;min-height:46px;text-align:left}
+.qb small{font-weight:500;font-size:12px;color:var(--muted)}
+.qb:hover{border-color:var(--brand)}
+.qb.on{background:var(--brand);border-color:var(--brand);color:#fff}.qb.on small{color:#eee}
+.qbtns.sm .qb{padding:7px 12px;font-size:14px;min-height:38px}
+.qb.on.many{background:var(--good-fg);border-color:var(--good-fg)}.qb.on.mtimes{background:#a87a00;border-color:#a87a00}.qb.on.mno{background:#5c566b;border-color:#5c566b}
+.qdays{display:flex;flex-wrap:wrap;gap:6px}
+.qday{border:2px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;font-weight:600;cursor:pointer;color:var(--ink)}
+.qday.on{background:var(--off-bg);border-color:var(--off-bg);color:var(--off-fg)}
+.wstrip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.ws{border-radius:8px;padding:5px 3px;text-align:center;font-size:12px;line-height:1.25}
+.ws b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.03em}
+.ws.ok{background:var(--good-bg);color:var(--good-fg)}.ws.part{background:var(--warn-bg);color:var(--warn-fg)}.ws.off{background:var(--off-bg);color:var(--off-fg)}.ws.no{background:#e4e1ea;color:#5c566b}
+.wk.part{background:var(--warn-bg);color:var(--warn-fg)}
+.avd.ok{background:var(--good-bg);color:var(--good-fg)}
+.alertlist{border:2px solid var(--bad-line);background:var(--bad-bg);border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:6px}
+.alerthead{font-weight:800;color:var(--bad-fg)}
+#alertBox{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:95;background:#fff4d6;border:2px solid #e0a800;color:#4a3500;border-radius:12px;padding:12px 16px;display:flex;gap:14px;align-items:center;box-shadow:var(--shadow);max-width:calc(100% - 32px);font-size:15px}
+.psec{margin-top:10px;display:flex;flex-direction:column;gap:6px}.psec .ptitle{font-size:14px}
+.pgood .ptitle{color:var(--good-fg)}.pwarn .ptitle{color:var(--warn-fg)}.pbad .ptitle{color:var(--bad-fg)}.pbusy .ptitle{color:var(--muted)}
+.pcount{background:var(--surface2);border-radius:99px;padding:1px 8px;font-size:12px;color:var(--muted)}
+.prow.kok{border-left:6px solid var(--good-fg);background:var(--good-bg)}.prow.kwarn{border-left:6px solid #e0a800;background:var(--warn-bg)}.prow.kno{border-left:6px solid var(--bad-fg);background:#fbf3f2}.prow.kno b{color:#6b625f}.prow.kbusy{border-left:6px solid #bbb;background:var(--surface2)}
+.avlegend{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:13px;color:var(--muted);margin-top:6px}.avlegend .avd{display:inline-block;min-width:30px;text-align:center;padding:2px 6px;border-radius:6px;font-size:11px;line-height:1.2}
+.sgh{margin:16px 0 6px;font-size:18px;display:flex;gap:8px;align-items:baseline}
+.bigacts{gap:10px;margin-bottom:6px}
+.btn.big{font-size:16px;padding:12px 18px}
+.avlist{display:flex;flex-direction:column}
+.avq{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}.avq>b{width:110px}
+.avtimes{display:inline-flex;gap:6px;align-items:center}
+.cshort{color:var(--bad-fg)}.cover{color:var(--blue)}.cok{color:var(--good-fg)}
+.cv.over{background:#d6ecfa;color:#08507f}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -451,14 +505,18 @@ tr.sumg td{background:var(--surface2);font-weight:700;font-size:13px;text-transf
       <div class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2.5" stroke="#FEC938" stroke-width="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke="#FEC938" stroke-width="2" stroke-linecap="round"/><path d="M8 15l2.5 2.5L16 13" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div><h1>Vista Schedule Builder</h1><div class="sub" id="modeLine">Loading…</div></div>
     </div>
-    <div class="tabs" role="tablist">
-      <button role="tab" id="tab-build" aria-selected="true" data-tab="build">Build schedule</button>
-      <button role="tab" id="tab-schedule" aria-selected="false" data-tab="schedule">Full schedule</button>
-      <button role="tab" id="tab-staff" aria-selected="false" data-tab="staff">Staff &amp; availability</button>
-      <button role="tab" id="tab-dash" aria-selected="false" data-tab="dash">Dashboard</button>
-      <button role="tab" id="tab-guide" aria-selected="false" data-tab="guide">Staffing guide</button>
-      <button role="tab" id="tab-settings" aria-selected="false" data-tab="settings">Settings</button>
-    </div>
+    <div class="langtog" role="group" aria-label="Language"><button data-lang="en" aria-pressed="true">English</button><button data-lang="es" aria-pressed="false">Español</button></div>
+  </header>
+  <nav class="tabs mainnav" role="tablist">
+      <button role="tab" id="tab-schedule" aria-selected="true" data-tab="schedule" class="navbig"><span class="ni" aria-hidden="true">📅</span>See full schedule</button>
+      <button role="tab" id="tab-build" aria-selected="false" data-tab="build" class="navbig"><span class="ni" aria-hidden="true">✏️</span>Build schedule</button>
+      <button role="tab" id="tab-staff" aria-selected="false" data-tab="staff" class="navbig"><span class="ni" aria-hidden="true">👥</span>Staff &amp; availability</button>
+      <span class="navsp"></span>
+      <button role="tab" id="tab-dash" aria-selected="false" data-tab="dash" class="navsm">Dashboard</button>
+      <button role="tab" id="tab-guide" aria-selected="false" data-tab="guide" class="navsm">Staffing guide</button>
+      <button role="tab" id="tab-settings" aria-selected="false" data-tab="settings" class="navsm">Settings</button>
+  </nav>
+  <header hidden>
   </header>
 
   <div id="bannerSlot"></div>
@@ -472,6 +530,7 @@ tr.sumg td{background:var(--surface2);font-weight:700;font-size:13px;text-transf
         <button class="btn icon" id="prevWk" aria-label="Previous week">‹</button>
         <div class="lbl" id="weekLbl"></div>
         <button class="btn icon" id="nextWk" aria-label="Next week">›</button>
+        <button class="btn sm" id="thisWk">This week</button>
         <input type="date" id="jumpDate" aria-label="Jump to date" style="width:44px;padding:7px 4px" title="Jump to a date">
       </div>
     </div>
@@ -498,7 +557,7 @@ tr.sumg td{background:var(--surface2);font-weight:700;font-size:13px;text-transf
       <span class="lg-tm" hidden><i class="sw tbad"></i>Red border = outside availability</span>
       <span><i class="sw off"></i>Day off</span>
       <span><i class="sw na"></i>Not available that day</span>
-      <span id="legendHint">Click any day to set a shift.</span>
+      <span id="legendHint">Click any day to set a shift. Under each department: <b style="color:var(--bad-fg)">red = short staffed</b>, <b style="color:var(--blue)">blue = over staffed</b> vs. the staffing guide.</span>
       <span class="spacer"></span>
       <div class="tabs vtog" role="group" aria-label="Color by"><button data-color="avail" aria-pressed="true">Color: availability</button><button data-color="time" aria-pressed="false">Color: time of day</button></div>
       <div class="tabs vtog" role="group" aria-label="Schedule view"><button data-view="person" aria-pressed="true">By employee</button><button data-view="shift" aria-pressed="false">By shift</button></div>
@@ -511,12 +570,12 @@ tr.sumg td{background:var(--surface2);font-weight:700;font-size:13px;text-transf
   </section>
 
   <section id="view-staff" class="panel" hidden>
+    <div class="row bigacts"><button class="btn primary big" id="addStaff">+ Add employee</button><button class="btn big" id="chgAvail">🕒 Change availability</button></div>
     <div class="row">
       <h2 class="sec" id="staffHead">Staff</h2>
       <div class="spacer"></div>
-      <button class="btn" id="selBtn">Select</button>
-      <button class="btn" id="pasteBtn">Paste a roster</button>
-      <button class="btn primary" id="addStaff">Add employee</button>
+      <button class="btn sm" id="selBtn">Select several</button>
+      <button class="btn sm" id="pasteBtn">Paste a roster</button>
     </div>
     <div class="selbar" id="selBar" hidden>
       <label class="row" style="gap:6px"><input type="checkbox" id="selAll"> <span id="selCount">0 selected</span></label>
@@ -558,7 +617,7 @@ tr.sumg td{background:var(--surface2);font-weight:700;font-size:13px;text-transf
       <div class="chips" id="storeChips"></div>
       <div class="row"><input type="text" id="newStore" placeholder="New store"><button class="btn" id="addStore">Add</button></div>
     </div>
-    <div class="card" id="payCard">
+    <div class="card" id="payCard" hidden>
       <h2 class="sec">Payroll goals</h2>
       <div class="note">Payroll budget = each day's sales goal × the store's payroll %. Hour budget = payroll budget ÷ blended hourly rate. Store managers enter their sales goals on the Full schedule tab. Leave a store blank to turn the budget off there.</div>
       <div id="payRows"></div>
@@ -682,7 +741,8 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-fina
 
 /* ---------- Payroll budget + issues (GitHub version) ---------- */
 const money=n=>"$"+Math.round(n).toLocaleString();
-function payCfg(st){const p=(S.cfg.payroll||{})[st||S.store];return p&&+p.rate>0&&+p.pct>0?{rate:+p.rate,pct:+p.pct}:null}
+const PAYROLL_ON=false;// payroll budget is a future add-on
+function payCfg(st){if(!PAYROLL_ON)return null;const p=(S.cfg.payroll||{})[st||S.store];return p&&+p.rate>0&&+p.pct>0?{rate:+p.rate,pct:+p.pct}:null}
 async function loadSales(){if(!backend||!backend.getSales)return;const k=key();try{const d=await backend.getSales(k);if(k===key()){S.sales=d||{store:S.store,weekStart:ymd(S.week),days:[]};renderPay()}}catch(e){}}
 function storeDayHours(){const h=[0,0,0,0,0,0,0];for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;for(let d=0;d<7;d++){const v=cellVal(id,d);if(v&&v.s&&!v.off)h[d]+=hoursOf(v,S.cfg)}}return h}
 function payCalc(){const P=payCfg();if(!P)return null;const sales=DAYS.map((x,d)=>+((S.sales&&S.sales.days&&S.sales.days[d])||0));
@@ -701,7 +761,7 @@ function issuesList(){const out=[];
   const C=payCalc();if(C&&C.tS>0){const r1=x=>fmtH(Math.round(x*10)/10);const od=C.hrs.map((h,d)=>C.sales[d]>0&&h>C.bud[d]+0.5?DAYS[d]+" +"+r1(h-C.bud[d]):"").filter(Boolean);
     if(C.tH>C.tB+0.5||od.length)out.push({g:"budget",bad:C.tH>C.tB+0.5,t:`<b>${C.tH>C.tB+0.5?r1(C.tH-C.tB)+" hrs over budget this week":"Week is on budget"}</b> · ${(C.tH*C.P.rate/C.tS*100).toFixed(1)}% of sales vs ${C.P.pct}% goal${od.length?` <span class="note">· over on ${od.join(", ")}</span>`:""}`})}
   return out}
-function budgetHTML(){const C=payCalc();if(!C)return S.canEdit&&backend.getSales?`<div class="banner info">No payroll goal for ${esc(S.store)} yet. Set a blended rate and payroll % in <b>Settings → Payroll goals</b>.</div>`:"";
+function budgetHTML(){const C=payCalc();if(!C)return PAYROLL_ON&&S.canEdit&&backend.getSales?`<div class="banner info">No payroll goal for ${esc(S.store)} yet. Set a blended rate and payroll % in <b>Settings → Payroll goals</b>.</div>`:"";
   const r1=x=>fmtH(Math.round(x*10)/10);const has=C.tS>0;const pctNow=has?C.tH*C.P.rate/C.tS*100:0;const over=C.tH-C.tB;
   const diff=(h,b,s)=>!s?`<span class="note">—</span>`:h>b+0.5?`<b class="bo">+${r1(h-b)}</b>`:`<b class="bu">${h<b-0.5?"−"+r1(b-h):"on"}</b>`;
   const head=has?`Scheduled <b>${r1(C.tH)} hrs</b> (${money(C.tH*C.P.rate)}) vs budget <b>${r1(C.tB)} hrs</b> (${money(C.tB*C.P.rate)}) · ${over>0.5?`<b class="bo">${r1(over)} hrs over</b>`:over<-0.5?`<b class="bu">${r1(-over)} hrs under</b>`:"<b>on budget</b>"} · <b class="${pctNow>C.P.pct+0.05?"bo":"bu"}">${pctNow.toFixed(1)}%</b> of sales`:`Enter this week's sales goal for each day to see the hour budget.`;
@@ -958,11 +1018,11 @@ function coverageCells(dept,all){
   const people=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&inGrp(s,grp(dept)));
   const cnt=g.slots.map(()=>[0,0,0,0,0,0,0]);
   for(const st of people)for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&v.s&&!v.off&&shG(st,v)===grp(dept)){const i=slotOf(g,v);if(i>=0)cnt[i][d]++}}
-  const cells=[];let short=0;
+  const cells=[];let short=0,over=0;
   for(let d=0;d<7;d++){
-    cells.push(`<div class="covs">${g.slots.map((sl,i)=>{const need=+(sl.need&&sl.need[d])||0,have=cnt[i][d];const c=need===0&&have===0?"none":have<need?"short":have>need?"over":"ok";if(have<need)short+=need-have;return `<span class="cv ${c}" title="${esc(sl.label)} ${fmtRange(sl.start,sl.end)}: ${have} scheduled, ${need} recommended"><span>${esc(sl.label)}</span><span>${have}/${need}</span></span>`}).join("")}</div>`);
+    cells.push(`<div class="covs">${g.slots.map((sl,i)=>{const need=+(sl.need&&sl.need[d])||0,have=cnt[i][d];const c=need===0&&have===0?"none":have<need?"short":have>need?"over":"ok";if(have<need)short+=need-have;if(have>need)over+=have-need;return `<span class="cv ${c}" title="${esc(sl.label)} ${fmtRange(sl.start,sl.end)}: ${have} scheduled, ${need} recommended"><span>${esc(sl.label)}</span><span>${have}/${need}</span></span>`}).join("")}</div>`);
   }
-  return{cells,short};
+  return{cells,short,over};
 }
 function renderSum(){const el=$("#sumSlot");if(!el)return;if(!S.store||S.tab!=="schedule"){el.innerHTML="";return}
   const ppl=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&grpMatch(s)&&(!S.q||matchQ(s.name)))
@@ -974,7 +1034,7 @@ function renderGrid(){renderSum();renderPay();
   document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===S.view)));
   document.querySelectorAll("[data-color]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.color===S.colorBy)));
   document.querySelectorAll(".lg-av").forEach(e=>e.hidden=S.colorBy==="time");document.querySelectorAll(".lg-tm").forEach(e=>e.hidden=S.colorBy!=="time");
-  $("#legendHint").textContent=S.view==="shift"?"Click + Add to fill a shift, or a name to change it.":"Click any day to set a shift.";
+  $("#legendHint").innerHTML=(S.view==="shift"?"Click + Add to fill a shift, or a name to change it.":"Click any day to set a shift.")+` <span>Under each department:</span> <b style="color:var(--bad-fg)">red = short staffed</b>, <b style="color:var(--blue)">blue = over staffed</b> <span>vs. the staffing guide.</span>`;
   if(S.view==="shift"&&Object.values(S.staff).some(s=>s.store===S.store)){renderShiftGrid();return}
   const list=crew(),all=crew(true);
   if(!list.length&&S.q){
@@ -995,7 +1055,7 @@ function renderGrid(){renderSum();renderPay();
   for(const dept of depts){
     const rows=list.filter(s=>inGrp(s,dept));
     const cov=S.q?null:coverageCells(dept,all);
-    h+=`<tr class="grp"><td colspan="9">${esc(dept||"No department")}<span class="ct">${rows.length} ${rows.length===1?"person":"people"}${cov?(cov.short?" · "+cov.short+" open spot"+(cov.short===1?"":"s")+" vs. guide":" · fully covered"):""}</span></td></tr>`;
+    h+=`<tr class="grp"><td colspan="9">${esc(dept||"No department")}<span class="ct">${rows.length} ${rows.length===1?"person":"people"}${cov?" · "+(cov.short||cov.over?[cov.short?`<b class="cshort">${cov.short} short</b>`:"",cov.over?`<b class="cover">${cov.over} over</b>`:""].filter(Boolean).join(" · ")+" vs. staffing guide":`<b class="cok">✓ matches staffing guide</b>`):""}</span></td></tr>`;
     for(const st of rows){
       const r=rowStats(st);let here=0;
       h+=`<tr><td class="who"><div class="nm">${dot(st.id)}${hl(st.name)}${roleTag(st)}${alsoTag(st,dept)} <span class="pill ${st.type==="FT"?"ft":""}">${st.type||"PT"}</span></div><div class="meta">${st.notes?esc(st.notes):""}</div></td>`;
@@ -1010,7 +1070,7 @@ function renderGrid(){renderSum();renderPay();
       }
       total+=here;h+=`<td class="tot"><div class="hrs">${fmtH(r.h)}</div>${gsetOf(st).length>1?`<div class="meta">${fmtH(here)} h in ${esc(dept)}</div>`:""}<div class="flags">${r.flags.map(([t,c])=>`<span class="flag ${c}">${t}</span>`).join("")}</div></td></tr>`;
     }
-    if(cov)h+=`<tr class="cov"><td class="who">Scheduled / guide</td>${cov.cells.map(c=>`<td>${c}</td>`).join("")}<td></td></tr>`;
+    if(cov)h+=`<tr class="cov"><td class="who">Staffed vs. guide</td>${cov.cells.map(c=>`<td>${c}</td>`).join("")}<td></td></tr>`;
   }
   h+=`</tbody><tfoot><tr><td class="who">${S.q?"Shown":"On schedule"} / hours</td>`;
   for(let d=0;d<7;d++)h+=`<td><b>${dayCount[d]}</b> people<br>${fmtH(dayHrs[d])} h</td>`;
@@ -1224,10 +1284,10 @@ function dashStore(st){
   <details class="card"><summary><b>Show details</b> <span class="note">— hours and people per department per day, and by time of day</span></summary>${(DASH.store=st,breakdownHTML()).replace(/<div class="card" style="gap:10px">/,'<div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">').replace(/<label class="field"><span>Store<\/span>[\s\S]*?<\/label>/,'')}</details>`;
 }
 /* ---------- guided "Build schedule" flow ---------- */
-const PREF=[["am","Morning","starts before 10a"],["mid","Mid","starts 10a–2p"],["pm","Afternoon","starts 2p or later"],["any","Any","no preference"]];
+const PREF=[["am","Morning","starts before 10a"],["mid","Mid","starts 10a–2p"],["pm","Closing","starts 2p or later"],["any","Any shift","no preference"]];
 const prefIdx={am:0,mid:1,pm:2};
 const W={step:0};
-const WSTEPS=["Week & department","Your team","Shifts & set schedules","Availability & days off","Place shifts","Review & print"];
+const WSTEPS=["Week & department","Your team","Set or rotating","Availability this week","Place shifts","Review & print"];
 function wPeople(){return Object.entries(S.staff).map(([id,o])=>({id,...o})).filter(o=>!o._pending&&o.store===S.store&&S.dept!=="__all"&&inGrp(o,grp(S.dept))).sort((a,b)=>a.name.localeCompare(b.name))}
 function wGroups(){return [...new Set(S.cfg.depts.map(grp))]}
 function renderWizard(){
@@ -1267,13 +1327,17 @@ function wShiftOpts(){const {slots}=slotsFor(grp(S.dept));const seen=new Set(),o
 function wFixedRow(p){const opts=wShiftOpts();const f=p.fixed||{};
   return `<div class="wfix">${DAYS.map((dn,d)=>{const v=f[d];const val=v&&v.off?"off":v&&v.s?v.s+"-"+v.e:"";
     return `<label><span>${dn}</span><select data-wfix="${p.id}" data-d="${d}" class="${val==="off"?"isoff":val?"ison":""}"><option value="">—</option><option value="off" ${val==="off"?"selected":""}>OFF</option>${opts.map(o=>{const k=o.s+"-"+o.e;return `<option value="${k}" ${val===k?"selected":""}>${fmtRange(o.s,o.e)}</option>`}).join("")}<option value="custom">Other time…</option></select></label>`}).join("")}</div>`}
+const fn=p=>String(p.name||"").split(/\s+/)[0];
 function wStep2(){
-  const ppl=wPeople();
-  return `<h2 class="wh">Shifts &amp; set schedules</h2><p class="wsub">Pick each person's preferred shift. If someone works the <b>same schedule every week</b>, set it once here and it fills in automatically each week. Time-off requests still win. <b>Rotates</b> means their days or shifts change, so you place them each week or let auto-fill do it.</p>
-  <div class="wlist">${ppl.map(p=>{const fixed=p.sched==="fixed";return `<div class="wrow wcol"><div class="wrowtop"><div class="wname"><b>${esc(p.name)}</b>${roleTag(p)}</div>
-    <div class="seg sm">${[["rotate","Rotates"],["fixed","Same every week"]].map(([k,l])=>`<button class="${(p.sched||"rotate")===k?"on":""}" data-wkind="${p.id}" data-v="${k}">${l}</button>`).join("")}</div>
-    <div class="seg">${PREF.map(([k,l])=>`<button class="${(p.pref||"any")===k?"on "+k:""}" data-wpref="${p.id}" data-v="${k}">${l}</button>`).join("")}</div></div>
-    ${fixed?wFixedRow(p):""}</div>`}).join("")||`<p class="note">Add people in step 2 first.</p>`}</div>`;
+  const ppl=wPeople();const done=ppl.filter(p=>p.sched&&p.pref).length;
+  return `<h2 class="wh">Two quick questions for each person</h2><p class="wsub">Click an answer. Answers are saved, so next week you only change what's different.</p>
+  <div class="wprog"><b>${done}</b> of ${ppl.length} answered</div>
+  <div class="qlist">${ppl.map(p=>{const fixed=p.sched==="fixed";const ok=p.sched&&p.pref;return `<div class="qcard ${ok?"done":""}"><div class="qname">${ok?`<span class="qok">✓</span>`:""}<b>${esc(p.name)}</b>${roleTag(p)}</div>
+    <div class="qq">1. Does ${esc(fn(p))} work the same schedule every week?</div>
+    <div class="qbtns"><button class="qb ${p.sched==="fixed"?"on":""}" data-wkind="${p.id}" data-v="fixed">Yes, same every week</button><button class="qb ${p.sched==="rotate"?"on":""}" data-wkind="${p.id}" data-v="rotate">No, it changes week to week</button></div>
+    ${fixed?`<div class="qsub">Pick ${esc(fn(p))}'s usual shift for each day. It fills in automatically every week.</div>${wFixedRow(p)}`:""}
+    <div class="qq">2. Which shift does ${esc(fn(p))} usually work?</div>
+    <div class="qbtns">${PREF.map(([k,l,h])=>`<button class="qb ${p.pref===k?"on":""}" data-wpref="${p.id}" data-v="${k}">${l}<small>${h}</small></button>`).join("")}</div></div>`}).join("")||`<p class="note">Add people in step 2 first.</p>`}</div>`;
 }
 function wApplyFixed(){
   const key=S.store+"|"+grp(S.dept)+"|"+ymd(S.week);if(W.applied===key)return;W.applied=key;if(S.readOnly)return;
@@ -1288,18 +1352,55 @@ function wCell(p,d){
   if(a.mode==="times")return["part",fmtT(a.from)+"–"+fmtT(a.to),"Available "+fmtRange(a.from,a.to)];
   return["ok","✓","Available"];
 }
+function availSummary(p){const parts=[];for(let d=0;d<7;d++){const a=availOf(p,d);if(a.mode==="no")parts.push(DAYS[d]+": can't work");else if(a.mode==="times")parts.push(DAYS[d]+": "+fmtRange(a.from,a.to))}return parts.length?parts.join(" · "):"Any day, any time"}
+function wStrip(p){return `<div class="wstrip">${DAYS.map((dn,d)=>{const v=cellVal(p.id,d);const a=availOf(p,d);const dt=addDays(S.week,d);
+  const[c,t]=v&&v.off?["off","Day off"]:a.mode==="no"?["no","Can't work"]:a.mode==="times"?["part",fmtT(a.from)+"–"+fmtT(a.to)]:["ok","Any time"];
+  return `<div class="ws ${c}"><b>${dn} ${dt.getDate()}</b><span>${t}</span></div>`}).join("")}</div>`}
+function wAvMap(){W.av=W.av||{};const k=S.store+"|"+ymd(S.week);return W.av[k]=W.av[k]||{}}
 function wStep3(){
-  const ppl=wPeople();
-  return `<h2 class="wh">When can people work this week?</h2><p class="wsub">Tap a day to change it: <span class="wk ok">✓ Available</span> → <span class="wk off">OFF this week</span> (time-off request) → <span class="wk no">Can't</span> (never works that day) → back to available. Use <b>Hours</b> to set a time window like "after 3pm".</p>
-  <div class="wtablewrap"><table class="wtable"><thead><tr><th style="text-align:left">Name</th>${DAYS.map((d,i)=>{const dt=addDays(S.week,i);return `<th>${d}<small>${dt.getMonth()+1}/${dt.getDate()}</small></th>`}).join("")}<th></th></tr></thead><tbody>
-  ${ppl.map(p=>`<tr><td class="wname"><b>${esc(p.name)}</b>${roleTag(p)}</td>${DAYS.map((x,d)=>{const[c,t,tt]=wCell(p,d);const v=cellVal(p.id,d);const busy=v&&v.s&&!v.off;return `<td><button class="wav ${c}" data-wav="${p.id}" data-d="${d}" title="${esc(tt)}${busy?" · scheduled "+fmtRange(v.s,v.e):""}">${t}${busy?`<i>${fmtT(v.s)}</i>`:""}</button></td>`}).join("")}<td><button class="btn sm" data-edit="${p.id}">Hours</button></td></tr>`).join("")}
-  </tbody></table></div>${sampleFn&&!S.readOnly?`<div class="wauto"><button class="btn" data-wchat>Type requests instead</button><span class="note">Write it out, like "Maria off Saturday, Jose only after 3pm", and approve the changes.</span></div>`:""}`;
+  const ppl=wPeople();const A=wAvMap();W.offOpen=W.offOpen||{};const done=ppl.filter(p=>A[p.id]).length;
+  return `<h2 class="wh">Check each person's availability for this week</h2>
+  <p class="wsub">Answer both questions for each person. Colors: <span class="wk ok">Any time</span> <span class="wk part">Certain hours</span> <span class="wk off">Day off this week</span> <span class="wk no">Can't work</span></p>
+  <div class="wprog"><b>${done}</b> of ${ppl.length} checked</div>
+  <div class="qlist">${ppl.map(p=>{const st=A[p.id];const offs=DAYS.map((x,d)=>{const v=cellVal(p.id,d);return !!(v&&v.off)});const anyOff=offs.some(Boolean);const showDays=anyOff||W.offOpen[p.id];
+    return `<div class="qcard ${st?"done":""}"><div class="qname">${st?`<span class="qok">✓</span>`:""}<b>${esc(p.name)}</b>${roleTag(p)}</div>${wStrip(p)}
+    <div class="qq">1. Is ${esc(fn(p))}'s availability the same as last week?</div>
+    <div class="qbtns"><button class="qb ${st==="same"?"on":""}" data-wsame="${p.id}">Yes, same as last week</button><button class="qb ${st==="changed"?"on":""}" data-avail="${p.id}">No, change it</button></div>
+    <div class="qq">2. Did ${esc(fn(p))} ask for any days off this week?</div>
+    <div class="qbtns"><button class="qb ${!showDays&&W.offNo&&W.offNo[p.id]?"on":""}" data-wnooff="${p.id}">No days off</button><button class="qb ${showDays?"on":""}" data-wyesoff="${p.id}">Yes, pick the days</button></div>
+    ${showDays?`<div class="qdays">${DAYS.map((dn,d)=>{const dt=addDays(S.week,d);return `<button class="qday ${offs[d]?"on":""}" data-woff="${p.id}" data-d="${d}">${offs[d]?"✓ ":""}${dn} ${dt.getMonth()+1}/${dt.getDate()}</button>`}).join("")}</div><div class="note">Tap each day they asked off. Tap again to undo.</div>`:""}
+    </div>`}).join("")||`<p class="note">Add people in step 2 first.</p>`}</div>`;
 }
+function limitMsgs(p,h,days){const m=[];if(h>40)m.push(fmtH(h)+" hours: over 40 (overtime)");else if(+p.maxHrs>0&&h>+p.maxHrs+1e-9)m.push(fmtH(h)+" hours: over their "+fmtH(+p.maxHrs)+"-hour limit");else if(p.type==="PT"&&h>29.99)m.push(fmtH(h)+" hours: part-time must stay at 29.99 or less");
+  if(days>(S.cfg.maxDays||5))m.push(days+" days: limit is "+(S.cfg.maxDays||5)+" days");return m}
+function wAlertsHTML(ppl){const xs=ppl.map(p=>{const r=rowStats(p);return{p,m:limitMsgs(p,r.h,r.days)}}).filter(x=>x.m.length);
+  return xs.length?`<div class="alertlist"><div class="alerthead">⚠ Check these before you finish</div>${xs.map(x=>`<div class="alertrow"><b>${esc(x.p.name)}</b> ${x.m.map(t=>`<span class="flag bad">${esc(t)}</span>`).join(" ")}</div>`).join("")}</div>`:""}
+function limitAlert(sid,d,nv){const st=S.staff[sid];if(!st)return;const wk=weekHours(sid,d);const m=limitMsgs(st,wk.h+hoursOf(nv,S.cfg),wk.days+1);
+  if(m.length)alertBox(`<b>⚠ Check ${esc(st.name)}</b><br>${m.map(esc).join("<br>")}`)}
+function alertBox(html){let el=document.getElementById("alertBox");if(!el){el=document.createElement("div");el.id="alertBox";el.setAttribute("role","alert");document.body.appendChild(el)}
+  el.innerHTML=`<div>${html}</div><button class="btn sm" id="alertOk">OK</button>`;el.querySelector("#alertOk").onclick=()=>el.remove();clearTimeout(alertBox.t);alertBox.t=setTimeout(()=>{if(el.isConnected)el.remove()},10000)}
+function availModal(id){const p=S.staff[id];if(!p)return;const av={};for(let d=0;d<7;d++)av[d]={...((p.avail||{})[d]||{mode:"any"})};
+  const row=d=>{const a=av[d];return `<div class="avq"><b>${DAYS_LONG[d]}</b><div class="qbtns sm">${[["any","Any time"],["times","Only certain hours"],["no","Can't work"]].map(([k,l])=>`<button class="qb ${a.mode===k?"on m"+k:""}" data-am="${d}" data-v="${k}">${l}</button>`).join("")}</div>${a.mode==="times"?`<span class="avtimes">from <input type="time" data-af="${d}" value="${a.from||"08:00"}"> to <input type="time" data-at="${d}" value="${a.to||"16:00"}"></span>`:""}</div>`};
+  const draw=()=>{openModal(`<h3>${esc(p.name)}: weekly availability</h3><div class="ctx">When can ${esc(fn(p))} work in a normal week? For a one-time day off, use <b>Build schedule → Availability this week</b>.</div>
+    <div class="row"><button class="btn sm" data-amall>Every day: any time</button></div>
+    <div class="avlist">${DAYS.map((x,d)=>row(d)).join("")}</div>
+    <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button><button class="btn primary big" id="avSave">Save availability</button></div>`,true);
+    document.querySelectorAll("[data-am]").forEach(b=>b.onclick=()=>{const d=+b.dataset.am;av[d]={...av[d],mode:b.dataset.v};if(b.dataset.v==="times"){av[d].from=av[d].from||"08:00";av[d].to=av[d].to||"16:00"}draw()});
+    document.querySelectorAll("[data-af]").forEach(i=>i.onchange=()=>{av[+i.dataset.af].from=i.value});document.querySelectorAll("[data-at]").forEach(i=>i.onchange=()=>{av[+i.dataset.at].to=i.value});
+    document.querySelector("[data-amall]").onclick=()=>{for(let d=0;d<7;d++)av[d]={mode:"any"};draw()};
+    $("#avSave").onclick=()=>{for(let d=0;d<7;d++){const a=av[d];if(a.mode==="times"&&(!a.from||!a.to||a.from===a.to)){toast("Enter the hours for "+DAYS_LONG[d]+".");return}if(a.mode!=="times"){delete a.from;delete a.to}}
+      wSaveStaff(id,{avail:av});if(S.tab==="build")wAvMap()[id]="changed";closeModal();toast("Availability saved for "+p.name);renderAll()}};
+  draw()}
+function pickEmpModal(){const list=Object.entries(S.staff).filter(([id,s])=>!s._pending&&s.store===S.store&&grpMatch(s)).sort((a,b)=>a[1].name.localeCompare(b[1].name));
+  openModal(`<h3>Change availability</h3><div class="ctx">Who do you want to update?</div><input type="search" id="peQ" placeholder="Type a name…" aria-label="Find employee">
+    <div class="plist" id="peList">${list.map(([id,s])=>`<button class="prow good" data-avpick="${id}"><span><b>${esc(s.name)}</b><br><span class="note">${esc(s.dept)} · ${esc(availSummary(s))}</span></span></button>`).join("")||`<p class="note">No employees here yet.</p>`}</div>
+    <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button></div>`,true);
+  $("#peQ").oninput=e=>{const q=norm(e.target.value);document.querySelectorAll("#peList .prow").forEach(b=>{b.hidden=q&&!norm(b.textContent).includes(q)})};setTimeout(()=>$("#peQ").focus(),0)}
 function wStep4(){
   const g=guideFor(S.store,grp(S.dept));
   return `<h2 class="wh">Place people on shifts</h2><p class="wsub">Tap <b>+ Add</b> on any shift to pick who works it. Green = fits their availability, red = doesn't. When you're ready, let auto-fill finish the rest.</p>
   <div class="wauto"><button class="btn primary" id="wFill">Fill the rest automatically</button><span class="note">${g?"Fills the open shifts for you. You choose how, see a preview, and approve before anything saves.":"No staffing guide for this department yet, so auto-fill can't run. Ask corporate to set one up, or place shifts by hand."}</span></div>
-  <div id="wBoard">${shiftGridHTML()}</div>${wSummaryHTML()}`;
+  ${wAlertsHTML(wPeople())}<div id="wBoard">${shiftGridHTML(true)}</div>${wSummaryHTML()}`;
 }
 function wStep5(){
   const ppl=wPeople();let tot=0;const rows=ppl.map(p=>{const r=rowStats(p);tot+=r.h;return `<tr><td class="wname" style="text-align:left"><b>${esc(p.name)}</b>${roleTag(p)}</td>${DAYS.map((x,d)=>{const v=cellVal(p.id,d);return `<td class="${v&&v.off?"wo":""}">${v&&v.off?"OFF":v&&v.s?fmtRange(v.s,v.e):"—"}</td>`}).join("")}<td>${r.days}</td><td><b>${fmtH(r.h)}</b></td><td style="text-align:left">${r.flags.map(([t,c])=>`<span class="flag ${c}">${t}</span>`).join(" ")||`<span class="okpill">OK</span>`}</td></tr>`}).join("");
@@ -1307,7 +1408,7 @@ function wStep5(){
   return `<h2 class="wh">Review your ${esc(grp(S.dept))} schedule</h2>
   <div class="dtiles"><div class="dtile"><span>Total hours</span><b>${fmtH(tot)}</b><small>${ppl.length} people</small></div>
   <div class="dtile ${probs?"warn":""}"><span>Problems</span><b>${probs}</b><small>${probs?"fix the red flags below":"everything is within the rules"}</small></div>
-  ${cov?`<div class="dtile ${cov.short?"warn":""}"><span>Open spots</span><b>${cov.short}</b><small>${cov.short?"shifts still need people":"every shift is covered"}</small></div>`:""}</div>
+  </div>${wAlertsHTML(ppl)}
   <div class="wtablewrap"><table class="wtable rev"><thead><tr><th style="text-align:left">Name</th>${DAYS.map(d=>`<th>${d}</th>`).join("")}<th>Days</th><th>Hours</th><th style="text-align:left">Check</th></tr></thead><tbody>${rows}</tbody></table></div>
   <div class="tcard"><div class="row"><div><div class="ptitle">Duties printed with this schedule</div><div class="note">${tasksFor(S.store,grp(S.dept))._custom?`Your ${esc(S.store)} list`:"Company list"} · prints under the schedule on the ${esc(grp(S.dept))} page</div></div><div class="spacer"></div>
     ${W.editTasks?"":`<button class="btn sm" data-wtask="edit">Edit for ${esc(S.store)}</button>`}</div>
@@ -1352,11 +1453,15 @@ function wireWizard(){
       if(ds.v==="fixed"&&!p.fixed){const f={};for(let d=0;d<7;d++){const v=cellVal(id,d);if(v&&v.off)f[d]={off:true};else if(v&&v.s)f[d]={s:v.s,e:v.e}}patch.fixed=f}
       wSaveStaff(id,patch);W.applied=null;renderWizard();return}
     if("wchat" in ds){CH.open=true;renderChat();setTimeout(()=>{const c=$("#chatIn");if(c)c.focus()},0);return}
-    if(ds.wpref){wSaveStaff(ds.wpref,{pref:ds.v==="any"?undefined:ds.v});renderWizard();return}
+    if(ds.wpref){wSaveStaff(ds.wpref,{pref:ds.v});renderWizard();return}
     if(ds.wdelask){W.confirmDel=ds.wdelask;renderWizard();return}
     if("wdelno" in ds){W.confirmDel=null;renderWizard();return}
     if(ds.wdel){const id=ds.wdel;W.confirmDel=null;backend.delStaff(id).then(()=>toast("Removed")).catch(showErr);delete S.staff[id];renderWizard();return}
     if(ds.wav){wCycle(ds.wav,+ds.d);return}
+    if(ds.wsame){wAvMap()[ds.wsame]="same";renderWizard();return}
+    if(ds.wnooff){const id=ds.wnooff;for(let d=0;d<7;d++){const v=cellVal(id,d);if(v&&v.off)setCell(id,d,null)}W.offOpen=W.offOpen||{};W.offOpen[id]=false;W.offNo=W.offNo||{};W.offNo[id]=true;setTimeout(renderWizard,150);return}
+    if(ds.wyesoff){W.offOpen=W.offOpen||{};W.offOpen[ds.wyesoff]=true;renderWizard();return}
+    if(ds.woff){const id=ds.woff,d=+ds.d;const v=cellVal(id,d);if(v&&v.off)setCell(id,d,null);else{if(v&&v.s)toast("Their "+fmtRange(v.s,v.e)+" shift that day was removed.");setCell(id,d,{off:true})}setTimeout(renderWizard,150);return}
     if(ds.wunlink){const id=ds.wunlink,G=grp(S.dept);const a=(S.staff[id].also||[]).filter(x=>grp(x)!==G);wSaveStaff(id,{also:a.length?a:undefined});toast(S.staff[id].name+" removed from "+G);renderWizard();return}
     if(t.id==="wBorrowGo"){const id=$("#wBorrow").value;if(!id){toast("Pick a person first.");return}const G=grp(S.dept);wSaveStaff(id,{also:[...(S.staff[id].also||[]),G]});toast(S.staff[id].name+" added to "+G);renderWizard();return}
     if(t.id==="wAdd"){const name=$("#wNewName").value.trim();if(!name){toast("Type a name first.");$("#wNewName").focus();return}
@@ -1404,7 +1509,7 @@ function slotsFor(dept){
   return{g:{slots},slots,fromGuide:false};
 }
 function renderShiftGrid(){$("#gridSlot").innerHTML=shiftGridHTML()}
-function shiftGridHTML(){
+function shiftGridHTML(noCov){
   const all=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&grpMatch(s)).sort((a,b)=>a.name.localeCompare(b.name));
   const depts=[...new Set(all.flatMap(s=>S.dept==="__all"?gsetOf(s):[grp(S.dept)]))].sort((a,b)=>{const f=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i};return f(a)-f(b)});
   const today=ymd(new Date());
@@ -1428,7 +1533,7 @@ function shiftGridHTML(){
         const stc=need==null?"":list.length<need?"short":list.length>need?"over":"ok";
         const chips=shown.sort((a,b)=>a.st.name.localeCompare(b.st.name)).map(({st,v})=>{const f=fit(st,d,v);const custom=v.s!==sl.start||v.e!==sl.end;
           return `<button class="nchip ${cellCls(f,v)}" data-sid="${st.id}" data-d="${d}" data-g="${esc(dept)}" ${S.readOnly?"disabled":""} title="${esc(st.name)} ${fmtRange(v.s,v.e)}${f==="bad"?" — outside availability ("+esc(availText(st,d))+")":""}"><span class="nn">${dot(st.id)}${hl(st.name)}${roleTag(st)}${alsoTag(st,dept)}</span>${custom?`<span class="ct2">${fmtRange(v.s,v.e)}</span>`:""}</button>`}).join("");
-        h+=`<td class="scell"><div class="slist">${need!=null&&(need||list.length)?`<span class="cv ${stc}"><span>${list.length<need?"Need "+(need-list.length)+" more":list.length>need?(list.length-need)+" over":"Covered"}</span><span>${list.length}/${need}</span></span>`:""}${chips}${S.readOnly?"":`<button class="addp" data-add="${esc(dept)}" data-slot="${i}" data-d="${d}" aria-label="Add someone to ${esc(dept)} ${esc(sl.label)} ${DAYS_LONG[d]}">+ Add</button>`}</div></td>`;
+        h+=`<td class="scell"><div class="slist">${!noCov&&need!=null&&(need||list.length)?`<span class="cv ${stc}"><span>${list.length<need?"Need "+(need-list.length)+" more":list.length>need?(list.length-need)+" over":"Covered"}</span><span>${list.length}/${need}</span></span>`:""}${chips}${S.readOnly?"":`<button class="addp" data-add="${esc(dept)}" data-slot="${i}" data-d="${d}" aria-label="Add someone to ${esc(dept)} ${esc(sl.label)} ${DAYS_LONG[d]}">+ Add</button>`}</div></td>`;
       }
       h+=`</tr>`;
     });
@@ -1449,13 +1554,17 @@ function addPicker(dept,i,d){
     const warn=[];if(st.type==="PT"&&after>29.99)warn.push("PT over 29.99");if(+st.maxHrs>0&&after>+st.maxHrs+1e-9)warn.push("Over "+fmtH(+st.maxHrs)+" cap");if(after>40)warn.push("Over 40");if(wk.days+1>(S.cfg.maxDays||5))warn.push((wk.days+1)+" days");
     const pm=st.pref&&st.pref!=="any"?(prefIdx[st.pref]===partOf(v)?0:1):0.5;
     return{st,f,busy,same,cur,after,warn,pm,rank:same?9:busy?5:(f==="good"?(warn.length?2:0):(warn.length?4:3))}}).filter(r=>!r.same).sort((a,b)=>a.rank-b.rank||a.pm-b.pm||a.after-b.after||a.st.name.localeCompare(b.st.name));
-  const sec=(title,list)=>list.length?`<div class="ptitle">${title}</div><div class="plist">${list.map(r=>`<button class="prow ${r.busy?"":r.f}" data-pick="${r.st.id}"><span><b>${esc(r.st.name)}</b> <span class="pill ${r.st.type==="FT"?"ft":""}">${r.st.type||"PT"}</span>${roleTag(r.st)}${r.st.pref&&r.st.pref!=="any"?` <span class="pill">prefers ${({am:"morning",mid:"mid",pm:"afternoon"})[r.st.pref]}</span>`:""}${+r.st.maxHrs>0?` <span class="pill">max ${fmtH(+r.st.maxHrs)}</span>`:""}<br><span class="note">Avail ${esc(availText(r.st,d))}${r.busy?" · now on "+fmtRange(r.cur.s,r.cur.e)+" (will move)":r.cur&&r.cur.off?" · marked off":""}</span></span><span class="ph"><b>${fmtH(r.after)} h</b><br>${r.warn.map(w=>`<span class="flag ${/PT|40|cap/.test(w)?"bad":""}">${w}</span>`).join(" ")}</span></button>`).join("")}</div>`:"";
-  openModal(`<div><h3>${esc(dept)} · ${esc(sl.label)} ${fmtRange(sl.start,sl.end)}</h3><div class="ctx">${DAYS_LONG[d]} ${dt.getMonth()+1}/${dt.getDate()} · hours shown include this shift</div></div>
+  const reason=r=>{if(r.cur&&r.cur.off)return"Asked for this day off";const a=availOf(r.st,d);if(a.mode==="no")return"Can't work on "+DAYS_LONG[d]+"s";if(a.mode==="times")return"Only available "+fmtRange(a.from,a.to);return"Outside their availability"};
+  const isOff=r=>!!(r.cur&&r.cur.off);
+  const G1=rows.filter(r=>!r.busy&&!isOff(r)&&r.f==="good"&&!r.warn.length),G2=rows.filter(r=>!r.busy&&!isOff(r)&&r.f==="good"&&r.warn.length),G3=rows.filter(r=>!r.busy&&(isOff(r)||r.f!=="good")),G4=rows.filter(r=>r.busy);
+  const card=(r,k)=>`<button class="prow k${k}" data-pick="${r.st.id}" ${k==="no"?`data-confirm="1"`:""}><span><b>${esc(r.st.name)}</b> <span class="pill ${r.st.type==="FT"?"ft":""}">${r.st.type||"PT"}</span>${roleTag(r.st)}${r.st.pref&&r.st.pref!=="any"?` <span class="pill">usually ${({am:"morning",mid:"mid",pm:"closing"})[r.st.pref]}</span>`:""}<br><span class="note pnote">${k==="no"?"✗ "+esc(reason(r)):k==="busy"?"Already working "+fmtRange(r.cur.s,r.cur.e)+". Picking them moves their shift.":"✓ Available "+esc(availText(r.st,d))}</span></span><span class="ph"><b>${fmtH(r.after)} h</b><small> this week</small><br>${r.warn.map(w=>`<span class="flag bad">${esc(w)}</span>`).join(" ")}</span></button>`;
+  const sec=(cls,title,sub,list,k)=>list.length?`<div class="psec ${cls}"><div class="ptitle">${title} <span class="pcount">${list.length}</span></div>${sub?`<div class="note">${sub}</div>`:""}<div class="plist">${list.map(r=>card(r,k)).join("")}</div></div>`:"";
+  openModal(`<div><h3>${esc(dept)} · ${esc(sl.label)} ${fmtRange(sl.start,sl.end)}</h3><div class="ctx">${DAYS_LONG[d]} ${dt.getMonth()+1}/${dt.getDate()} · Tap a name to put them on this shift. Hours include this shift.</div></div>
     <input type="search" id="pickQ" placeholder="Search ${esc(dept)}…" aria-label="Search people">
-    <div id="pickList">${sec("Available",rows.filter(r=>!r.busy&&r.f==="good"))}${sec("Outside availability",rows.filter(r=>!r.busy&&r.f!=="good"))}${sec("Already working this day",rows.filter(r=>r.busy))}${rows.length?"":`<p class="note">Everyone in ${esc(dept)} is already on this shift, or the department has no staff yet.</p>`}</div>
+    <div id="pickList">${sec("pgood","✓ Available","",G1,"ok")}${sec("pwarn","⚠ Available, but goes over a limit","Only pick them if you have to.",G2,"warn")}${sec("pbad","✗ Not available","They asked off or can't work this time. Tap twice to add anyway.",G3,"no")}${sec("pbusy","Already working another shift this day","",G4,"busy")}${rows.length?"":`<p class="note">Everyone in ${esc(dept)} is already on this shift, or the department has no staff yet.</p>`}</div>
     <div class="row"><div class="spacer"></div><button class="btn" data-close>Done</button></div>`,true);
   $("#pickQ").oninput=e=>{const q=norm(e.target.value);document.querySelectorAll("#pickList .prow").forEach(b=>{b.hidden=q&&!norm(b.textContent).includes(q)})};
-  document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{setCell(b.dataset.pick,d,{s:sl.start,e:sl.end});closeModal();toast(S.staff[b.dataset.pick].name+" added to "+sl.label)});
+  document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{if(b.dataset.confirm&&!b.dataset.armed){b.dataset.armed="1";const n=b.querySelector(".pnote");if(n)n.innerHTML="<b>Tap again to add anyway</b>";return}setCell(b.dataset.pick,d,{s:sl.start,e:sl.end});closeModal();toast(S.staff[b.dataset.pick].name+" added to "+sl.label)});
 }
 /* ---------- colors ---------- */
 const PCOL=8;
@@ -1726,7 +1835,7 @@ function bulkConfirm(kind){
 function renderStaff(){
   const list=S.q?Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&matchQ(s.name)).sort((a,b)=>a.name.localeCompare(b.name)):crew();
   $("#staffHead").textContent=S.q?(LOCK?"Search results (":"Search results, all stores (")+list.length+")":(S.dept==="__all"?"":S.dept+" · ")+S.store+" staff ("+list.length+")";
-  $("#addStaff").disabled=S.readOnly;$("#pasteBtn").disabled=S.readOnly;$("#selBtn").disabled=S.readOnly||!list.length;
+  $("#addStaff").disabled=S.readOnly;$("#chgAvail").disabled=S.readOnly;$("#pasteBtn").disabled=S.readOnly;$("#selBtn").disabled=S.readOnly||!list.length;
   const vis=new Set(list.map(x=>x.id));for(const id of [...SEL.ids])if(!vis.has(id)||!S.staff[id])SEL.ids.delete(id);
   if(S.readOnly)SEL.on=false;
   $("#selBar").hidden=!SEL.on;$("#selBtn").hidden=SEL.on;
@@ -1735,8 +1844,10 @@ function renderStaff(){
   $("#selReset").disabled=$("#selDel").disabled=!SEL.ids.size;
   if(!list.length&&S.q){$("#staffSlot").innerHTML=`<div class="card"><div class="empty"><h2>No one named “${esc(S.q)}” at any store</h2><button class="btn" data-act="clearq">Clear search</button></div></div>`;return}
   if(!list.length){$("#staffSlot").innerHTML=`<div class="card"><div class="empty"><h2>No employees here yet</h2><p>Use <b>Add employee</b> for one person, or <b>Paste a roster</b> to add a whole department at once and fill in availability after.</p></div></div>`;return}
-  $("#staffSlot").innerHTML=`<div class="stafflist">`+list.map(st=>`<div class="scard${SEL.on&&SEL.ids.has(st.id)?" picked":""}"${SEL.on?` data-pick-emp="${st.id}"`:""}><div class="top">${SEL.on?`<input type="checkbox" class="pickbox" data-pick-emp="${st.id}" ${SEL.ids.has(st.id)?"checked":""} aria-label="Select ${esc(st.name)}">`:""}<div style="flex:1;min-width:0"><div class="nm">${hl(st.name)}</div><div class="note">${S.q?esc(st.store)+" · ":""}${esc(st.dept)} · ${st.type==="FT"?"Full-time":"Part-time"}${+st.maxHrs>0?" · <b>max "+fmtH(+st.maxHrs)+" h/wk</b>":""}${(st.also||[]).length?" · <b>also "+esc(st.also.join(", "))+"</b>":""}${st.notes?" · "+esc(st.notes):""}</div>${st.sched==="fixed"&&st.fixed&&Object.keys(st.fixed).length?`<div class="note"><span class="pill setp">Set schedule</span> ${DAYS.map((dn,d)=>{const v=st.fixed[d];return v?dn+" "+(v.off?"off":fmtRange(v.s,v.e)):""}).filter(Boolean).join(" · ")}</div>`:""}</div>${S.readOnly||SEL.on?"":`<button class="btn sm" data-edit="${st.id}">Edit</button>`}</div>
-    <div class="avrow">${DAYS.map((dn,d)=>{const a=availOf(st,d);return `<div class="avd ${a.mode==="no"?"no":a.mode==="times"?"part":""}"><b>${dn}</b>${a.mode==="any"?"Any":a.mode==="no"?"—":fmtT(a.from)+"<br>"+fmtT(a.to)}</div>`}).join("")}</div></div>`).join("")+`</div>`;
+  const card=st=>`<div class="scard${SEL.on&&SEL.ids.has(st.id)?" picked":""}"${SEL.on?` data-pick-emp="${st.id}"`:""}><div class="top">${SEL.on?`<input type="checkbox" class="pickbox" data-pick-emp="${st.id}" ${SEL.ids.has(st.id)?"checked":""} aria-label="Select ${esc(st.name)}">`:""}<div style="flex:1;min-width:0"><div class="nm">${hl(st.name)}</div><div class="note">${S.q?esc(st.store)+" · ":""}${esc(st.dept)} · ${st.type==="FT"?"Full-time":"Part-time"}${+st.maxHrs>0?" · <b>max "+fmtH(+st.maxHrs)+" h/wk</b>":""}${(st.also||[]).length?" · <b>also "+esc(st.also.join(", "))+"</b>":""}${st.notes?" · "+esc(st.notes):""}</div>${st.sched==="fixed"&&st.fixed&&Object.keys(st.fixed).length?`<div class="note"><span class="pill setp">Set schedule</span> ${DAYS.map((dn,d)=>{const v=st.fixed[d];return v?dn+" "+(v.off?"off":fmtRange(v.s,v.e)):""}).filter(Boolean).join(" · ")}</div>`:""}</div>${S.readOnly||SEL.on?"":`<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm" data-avail="${st.id}">Availability</button><button class="btn sm" data-edit="${st.id}">Edit</button></div>`}</div>
+    <div class="avrow">${DAYS.map((dn,d)=>{const a=availOf(st,d);return `<div class="avd ${a.mode==="no"?"no":a.mode==="times"?"part":"ok"}" title="${a.mode==="any"?"Any time":a.mode==="no"?"Can't work":fmtRange(a.from,a.to)}"><b>${dn}</b>${a.mode==="any"?"✓":a.mode==="no"?"✗":fmtT(a.from)+"<br>"+fmtT(a.to)}</div>`}).join("")}</div></div>`;
+  const gs=[...new Set(list.map(s=>grp(s.dept)))];
+  $("#staffSlot").innerHTML=`<div class="avlegend"><span class="avd ok">✓</span> <span>Available any time</span> <span class="avd part">8a<br>2p</span> <span>Only those hours</span> <span class="avd no">✗</span> <span>Can't work that day</span></div>`+gs.map(G=>{const xs=list.filter(s=>grp(s.dept)===G);return `<h3 class="sgh">${esc(G)} <span class="note">${xs.length} ${xs.length===1?"person":"people"}</span></h3><div class="stafflist">${xs.map(card).join("")}</div>`}).join("");
 }
 const TEMPLATE=[{label:"AM",start:"06:00",end:"14:00"},{label:"Mid",start:"10:00",end:"18:00"},{label:"PM",start:"14:00",end:"22:00"},{label:"After 5",start:"17:00",end:"22:00"}];
 const slotHrs=sl=>hoursOf({s:sl.start,e:sl.end},S.cfg);
@@ -1915,7 +2026,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
 
 function meta(){return{store:S.store,weekStart:ymd(S.week)}}
 function stampDept(sid,v){if(!v||!v.s||v.off)return v;const st=S.staff[sid];if(!st)return v;const G=CTXG||(S.dept!=="__all"?grp(S.dept):null)||v.dept||null;const n={s:v.s,e:v.e};if(G&&G!==grp(st.dept)&&inGrp(st,G))n.dept=G;return n}
-function setCell(sid,d,v){backend.setCell(key(),meta(),sid,d,stampDept(sid,v)).catch(showErr)}
+function setCell(sid,d,v){const nv=stampDept(sid,v);if(nv&&nv.s&&!nv.off&&$("#modalSlot").innerHTML)limitAlert(sid,d,nv);backend.setCell(key(),meta(),sid,d,nv).catch(showErr)}
 
 function shiftPicker(sid,d){
   const st={id:sid,...S.staff[sid]};const cur=cellVal(sid,d);const dt=addDays(S.week,d);
@@ -2045,6 +2156,7 @@ document.addEventListener("click",e=>{
   const vt=e.target.closest("[data-view]");if(vt){S.view=vt.dataset.view;savePrefs();renderGrid();return}
   const ad=e.target.closest("[data-add]");if(ad){addPicker(ad.dataset.add,+ad.dataset.slot,+ad.dataset.d);return}
   const ed=e.target.closest("[data-edit]");if(ed){staffEditor(ed.dataset.edit);return}
+  const avb=e.target.closest("[data-avail],[data-avpick]");if(avb){availModal(avb.dataset.avail||avb.dataset.avpick);return}
   const act=e.target.closest("[data-act]");if(act){const a=act.dataset.act;if(a==="toGuide"){closeModal();S.tab="guide";savePrefs();renderAll()}else if(a==="clearq"){S.q="";$("#searchIn").value="";renderAll()}else if(a==="goStaff"){S.tab="staff";savePrefs();renderAll();staffEditor(null)}else if(a==="paste")rosterPaste();else if(a==="sample")startSample();return}
   const gt=e.target.closest("[data-goto]");if(gt){const o=S.staff[gt.dataset.goto];if(o){S.store=o.store;S.dept=o.dept;S.q=o.name;$("#searchIn").value=o.name;savePrefs();renderAll();resub()}return}
   const gd=e.target.closest("[data-gdept]");if(gd){const nd=gd.dataset.gdept;if(S.gDraft&&S.gDraft.dirty&&nd!==S.dept){toast("Save or discard your changes first.");return}S.dept=nd;savePrefs();renderAll();return}
@@ -2070,8 +2182,10 @@ $("#guideSlot").addEventListener("change",e=>{const el=e.target;if(!el.dataset.g
     renderGuide();if(sel){const b=$("#guideSlot "+sel);if(b){b.focus();if(b.select)try{b.select()}catch(_){}}}},0);});
 $("#prevWk").onclick=()=>{S.week=addDays(S.week,-7);renderAll();resub()};
 $("#nextWk").onclick=()=>{S.week=addDays(S.week,7);renderAll();resub()};
+$("#thisWk").onclick=()=>{S.week=sundayOf(new Date());renderAll();resub()};
 $("#jumpDate").onchange=e=>{if(!e.target.value)return;S.week=sundayOf(parseYmd(e.target.value));renderAll();resub()};
 $("#addStaff").onclick=()=>staffEditor(null);
+$("#chgAvail").onclick=()=>pickEmpModal();
 $("#selBtn").onclick=()=>{SEL.on=true;SEL.ids.clear();renderStaff()};
 $("#selDone").onclick=()=>{SEL.on=false;SEL.ids.clear();renderStaff()};
 $("#selAll").onchange=e=>{if(e.target.checked)staffShown().forEach(x=>SEL.ids.add(x.id));else SEL.ids.clear();renderStaff()};
@@ -2118,8 +2232,112 @@ $("#mealDeduct").onchange=e=>backend.saveCfg({...S.cfg,mealDeduct:e.target.check
 $("#maxDays").onchange=e=>backend.saveCfg({...S.cfg,maxDays:Math.max(1,Math.min(7,+e.target.value||5))}).catch(showErr);
 $("#wkOffset").onchange=e=>backend.saveCfg({...S.cfg,wkOffset:Math.round(+e.target.value||0)}).catch(showErr);
 
-if(prefs.dept)S.dept=prefs.dept;S.view=prefs.view==="shift"?"shift":"person";S.colorBy=prefs.colorBy==="time"?"time":"avail";if(prefs.tab)S.tab=prefs.tab;if(prefs.store)S.store=prefs.store;
-if(!prefs.tab)S.tab="build";
+/* ---------- English / Español ---------- */
+let LANG=(()=>{try{return localStorage.getItem("vsb-lang")==="es"?"es":"en"}catch(e){return"en"}})();
+const DAY_ES={Sun:"Dom",Mon:"Lun",Tue:"Mar",Wed:"Mié",Thu:"Jue",Fri:"Vie",Sat:"Sáb",SUN:"DOM",MON:"LUN",TUE:"MAR",WED:"MIÉ",THU:"JUE",FRI:"VIE",SAT:"SÁB"};
+const DAYL_ES={Sunday:"Domingo",Monday:"Lunes",Tuesday:"Martes",Wednesday:"Miércoles",Thursday:"Jueves",Friday:"Viernes",Saturday:"Sábado",Sundays:"domingos",Mondays:"lunes",Tuesdays:"martes",Wednesdays:"miércoles",Thursdays:"jueves",Fridays:"viernes",Saturdays:"sábados"};
+const MON_ES={Jan:"ene",Feb:"feb",Mar:"mar",Apr:"abr",May:"may",Jun:"jun",Jul:"jul",Aug:"ago",Sep:"sep",Oct:"oct",Nov:"nov",Dec:"dic"};
+const ES={
+"See full schedule":"Ver horario completo","Build schedule":"Hacer horario","Staff & availability":"Personal y disponibilidad","Dashboard":"Panel","Staffing guide":"Guía de personal","Settings":"Ajustes",
+"Store":"Tienda","Department":"Departamento","Find employee":"Buscar empleado","Week":"Semana","This week":"Esta semana","All departments":"Todos los departamentos","Front End (all cashier, office & pricing roles)":"Front End (cajeros, oficina y precios)",
+"Fill automatically":"Llenar automáticamente","Copy last week":"Copiar semana pasada","Clear week":"Borrar semana","Print schedule":"Imprimir horario","Print":"Imprimir","Mark final & share":"Marcar final y compartir","✓ Final · shared":"✓ Final · compartido","Update final (changes not shared)":"Actualizar final (cambios sin compartir)",
+"Matches availability":"Dentro de su disponibilidad","Outside availability":"Fuera de su disponibilidad","Day off":"Día libre","Not available that day":"No disponible ese día","Color: availability":"Color: disponibilidad","Color: time of day":"Color: hora del día","By employee":"Por empleado","By shift":"Por turno",
+"Morning (before 10a)":"Mañana (antes de 10a)","Mid (10a–2p)":"Medio (10a–2p)","Afternoon / close (2p+)":"Tarde / cierre (2p+)","Red border = outside availability":"Borde rojo = fuera de su disponibilidad",
+"Click any day to set a shift. Under each department:":"Haz clic en un día para poner un turno. Debajo de cada departamento:","Under each department:":"Debajo de cada departamento:","red = short staffed":"rojo = falta personal","blue = over staffed":"azul = personal de más","vs. the staffing guide.":"según la guía de personal.","Click any day to set a shift.":"Haz clic en un día para poner un turno.","Click + Add to fill a shift, or a name to change it.":"Haz clic en + Agregar para llenar un turno, o en un nombre para cambiarlo.",
+"Employee":"Empleado","Hours":"Horas","Shift":"Turno","Name":"Nombre","Days":"Días","Check":"Revisión","OK":"OK","Any time":"Cualquier hora","Unavailable":"No disponible","Can't work":"No puede","Can't":"No puede","Certain hours":"Ciertas horas","Day off this week":"Día libre esta semana","OFF":"LIBRE","Off":"Libre",
+"Staffed vs. guide":"Personal vs. guía","vs. staffing guide":"según la guía","✓ matches staffing guide":"✓ cumple con la guía","Total hours":"Total de horas","+ Add":"+ Agregar","Covered":"Cubierto","person":"persona","people":"personas",
+"Week & department":"Semana y departamento","Your team":"Tu equipo","Set or rotating":"Fijo o rotativo","Availability this week":"Disponibilidad esta semana","Place shifts":"Asignar turnos","Review & print":"Revisar e imprimir","← Back":"← Atrás","Finish":"Terminar",
+"Which week and department are you scheduling?":"¿Qué semana y departamento vas a programar?","1. Store":"1. Tienda","2. Week":"2. Semana","3. Department":"3. Departamento","‹ Previous":"‹ Anterior","Next ›":"Siguiente ›",
+"Remove anyone who no longer works here and add new people. Set full-time or part-time, and a weekly hour limit if someone needs one.":"Quita a quien ya no trabaja aquí y agrega personas nuevas. Marca tiempo completo o medio tiempo, y un límite de horas si alguien lo necesita.",
+"Full-time":"Tiempo completo","Part-time":"Medio tiempo","Max hrs":"Máx. hrs","Remove":"Quitar","Keep":"Dejar","Yes, remove":"Sí, quitar","No one in this department yet. Add your first person below.":"Todavía no hay nadie en este departamento. Agrega a la primera persona abajo.",
+"Someone from another department also works here…":"Alguien de otro departamento también trabaja aquí…",
+"Two quick questions for each person":"Dos preguntas rápidas para cada persona","Click an answer. Answers are saved, so next week you only change what's different.":"Haz clic en una respuesta. Se guardan, así que la próxima semana solo cambias lo que sea diferente.",
+"answered":"contestados","checked":"revisados","Yes, same every week":"Sí, el mismo cada semana","No, it changes week to week":"No, cambia cada semana",
+"Morning":"Mañana","Mid":"Medio","Closing":"Cierre","Any shift":"Cualquier turno","starts before 10a":"empieza antes de 10a","starts 10a–2p":"empieza 10a–2p","starts 2p or later":"empieza 2p o después","no preference":"sin preferencia","Add people in step 2 first.":"Primero agrega personas en el paso 2.",
+"Check each person's availability for this week":"Revisa la disponibilidad de cada persona esta semana","Answer both questions for each person. Colors:":"Contesta las dos preguntas para cada persona. Colores:",
+"Yes, same as last week":"Sí, igual que la semana pasada","No, change it":"No, cambiarla","No days off":"Sin días libres","Yes, pick the days":"Sí, elegir los días","Tap each day they asked off. Tap again to undo.":"Toca cada día que pidió libre. Toca otra vez para deshacer.",
+"Place people on shifts":"Pon a la gente en los turnos","Fill the rest automatically":"Llenar el resto automáticamente","⚠ Check these before you finish":"⚠ Revisa esto antes de terminar",
+"Fills the open shifts for you. You choose how, see a preview, and approve before anything saves.":"Llena los turnos abiertos por ti. Tú eliges cómo, ves una vista previa y apruebas antes de guardar.",
+"Total hours ":"Total de horas ","Problems":"Problemas","fix the red flags below":"corrige lo marcado en rojo","everything is within the rules":"todo está dentro de las reglas","Duties printed with this schedule":"Tareas que se imprimen con este horario","Schedule another department":"Programar otro departamento","See dashboard":"Ver panel","Save duties":"Guardar tareas","Cancel":"Cancelar","Use company list":"Usar lista de la compañía","Company list":"Lista de la compañía",
+"✓ Available":"✓ Disponible","⚠ Available, but goes over a limit":"⚠ Disponible, pero pasa un límite","Only pick them if you have to.":"Escógelos solo si es necesario.","✗ Not available":"✗ No disponible","They asked off or can't work this time. Tap twice to add anyway.":"Pidieron libre o no pueden a esta hora. Toca dos veces para agregarlos de todos modos.","Already working another shift this day":"Ya trabaja otro turno este día","Tap again to add anyway":"Toca otra vez para agregar de todos modos","Done":"Listo","this week":"esta semana","✗ Asked for this day off":"✗ Pidió este día libre","✗ Outside their availability":"✗ Fuera de su disponibilidad",
+"+ Add employee":"+ Agregar empleado","🕒 Change availability":"🕒 Cambiar disponibilidad","Select several":"Seleccionar varios","Paste a roster":"Pegar lista","Availability":"Disponibilidad","Edit":"Editar","Change availability":"Cambiar disponibilidad","Who do you want to update?":"¿A quién quieres actualizar?","Type a name…":"Escribe un nombre…","Any day, any time":"Cualquier día, cualquier hora",
+"Available any time":"Disponible a cualquier hora","Only those hours":"Solo esas horas","Can't work that day":"No puede ese día","Every day: any time":"Todos los días: cualquier hora","Only certain hours":"Solo ciertas horas","from":"de","to":"a","Save availability":"Guardar disponibilidad","Build schedule → Availability this week":"Hacer horario → Disponibilidad esta semana",
+"Employee summary · hours & days":"Resumen de empleados · horas y días","Hours & days summary":"Resumen de horas y días","FT under 30":"TC menos de 30","Over 40 — OT":"Más de 40 — tiempo extra","FT with no shifts":"TC sin turnos","PT over 29.99":"MT más de 29.99","Over 40":"Más de 40","Set":"Fijo","No one here yet.":"Todavía no hay nadie.",
+"Add employee":"Agregar empleado","Status":"Estado","Full-time (30+ hrs)":"Tiempo completo (30+ hrs)","Part-time (under 30)":"Medio tiempo (menos de 30)","Max hours / week (optional)":"Máx. horas / semana (opcional)","Note (optional)":"Nota (opcional)","Also works in (optional)":"También trabaja en (opcional)","Schedule type":"Tipo de horario","Rotates week to week":"Cambia cada semana","Set schedule (same every week)":"Horario fijo (igual cada semana)","Weekly availability":"Disponibilidad semanal","All days any time":"Todos los días a cualquier hora","Copy Monday to all":"Copiar lunes a todos","Between":"Entre","Not available":"No disponible","Remove employee":"Quitar empleado","Save":"Guardar","Tap again to remove":"Toca otra vez para quitar","Not set":"Sin asignar","Custom time…":"Otra hora…","Other time…":"Otra hora…","Copy Monday to weekdays":"Copiar lunes a entre semana","Set schedule":"Horario fijo",
+"Enter your store PIN to continue.":"Escribe el PIN de tu tienda para continuar.","Open":"Abrir","Sign out":"Salir","That PIN didn't work. Try again.":"Ese PIN no funcionó. Intenta otra vez.",
+"Schedule marked final":"Horario marcado como final","Final schedule updated":"Horario final actualizado","This week is final":"Esta semana es final","Copy link":"Copiar enlace","Take this week down":"Quitar esta semana","Open employee view":"Abrir vista de empleados","Link copied":"Enlace copiado",
+"Fill the schedule automatically":"Llenar el horario automáticamente","1. What should happen to shifts already on the schedule?":"1. ¿Qué hacer con los turnos que ya están en el horario?","Keep them, fill only the empty spots":"Dejarlos y llenar solo los espacios vacíos","Recommended":"Recomendado","Anything you already placed stays exactly as it is.":"Todo lo que ya pusiste se queda igual.","Clear them and start fresh":"Borrarlos y empezar de nuevo","Removes this week's shifts and rebuilds the week. Days off and set schedules stay.":"Quita los turnos de esta semana y la arma de nuevo. Los días libres y horarios fijos se quedan.","2. How should it fill?":"2. ¿Cómo debe llenar?","Fast fill":"Llenado rápido","Instant. Each open spot goes to an available person with the fewest hours so far.":"Al instante. Cada espacio va a una persona disponible con menos horas hasta ahora.","Show preview":"Ver vista previa","Apply to schedule":"Aplicar al horario","Try again":"Intentar otra vez","Looks good? Tap Apply. Nothing is saved until you do.":"¿Se ve bien? Toca Aplicar. No se guarda nada hasta que lo hagas.","Preview":"Vista previa","shifts added":"turnos agregados","guide spots filled":"espacios de la guía llenos","spots still open":"espacios sin llenar","set-schedule days placed":"días de horario fijo puestos","Dept":"Depto.",
+"Notes & duties":"Notas y tareas","These print under each department's schedule.":"Se imprimen debajo del horario de cada departamento.","+ Add notes":"+ Agregar notas","No notes or duties yet.":"Todavía no hay notas ni tareas.",
+"Saved for everyone with this link":"Guardado para todos con este enlace","Loading…":"Cargando…","Search results":"Resultados","Clear search":"Borrar búsqueda","Tap a department or person to show only that department.":"Toca un departamento o persona para ver solo ese departamento."
+};
+const ES_RE=[
+[/^(\d+(?:\.\d+)?) hours: over 40 \(overtime\)$/,"$1 horas: más de 40 (tiempo extra)"],
+[/^(\d+(?:\.\d+)?) hours: over their (\d+(?:\.\d+)?)-hour limit$/,"$1 horas: más de su límite de $2 horas"],
+[/^(\d+(?:\.\d+)?) hours: part-time must stay at 29\.99 or less$/,"$1 horas: medio tiempo debe quedarse en 29.99 o menos"],
+[/^(\d+) days: limit is (\d+) days$/,"$1 días: el límite es $2 días"],
+[/^⚠ Check (.+)$/,"⚠ Revisa a $1"],
+[/^(\d+) days$/,"$1 días"],[/^(\d+) outside avail\.$/,"$1 fuera de disp."],[/^Over (\d+(?:\.\d+)?) h cap$/,"Más de su límite de $1 h"],[/^Over (\d+(?:\.\d+)?) cap$/,"Más de su límite de $1"],
+[/^1\. Does (.+) work the same schedule every week\?$/,"1. ¿$1 trabaja el mismo horario cada semana?"],
+[/^2\. Which shift does (.+) usually work\?$/,"2. ¿Qué turno trabaja $1 normalmente?"],
+[/^Pick (.+)'s usual shift for each day\. It fills in automatically every week\.$/,"Elige el turno de $1 para cada día. Se llena solo cada semana."],
+[/^1\. Is (.+)'s availability the same as last week\?$/,"1. ¿La disponibilidad de $1 es igual que la semana pasada?"],
+[/^2\. Did (.+) ask for any days off this week\?$/,"2. ¿$1 pidió días libres esta semana?"],
+[/^Who's on your (.+) team\?$/,"¿Quién está en tu equipo de $1?"],
+[/^Review your (.+) schedule$/,"Revisa tu horario de $1"],
+[/^Next: (.+) →$/,m=>"Siguiente: "+(ES[m[1]]||m[1])+" →"],
+[/^Add to (.+)$/,"Agregar a $1"],[/^Remove from (.+)$/,"Quitar de $1"],[/^Edit for (.+)$/,"Editar para $1"],[/^Your (.+) list$/,"Tu lista de $1"],
+[/^Search (.+)…$/,"Buscar en $1…"],
+[/^✓ Available (.+)$/,m=>"✓ Disponible "+(ES[m[1]]||m[1])],
+[/^✗ Can't work on (\w+)$/,m=>"✗ No puede los "+(DAYL_ES[m[1]]||m[1])],
+[/^✗ Only available (.+)$/,"✗ Solo disponible $1"],
+[/^Already working (.+)\. Picking them moves their shift\.$/,"Ya trabaja $1. Si lo escoges, se mueve su turno."],
+[/^usually (morning|mid|closing)$/,m=>"normalmente "+({morning:"mañana",mid:"medio",closing:"cierre"})[m[1]]],
+[/^Tap a name to put them on this shift\. Hours include this shift\.$/,"Toca un nombre para ponerlo en este turno. Las horas incluyen este turno."],
+[/^ · Tap a name to put them on this shift\. Hours include this shift\.$/," · Toca un nombre para ponerlo en este turno. Las horas incluyen este turno."],
+[/^(\d+) (people|person)$/,m=>m[1]+" "+(m[2]==="person"?"persona":"personas")],
+[/^(\d+) short$/,"faltan $1"],[/^(\d+) over$/,"$1 de más"],[/^Need (\d+) more$/,"Faltan $1"],
+[/^of (\d+) (answered|checked)$/,m=>"de "+m[1]+" "+(m[2]==="answered"?"contestados":"revisados")],
+[/^(\d+) shifts$/,"$1 turnos"],[/^Total · (\d+) people$/,"Total · $1 personas"],[/^(\d+) ppl$/,"$1 pers."],
+[/^\/ (\S+) max$/,"/ $1 máx."],
+[/^hours this week · (\d+) (?:people|person) scheduled(.*)$/,m=>"horas esta semana · "+m[1]+" programados"+(m[2]?" · 30 min de comida descontados en turnos de 6h+":"")],
+[/^in (.+)$/,"en $1"],[/^(\d+(?:\.\d+)?) h in (.+)$/,"$1 h en $2"],
+[/^(.+): weekly availability$/,"$1: disponibilidad semanal"],
+[/^When can (.+) work in a normal week\? For a one-time day off, use$/,"¿Cuándo puede trabajar $1 en una semana normal? Para un día libre de una vez, usa"],
+[/^Availability saved for (.+)$/,"Disponibilidad guardada para $1"],[/^(.+) added to (.+)$/,"$1 agregado a $2"],
+[/^Edit (.+)$/,"Editar $1"],
+[/^(.+) staff \((\d+)\)$/,"Personal de $1 ($2)"],
+[/^(.+) store$/,"Tienda $1"],
+[/^Employees open this link to see every week marked final for (.+)\. No PIN needed\. Edits you make later stay private until you click$/,"Los empleados abren este enlace para ver cada semana marcada como final en $1. No necesitan PIN. Lo que cambies después queda privado hasta que hagas clic en"],
+[/^Tap$/,"Toca"],[/^on any shift to pick who works it\. Green = fits their availability, red = doesn't\. When you're ready, let auto-fill finish the rest\.$/,"en cualquier turno para escoger quién lo trabaja. Verde = dentro de su disponibilidad, rojo = no. Cuando estés listo, deja que el llenado automático termine el resto."],
+[/^(\d+(?:\.\d+)?) hrs · (\d+) (?:people|person) · shifts from corporate guide$/,"$1 hrs · $2 personas · turnos de la guía"],
+[/^(\d+(?:\.\d+)?) hrs · (\d+) (?:people|person) · no guide yet, using standard shift buttons$/,"$1 hrs · $2 personas · sin guía, turnos estándar"]
+];
+function trS(t){
+  if(Object.prototype.hasOwnProperty.call(ES,t))return ES[t];
+  for(const[re,f]of ES_RE){const m=t.match(re);if(m)return typeof f==="function"?f(m):t.replace(re,f)}
+  const u=t.replace(/\bWeek (\d+)/g,"Semana $1").replace(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d)/g,(x,a,b)=>MON_ES[a]+" "+b)
+    .replace(/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat|SUN|MON|TUE|WED|THU|FRI|SAT)\b/,x=>DAY_ES[x]).replace(/\b(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)s?\b/g,x=>DAYL_ES[x]||x);
+  if(u!==t)return u;
+  if(t.includes(" · ")){const ps=t.split(" · ");const q=ps.map(x=>{const y=x.trim();return y?(trS(y)??y):x});const j=q.join(" · ");if(j!==t)return j}
+  return null}
+const TR_ORIG=new WeakMap(),TR_ATTR=new WeakMap();const TR_SKIP=/^(SCRIPT|STYLE|TEXTAREA)$/;
+function trNode(n){const raw=n.nodeValue;const t=raw.trim();if(!t||/^[\d\s.:,\/–\-+%$()]*$/.test(t))return;const r=trS(t);if(r!=null&&r!==t){if(!TR_ORIG.has(n))TR_ORIG.set(n,raw);n.nodeValue=raw.replace(t,r)}}
+function trEl(el){for(const a of["placeholder","title","aria-label"]){const v=el.getAttribute&&el.getAttribute(a);if(!v)continue;const r=trS(v.trim());if(r!=null&&r!==v){const o=TR_ATTR.get(el)||{};if(!(a in o))o[a]=v;TR_ATTR.set(el,o);el.setAttribute(a,r)}}}
+function trSkip(el){for(let e=el;e&&e!==document.body;e=e.parentElement){if(e.id==="printArea"||TR_SKIP.test(e.tagName)||e.getAttribute&&e.getAttribute("translate")==="no")return true}return false}
+function trTree(root){if(LANG!=="es"||!root)return;if(root.nodeType===3){if(!trSkip(root.parentElement))trNode(root);return}if(root.nodeType!==1||trSkip(root))return;trEl(root);
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT,{acceptNode:n=>n.nodeType===1&&(n.id==="printArea"||TR_SKIP.test(n.tagName)||n.getAttribute("translate")==="no")?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
+  let n;while((n=w.nextNode())){if(n.nodeType===3)trNode(n);else trEl(n)}}
+function trRestore(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_ELEMENT|NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode())){if(n.nodeType===3){if(TR_ORIG.has(n)){n.nodeValue=TR_ORIG.get(n);TR_ORIG.delete(n)}}else{const o=TR_ATTR.get(n);if(o){for(const a in o)n.setAttribute(a,o[a]);TR_ATTR.delete(n)}}}}
+const TR_OBS=new MutationObserver(ms=>{if(LANG!=="es")return;for(const m of ms)for(const n of m.addedNodes)trTree(n)});
+TR_OBS.observe(document.body,{childList:true,subtree:true});
+function setLang(l){LANG=l==="es"?"es":"en";try{localStorage.setItem("vsb-lang",LANG)}catch(e){}document.documentElement.lang=LANG;
+  document.querySelectorAll("[data-lang]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.lang===LANG)));
+  if(LANG==="es")trTree(document.body);else{trRestore();if(typeof renderAll==="function")renderAll()}}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-lang]");if(b){e.preventDefault();setLang(b.dataset.lang)}});
+setLang(LANG);
+
+if(prefs.dept)S.dept=prefs.dept;S.view=prefs.view==="shift"?"shift":"person";S.colorBy=prefs.colorBy==="time"?"time":"avail";S.tab="schedule";if(prefs.store)S.store=prefs.store;
+
 wireWizard();
 renderControls();
 boot();
