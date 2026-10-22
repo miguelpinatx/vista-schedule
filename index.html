@@ -716,12 +716,12 @@ function budgetHTML(){const C=payCalc();if(!C)return S.canEdit&&backend.getSales
 function issuesHTML(){const L=issuesList();if(!S.store)return"";
   const bad=L.filter(x=>x.bad).length;const sec=(k,title)=>{const xs=L.filter(x=>x.g===k);return xs.length?`<div class="isec"><div class="ptitle">${title} (${xs.length})</div>${xs.map(x=>`<div class="iitem ${x.bad?"bad":""}" ${x.G?`data-tdept="${esc(x.G)}" role="button" tabindex="0"`:""}>${x.t}</div>`).join("")}</div>`:""};
   if(!L.length)return `<div class="card issues ok"><b>✓ No issues.</b> <span class="note">Staffing guide covered, hours within the rules${payCfg()?" and on budget":""}.</span></div>`;
-  return `<details class="card issues" ${ISS_OPEN?"open":""}><summary><b>Issues to fix before marking final</b> <span class="flag ${bad?"bad":""}">${L.length}</span> <span class="note">${bad} need attention${S.dept==="__all"?"":" · "+esc(grp(S.dept))+" only"}</span></summary>
+  return `<details class="card issues" ${ISS_OPEN?"open":""}><summary><b>Issues to review</b> <span class="note">(admin only)</span> <span class="flag ${bad?"bad":""}">${L.length}</span> <span class="note">${bad} need attention${S.dept==="__all"?"":" · "+esc(grp(S.dept))+" only"}</span></summary>
   ${sec("budget","Budget")}${sec("staff","Staffing")}${sec("hours","Hours & rules")}<div class="note">Tap a department or person to show only that department.</div></details>`}
 let ISS_OPEN=true;
 function renderPay(){const b=$("#budgetSlot"),i=$("#issuesSlot");if(!b||!i)return;if(!S.store||S.tab!=="schedule"){b.innerHTML="";i.innerHTML="";return}
   const ae=document.activeElement;const foc=ae&&ae.dataset&&ae.dataset.sales;if(!(foc!=null&&b.contains(ae)))b.innerHTML=budgetHTML();else{const t=document.createElement("div");t.innerHTML=budgetHTML();const nb=t.querySelector(".bhead"),ob=b.querySelector(".bhead");if(nb&&ob)ob.innerHTML=nb.innerHTML;const nt=t.querySelectorAll(".btab tbody tr"),ot=b.querySelectorAll(".btab tbody tr");for(let r=1;r<nt.length;r++)if(ot[r])ot[r].innerHTML=nt[r].innerHTML;const w=t.querySelector(".btab tbody tr td:last-child"),ow=b.querySelector(".btab tbody tr td:last-child");if(w&&ow)ow.innerHTML=w.innerHTML}
-  const d=i.querySelector("details");if(d)ISS_OPEN=d.open;i.innerHTML=issuesHTML()}
+  const d=i.querySelector("details");if(d)ISS_OPEN=d.open;i.innerHTML=(LOCK||!S.canEdit)?"":issuesHTML()}
 async function saveSalesDays(days){const doc={store:S.store,weekStart:ymd(S.week),days,at:new Date().toISOString()};S.sales=doc;renderPay();try{await backend.saveSales(key(),doc)}catch(e){showErr(e)}}
 document.addEventListener("input",e=>{const t=e.target;if(t.dataset&&t.dataset.sales!=null&&S.sales){const days=[...(S.sales.days||[])];for(let d=0;d<7;d++)days[d]=+days[d]||0;days[+t.dataset.sales]=Math.max(0,+t.value||0);S.sales={...S.sales,days};renderPay()}});
 document.addEventListener("change",e=>{const t=e.target;
