@@ -1407,7 +1407,7 @@ function wStep4(){
   ${wAlertsHTML(wPeople())}<div id="wBoard">${shiftGridHTML(true)}</div>${wSummaryHTML()}`;
 }
 function wStep5(){
-  const ppl=wPeople();let tot=0;const rows=ppl.map(p=>{const r=rowStats(p);tot+=r.h;return `<tr><td class="wname" style="text-align:left"><b>${esc(p.name)}</b>${roleTag(p)}</td>${DAYS.map((x,d)=>{const v=cellVal(p.id,d);return `<td class="${v&&v.s&&!v.off?"":"wo"}">${v&&v.off?"OFF · req.":v&&v.s?fmtRange(v.s,v.e):"OFF"}</td>`}).join("")}<td>${r.days}</td><td><b>${fmtH(r.h)}</b></td><td style="text-align:left">${r.flags.map(([t,c])=>`<span class="flag ${c}">${t}</span>`).join(" ")||`<span class="okpill">OK</span>`}</td></tr>`}).join("");
+  const ppl=wPeople();let tot=0;const rows=ppl.map(p=>{const r=rowStats(p);tot+=r.h;return `<tr><td class="wname" style="text-align:left"><b>${esc(p.name)}</b>${roleTag(p)}</td>${DAYS.map((x,d)=>{const v=cellVal(p.id,d);return `<td class="${v&&v.s&&!v.off?"":"wo"}">${v&&v.s&&!v.off?fmtRange(v.s,v.e):"OFF"}</td>`}).join("")}<td>${r.days}</td><td><b>${fmtH(r.h)}</b></td><td style="text-align:left">${r.flags.map(([t,c])=>`<span class="flag ${c}">${t}</span>`).join(" ")||`<span class="okpill">OK</span>`}</td></tr>`}).join("");
   const cov=coverageCells(grp(S.dept),ppl);const probs=ppl.reduce((a,p)=>a+rowStats(p).flags.filter(f=>f[1]==="bad").length,0);
   return `<h2 class="wh">Review your ${esc(grp(S.dept))} schedule</h2>
   <div class="dtiles"><div class="dtile"><span>Total hours</span><b>${fmtH(tot)}</b><small>${ppl.length} people</small></div>
