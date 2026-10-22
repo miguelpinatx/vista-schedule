@@ -496,6 +496,9 @@ header.top{align-items:center}
 .avtimes{display:inline-flex;gap:6px;align-items:center}
 .cshort{color:var(--bad-fg)}.cover{color:var(--blue)}.cok{color:var(--good-fg)}
 .cv.over{background:#d6ecfa;color:#08507f}
+.nchip.unsched{background:#fff;border:1.5px dashed #b9b2c6;color:var(--ink)}.nchip.unsched:hover{border-color:var(--brand);border-style:solid}
+.nchip .ct2{display:block;font-size:10.5px;font-weight:500;opacity:.8}
+.lnkbtn{border:0;background:none;color:var(--brand);font-weight:600;text-decoration:underline;cursor:pointer;padding:0 4px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -1367,8 +1370,8 @@ function wStep3(){
     <div class="qq">1. Is ${esc(fn(p))}'s availability the same as last week?</div>
     <div class="qbtns"><button class="qb ${st==="same"?"on":""}" data-wsame="${p.id}">Yes, same as last week</button><button class="qb ${st==="changed"?"on":""}" data-avail="${p.id}">No, change it</button></div>
     <div class="qq">2. Did ${esc(fn(p))} ask for any days off this week?</div>
-    <div class="qbtns"><button class="qb ${!showDays&&W.offNo&&W.offNo[p.id]?"on":""}" data-wnooff="${p.id}">No days off</button><button class="qb ${showDays?"on":""}" data-wyesoff="${p.id}">Yes, pick the days</button></div>
-    ${showDays?`<div class="qdays">${DAYS.map((dn,d)=>{const dt=addDays(S.week,d);return `<button class="qday ${offs[d]?"on":""}" data-woff="${p.id}" data-d="${d}">${offs[d]?"✓ ":""}${dn} ${dt.getMonth()+1}/${dt.getDate()}</button>`}).join("")}</div><div class="note">Tap each day they asked off. Tap again to undo.</div>`:""}
+    ${showDays?"":`<div class="qbtns"><button class="qb" data-wyesoff="${p.id}">Pick days off</button></div><div class="note">Skip this if they didn't ask for any days off.</div>`}
+    ${showDays?`<div class="qdays">${DAYS.map((dn,d)=>{const dt=addDays(S.week,d);return `<button class="qday ${offs[d]?"on":""}" data-woff="${p.id}" data-d="${d}">${offs[d]?"✓ ":""}${dn} ${dt.getMonth()+1}/${dt.getDate()}</button>`}).join("")}</div><div class="note">Tap each day they asked off. Tap again to undo.${anyOff?"":` <button class="lnkbtn" data-wnooff="${p.id}">Close</button>`}</div>`:""}
     </div>`}).join("")||`<p class="note">Add people in step 2 first.</p>`}</div>`;
 }
 function limitMsgs(p,h,days){const m=[];if(h>40)m.push(fmtH(h)+" hours: over 40 (overtime)");else if(+p.maxHrs>0&&h>+p.maxHrs+1e-9)m.push(fmtH(h)+" hours: over their "+fmtH(+p.maxHrs)+"-hour limit");else if(p.type==="PT"&&h>29.99)m.push(fmtH(h)+" hours: part-time must stay at 29.99 or less");
@@ -1537,7 +1540,8 @@ function shiftGridHTML(noCov){
       }
       h+=`</tr>`;
     });
-    h+=`<tr class="cov"><td class="who">Off</td>${offs.map(o=>`<td class="scell"><div class="slist">${o.filter(st=>matchQ(st.name)).map(st=>`<button class="nchip off" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${offs.indexOf(o)}" ${S.readOnly?"disabled":""}>${hl(st.name)}</button>`).join("")}</div></td>`).join("")}</tr>`;
+    h+=`<tr class="cov"><td class="who"><div class="nm">Off / not scheduled</div><div class="meta">Tap a name to give them a shift</div></td>${offs.map((o,d)=>{const free=people.filter(st=>!cellVal(st.id,d)&&availOf(st,d).mode!=="no"&&matchQ(st.name)).sort((a,b)=>a.name.localeCompare(b.name));
+      return `<td class="scell"><div class="slist">${o.filter(st=>matchQ(st.name)).map(st=>`<button class="nchip off" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":""} title="Day off">${hl(st.name)}<span class="ct2">Day off</span></button>`).join("")}${free.map(st=>`<button class="nchip unsched" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":""} title="Not scheduled yet. Tap to give them a shift.">${dot(st.id)}${hl(st.name)}<span class="ct2">Not scheduled</span></button>`).join("")}</div></td>`}).join("")}</tr>`;
   }
   if(!depts.length)h+=`<tr><td colspan="8" style="padding:24px;color:var(--muted)">No staff in this view.</td></tr>`;
   {const T=hourTotals();h+=`</tbody><tfoot><tr><td class="who">Total hours</td>${T.day.map((x,d)=>`<td><b>${fmtH(x)}</b><br>${T.heads[d]} ppl</td>`).join("")}</tr></tfoot><tbody>`;}
@@ -2255,7 +2259,7 @@ const ES={
 "answered":"contestados","checked":"revisados","Yes, same every week":"Sí, el mismo cada semana","No, it changes week to week":"No, cambia cada semana",
 "Morning":"Mañana","Mid":"Medio","Closing":"Cierre","Any shift":"Cualquier turno","starts before 10a":"empieza antes de 10a","starts 10a–2p":"empieza 10a–2p","starts 2p or later":"empieza 2p o después","no preference":"sin preferencia","Add people in step 2 first.":"Primero agrega personas en el paso 2.",
 "Check each person's availability for this week":"Revisa la disponibilidad de cada persona esta semana","Answer both questions for each person. Colors:":"Contesta las dos preguntas para cada persona. Colores:",
-"Yes, same as last week":"Sí, igual que la semana pasada","No, change it":"No, cambiarla","No days off":"Sin días libres","Yes, pick the days":"Sí, elegir los días","Tap each day they asked off. Tap again to undo.":"Toca cada día que pidió libre. Toca otra vez para deshacer.",
+"Yes, same as last week":"Sí, igual que la semana pasada","No, change it":"No, cambiarla","No days off":"Sin días libres","Yes, pick the days":"Sí, elegir los días","Pick days off":"Elegir días libres","Skip this if they didn't ask for any days off.":"Sáltalo si no pidió días libres.","Close":"Cerrar","Off / not scheduled":"Libre / sin turno","Tap a name to give them a shift":"Toca un nombre para darle turno","Not scheduled":"Sin turno","Not scheduled yet. Tap to give them a shift.":"Sin turno todavía. Toca para darle uno.","Tap each day they asked off. Tap again to undo.":"Toca cada día que pidió libre. Toca otra vez para deshacer.",
 "Place people on shifts":"Pon a la gente en los turnos","Fill the rest automatically":"Llenar el resto automáticamente","⚠ Check these before you finish":"⚠ Revisa esto antes de terminar",
 "Fills the open shifts for you. You choose how, see a preview, and approve before anything saves.":"Llena los turnos abiertos por ti. Tú eliges cómo, ves una vista previa y apruebas antes de guardar.",
 "Total hours ":"Total de horas ","Problems":"Problemas","fix the red flags below":"corrige lo marcado en rojo","everything is within the rules":"todo está dentro de las reglas","Duties printed with this schedule":"Tareas que se imprimen con este horario","Schedule another department":"Programar otro departamento","See dashboard":"Ver panel","Save duties":"Guardar tareas","Cancel":"Cancelar","Use company list":"Usar lista de la compañía","Company list":"Lista de la compañía",
