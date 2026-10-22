@@ -338,6 +338,7 @@ details.card>summary::before{content:"▸ ";color:var(--muted)}details.card[open
 .wfix select{width:100%;min-width:0;font-size:13px;padding:6px 4px}.wfix select.ison{background:var(--good-bg);color:var(--good-fg);border-color:var(--good-line)}.wfix select.isoff{background:var(--off-bg);color:var(--off-fg)}
 @media (max-width:640px){.wfix{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .pill.setp{border-color:var(--brand);color:var(--brand)}
+.cbtn.oth{opacity:.55;border-style:dashed}
 .gq{display:flex;flex-direction:column;gap:6px}
 .gopt{display:flex;gap:10px;align-items:flex-start;border:2px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer}
 .gopt:has(input:checked){border-color:var(--brand);background:color-mix(in srgb,var(--brand) 8%,var(--surface))}
@@ -641,7 +642,7 @@ function signOut(){try{localStorage.removeItem("vsb-pin")}catch(e){}location.rel
 
 /* ---------- Final schedules for employees (GitHub version) ---------- */
 function pubSnapshot(){const rows=[];for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;
-  const days=DAYS.map((x,d)=>{const v=cellVal(id,d);return v&&v.off?"off":v&&v.s?[v.s,v.e]:null});if(!days.some(x=>Array.isArray(x)))continue;rows.push({name:p.name,dept:grp(p.dept),days})}
+  const days=DAYS.map((x,d)=>{const v=cellVal(id,d);return v&&v.off?"off":v&&v.s?(shG(p,v)!==grp(p.dept)?[v.s,v.e,shG(p,v)]:[v.s,v.e]):null});if(!days.some(x=>Array.isArray(x)))continue;rows.push({name:p.name,dept:grp(p.dept),days})}
   rows.sort((a,b)=>a.dept.localeCompare(b.dept)||a.name.localeCompare(b.name));return rows}
 function pubState(){if(!S.pub)return"none";return JSON.stringify(S.pub.rows)===JSON.stringify(pubSnapshot())?"same":"changed"}
 function staffLink(st){return location.origin+location.pathname.replace(/[^/]*$/,"")+"staff.html?store="+encodeURIComponent(st)}
@@ -777,8 +778,14 @@ const FE_RE=/cashier|cajer|office|oficina|pricing|precio/i;
 const isFE=d=>!!d&&(d===FE||FE_RE.test(d)||(S.cfg.frontEnd||[]).includes(d));
 const feList=()=>S.cfg.depts.filter(isFE);
 const grp=d=>isFE(d)?FE:d;
-const deptMatch=s=>S.dept==="__all"||s.dept===S.dept||(S.dept===FE&&grp(s.dept)===FE);
-const grpMatch=s=>S.dept==="__all"||grp(s.dept)===grp(S.dept);
+const gsetOf=s=>{const a=[grp(s.dept)];for(const d of (s.also||[])){const g=grp(d);if(!a.includes(g))a.push(g)}return a};
+const inGrp=(s,G)=>gsetOf(s).includes(G);
+const shG=(s,v)=>v&&v.dept&&inGrp(s,v.dept)?v.dept:grp(s.dept);
+const alsoTag=(st,G)=>G&&grp(st.dept)!==G?`<span class="rt">main: ${esc(grp(st.dept))}</span>`:"";
+const deptOrder=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i};
+let CTXG=null;
+const deptMatch=s=>S.dept==="__all"||s.dept===S.dept||(s.also||[]).includes(S.dept)||(S.dept===FE&&inGrp(s,FE));
+const grpMatch=s=>S.dept==="__all"||inGrp(s,grp(S.dept));
 const guideFor=(store,dept)=>{const ok=g=>g&&g.slots&&g.slots.length?g:null;const k=grp(dept);return ok(S.guides[guideId(store,k)])||(k===FE?ok(S.guides[guideId(store,"Cashiers")]):null)};
 const roleTag=st=>grp(st.dept)!==st.dept?`<span class="rt">${esc(st.dept)}</span>`:"";
 const norm=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
@@ -877,9 +884,9 @@ function elsewhereHTML(){
 }
 function coverageCells(dept,all){
   const g=guideFor(S.store,dept);if(!g)return null;
-  const people=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&grp(s.dept)===grp(dept));
+  const people=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&inGrp(s,grp(dept)));
   const cnt=g.slots.map(()=>[0,0,0,0,0,0,0]);
-  for(const st of people)for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&v.s&&!v.off){const i=slotOf(g,v);if(i>=0)cnt[i][d]++}}
+  for(const st of people)for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&v.s&&!v.off&&shG(st,v)===grp(dept)){const i=slotOf(g,v);if(i>=0)cnt[i][d]++}}
   const cells=[];let short=0;
   for(let d=0;d<7;d++){
     cells.push(`<div class="covs">${g.slots.map((sl,i)=>{const need=+(sl.need&&sl.need[d])||0,have=cnt[i][d];const c=need===0&&have===0?"none":have<need?"short":have>need?"over":"ok";if(have<need)short+=need-have;return `<span class="cv ${c}" title="${esc(sl.label)} ${fmtRange(sl.start,sl.end)}: ${have} scheduled, ${need} recommended"><span>${esc(sl.label)}</span><span>${have}/${need}</span></span>`}).join("")}</div>`);
@@ -908,24 +915,24 @@ function renderGrid(){
   for(let d=0;d<7;d++){const dt=addDays(S.week,d);h+=`<th class="${ymd(dt)===today?"today":""}">${DAYS[d]}<span class="d">${dt.getMonth()+1}/${dt.getDate()}</span></th>`}
   h+=`<th>Hours</th></tr></thead><tbody>`;
   const dayCount=[0,0,0,0,0,0,0],dayHrs=[0,0,0,0,0,0,0];let total=0;
-  const depts=[...new Set(list.map(s=>grp(s.dept)))];
+  const depts=[...new Set(list.flatMap(s=>S.dept==="__all"?gsetOf(s):[grp(S.dept)]))].sort((a,b)=>deptOrder(a)-deptOrder(b));
   for(const dept of depts){
-    const rows=list.filter(s=>grp(s.dept)===dept);
+    const rows=list.filter(s=>inGrp(s,dept));
     const cov=S.q?null:coverageCells(dept,all);
     h+=`<tr class="grp"><td colspan="9">${esc(dept||"No department")}<span class="ct">${rows.length} ${rows.length===1?"person":"people"}${cov?(cov.short?" · "+cov.short+" open spot"+(cov.short===1?"":"s")+" vs. guide":" · fully covered"):""}</span></td></tr>`;
     for(const st of rows){
-      const r=rowStats(st);total+=r.h;
-      h+=`<tr><td class="who"><div class="nm">${dot(st.id)}${hl(st.name)}${roleTag(st)} <span class="pill ${st.type==="FT"?"ft":""}">${st.type||"PT"}</span></div><div class="meta">${st.notes?esc(st.notes):""}</div></td>`;
+      const r=rowStats(st);let here=0;
+      h+=`<tr><td class="who"><div class="nm">${dot(st.id)}${hl(st.name)}${roleTag(st)}${alsoTag(st,dept)} <span class="pill ${st.type==="FT"?"ft":""}">${st.type||"PT"}</span></div><div class="meta">${st.notes?esc(st.notes):""}</div></td>`;
       for(let d=0;d<7;d++){
         const v=cellVal(st.id,d);const f=fit(st,d,v);const a=availOf(st,d);
         let inner,cls=f;
         if(v&&v.off)inner=`<span class="t">OFF</span>`;
-        else if(v&&v.s){const hh=hoursOf(v,S.cfg);dayCount[d]++;dayHrs[d]+=hh;inner=`<span class="t">${fmtRange(v.s,v.e)}</span><span class="h">${fmtH(hh)} h${f==="bad"?" · avail "+esc(availText(st,d)):""}</span>`}
+        else if(v&&v.s){const hh=hoursOf(v,S.cfg);const og=shG(st,v);if(og===dept){dayCount[d]++;dayHrs[d]+=hh;here+=hh}inner=`<span class="t">${fmtRange(v.s,v.e)}</span><span class="h">${og!==dept?"in "+esc(og):fmtH(hh)+" h"}${f==="bad"?" · avail "+esc(availText(st,d)):""}</span>`}
         else{cls=a.mode==="no"?"na":"";inner=`<span class="av">${a.mode==="no"?"Unavailable":esc(availText(st,d))}</span>`}
-        if(v&&v.s&&!v.off)cls=cellCls(f,v);
-        h+=`<td class="cell"><button class="cbtn ${cls}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":""} aria-label="${esc(st.name)}, ${DAYS_LONG[d]}">${inner}</button></td>`;
+        if(v&&v.s&&!v.off)cls=cellCls(f,v)+(shG(st,v)!==dept?" oth":"");
+        h+=`<td class="cell"><button class="cbtn ${cls}" data-sid="${st.id}" data-d="${d}" data-g="${esc(dept)}" ${S.readOnly?"disabled":""} aria-label="${esc(st.name)}, ${DAYS_LONG[d]}">${inner}</button></td>`;
       }
-      h+=`<td class="tot"><div class="hrs">${fmtH(r.h)}</div><div class="flags">${r.flags.map(([t,c])=>`<span class="flag ${c}">${t}</span>`).join("")}</div></td></tr>`;
+      total+=here;h+=`<td class="tot"><div class="hrs">${fmtH(r.h)}</div>${gsetOf(st).length>1?`<div class="meta">${fmtH(here)} h in ${esc(dept)}</div>`:""}<div class="flags">${r.flags.map(([t,c])=>`<span class="flag ${c}">${t}</span>`).join("")}</div></td></tr>`;
     }
     if(cov)h+=`<tr class="cov"><td class="who">Scheduled / guide</td>${cov.cells.map(c=>`<td>${c}</td>`).join("")}<td></td></tr>`;
   }
@@ -938,9 +945,10 @@ function renderGrid(){
 function hourTotals(){
   const people=Object.entries(S.staff).map(([id,o])=>({id,...o})).filter(o=>!o._pending&&o.store===S.store&&grpMatch(o));
   const by={},day=[0,0,0,0,0,0,0],heads=[0,0,0,0,0,0,0];let total=0,ppl=0;
-  for(const st of people){const G=grp(st.dept);const b=by[G]=by[G]||{h:0,day:[0,0,0,0,0,0,0],n:0};let any=false;
-    for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&v.s&&!v.off){const h=hoursOf(v,S.cfg);b.h+=h;b.day[d]+=h;day[d]+=h;heads[d]++;total+=h;any=true}}
-    if(any){b.n++;ppl++}}
+  for(const st of people){let any=false;
+    for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&v.s&&!v.off){const G=shG(st,v);if(S.dept!=="__all"&&G!==grp(S.dept))continue;const b=by[G]=by[G]||{h:0,day:[0,0,0,0,0,0,0],n:0,ids:new Set()};const h=hoursOf(v,S.cfg);b.h+=h;b.day[d]+=h;b.ids.add(st.id);day[d]+=h;heads[d]++;total+=h;any=true}}
+    if(any)ppl++}
+  for(const b of Object.values(by))b.n=b.ids.size;
   const order=Object.keys(by).sort((a,b)=>{const f=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i};return f(a)-f(b)});
   return{by,order,day,heads,total,ppl};
 }
@@ -964,16 +972,16 @@ function storeStats(st,doc){
   const people=Object.entries(S.staff).map(([id,o])=>({id,...o})).filter(o=>!o._pending&&o.store===st);
   const sh=(doc&&doc.shifts)||{};const cv=(id,d)=>sh[id]&&sh[id][d]||null;
   const r={hrs:0,ppl:0,roster:people.length,ftUnder:[],ptOver:[],ot:[],capOver:[],dept:{},day:[0,0,0,0,0,0,0],open:0,need:0};
-  for(const p of people){let h=0,days=0;const G=grp(p.dept);
-    for(let d=0;d<7;d++){const v=cv(p.id,d);if(v&&v.s&&!v.off){const x=hoursOf(v,S.cfg);h+=x;days++;r.day[d]+=x}}
-    r.dept[G]=(r.dept[G]||0)+h;r.hrs+=h;if(days)r.ppl++;
+  for(const p of people){let h=0,days=0;
+    for(let d=0;d<7;d++){const v=cv(p.id,d);if(v&&v.s&&!v.off){const x=hoursOf(v,S.cfg);h+=x;days++;r.day[d]+=x;const G=shG(p,v);r.dept[G]=(r.dept[G]||0)+x}}
+    r.hrs+=h;if(days)r.ppl++;
     if(p.type==="FT"&&h>0&&h<30)r.ftUnder.push(p.name);
     if(p.type==="PT"&&h>29.99)r.ptOver.push(p.name);
     if(h>40)r.ot.push(p.name);
     if(+p.maxHrs>0&&h>+p.maxHrs)r.capOver.push(p.name)}
-  for(const G of new Set(people.map(p=>grp(p.dept)))){const g=guideFor(st,G);if(!g)continue;
+  for(const G of new Set(people.flatMap(p=>gsetOf(p)))){const g=guideFor(st,G);if(!g)continue;
     const cnt=g.slots.map(()=>[0,0,0,0,0,0,0]);
-    for(const p of people.filter(p=>grp(p.dept)===G))for(let d=0;d<7;d++){const v=cv(p.id,d);if(v&&v.s&&!v.off){const i=slotOf(g,v);if(i>=0)cnt[i][d]++}}
+    for(const p of people.filter(p=>inGrp(p,G)))for(let d=0;d<7;d++){const v=cv(p.id,d);if(v&&v.s&&!v.off&&shG(p,v)===G){const i=slotOf(g,v);if(i>=0)cnt[i][d]++}}
     g.slots.forEach((sl,i)=>{for(let d=0;d<7;d++){const n=+(sl.need&&sl.need[d])||0;r.need+=n;r.open+=Math.max(0,n-cnt[i][d])}})}
   return r;
 }
@@ -985,8 +993,8 @@ function breakdown(storeSel){
   const rows={};const tot=()=>({ppl:new Set(),hrs:0,day:[0,0,0,0,0,0,0].map(()=>({h:0,p:new Set()})),part:[0,1,2].map(()=>({h:0,p:new Set(),n:0})),dp:[0,1,2,3,4,5,6].map(()=>[0,1,2].map(()=>({h:0,p:new Set()})))});
   const T=tot();
   for(const st of stores){const doc=DASH.docs[st];const sh=(doc&&doc.shifts)||{};
-    for(const[id,p]of Object.entries(S.staff)){if(p._pending||p.store!==st)continue;const G=grp(p.dept);
-      for(let d=0;d<7;d++){const v=sh[id]&&sh[id][d];if(!(v&&v.s&&!v.off))continue;const h=hoursOf(v,S.cfg),k=partOf(v);
+    for(const[id,p]of Object.entries(S.staff)){if(p._pending||p.store!==st)continue;
+      for(let d=0;d<7;d++){const v=sh[id]&&sh[id][d];if(!(v&&v.s&&!v.off))continue;const G=shG(p,v);const h=hoursOf(v,S.cfg),k=partOf(v);
         for(const R of[(rows[G]=rows[G]||tot()),T]){R.ppl.add(id);R.hrs+=h;R.day[d].h+=h;R.day[d].p.add(id);R.part[k].h+=h;R.part[k].p.add(id);R.part[k].n++;R.dp[d][k].h+=h;R.dp[d][k].p.add(id)}}}}
   const order=Object.keys(rows).sort((a,b)=>{const f=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i};return f(a)-f(b)});
   return{rows,order,T};
@@ -1025,8 +1033,8 @@ function trafficAvg(doc){
 }
 function onFloor(st,doc,H,n){
   const sh=(doc&&doc.shifts)||{};const fe=Array.from({length:7},()=>Array(n).fill(0)),all=Array.from({length:7},()=>Array(n).fill(0));
-  for(const[id,p]of Object.entries(S.staff)){if(p._pending||p.store!==st)continue;const isFE=grp(p.dept)===FE;
-    for(let d=0;d<7;d++){const v=sh[id]&&sh[id][d];if(!(v&&v.s&&!v.off))continue;const[a,b]=span(v.s,v.e);
+  for(const[id,p]of Object.entries(S.staff)){if(p._pending||p.store!==st)continue;
+    for(let d=0;d<7;d++){const v=sh[id]&&sh[id][d];if(!(v&&v.s&&!v.off))continue;const isFE=shG(p,v)===FE;const[a,b]=span(v.s,v.e);
       for(let i=0;i<n;i++){const mid=(H+i)*60+30;if(a<=mid&&b>mid){all[d][i]++;if(isFE)fe[d][i]++}}}}
   return{fe,all};
 }
@@ -1118,7 +1126,7 @@ function dashStore(st){
   const chart=`<div class="dchart">${DAYS.map((dn,d)=>{const ps=B.T.dp[d].map(x=>x.p.size);const tot=B.T.day[d].p.size;
     return `<div class="dcol" title="${DAYS_LONG[d]}: ${tot} people, ${fmtH(B.T.day[d].h)} hrs · AM ${ps[0]}, Mid ${ps[1]}, PM ${ps[2]}"><div class="dnum">${tot}</div><div class="dstack">${[2,1,0].map(k=>`<i class="p${k}" style="height:${(ps[k]/maxP*100).toFixed(1)}%">${ps[k]?ps[k]:""}</i>`).join("")}</div><div class="dlbl"><b>${dn}</b><small>${Math.round(B.T.day[d].h)} hrs</small></div></div>`}).join("")}</div>`;
   const openBy={};for(const G of B.order){const g=guideFor(st,G);if(!g)continue;let o=0;const sh=doc.shifts||{};const cnt=g.slots.map(()=>[0,0,0,0,0,0,0]);
-    for(const[id,p]of Object.entries(S.staff)){if(p.store!==st||grp(p.dept)!==G)continue;for(let d=0;d<7;d++){const v=sh[id]&&sh[id][d];if(v&&v.s&&!v.off){const i=slotOf(g,v);if(i>=0)cnt[i][d]++}}}
+    for(const[id,p]of Object.entries(S.staff)){if(p.store!==st||!inGrp(p,G))continue;for(let d=0;d<7;d++){const v=sh[id]&&sh[id][d];if(v&&v.s&&!v.off&&shG(p,v)===G){const i=slotOf(g,v);if(i>=0)cnt[i][d]++}}}
     g.slots.forEach((sl,i)=>{for(let d=0;d<7;d++)o+=Math.max(0,(+(sl.need&&sl.need[d])||0)-cnt[i][d])});openBy[G]=o}
   const deptRows=B.order.map(G=>{const R=B.rows[G];return `<tr><td style="text-align:left"><b>${esc(G)}</b></td><td>${R.ppl.size}</td><td>${fmtH(R.hrs)}</td><td>${goalFor(st,G)?fmtH(goalFor(st,G))+"<br>"+goalPill(R.hrs,goalFor(st,G)):`<span class="note">—</span>`}</td>${R.part.map((x,k)=>`<td class="p${k}">${x.p.size||"—"}</td>`).join("")}<td>${G in openBy?(openBy[G]?`<span class="flag bad">${openBy[G]}</span>`:`<span class="okpill">0</span>`):`<span class="note">no guide</span>`}</td></tr>`}).join("");
   TRAF.store=st;
@@ -1144,7 +1152,7 @@ const PREF=[["am","Morning","starts before 10a"],["mid","Mid","starts 10a–2p"]
 const prefIdx={am:0,mid:1,pm:2};
 const W={step:0};
 const WSTEPS=["Week & department","Your team","Shifts & set schedules","Availability & days off","Place shifts","Review & print"];
-function wPeople(){return Object.entries(S.staff).map(([id,o])=>({id,...o})).filter(o=>!o._pending&&o.store===S.store&&S.dept!=="__all"&&grp(o.dept)===grp(S.dept)).sort((a,b)=>a.name.localeCompare(b.name))}
+function wPeople(){return Object.entries(S.staff).map(([id,o])=>({id,...o})).filter(o=>!o._pending&&o.store===S.store&&S.dept!=="__all"&&inGrp(o,grp(S.dept))).sort((a,b)=>a.name.localeCompare(b.name))}
 function wGroups(){return [...new Set(S.cfg.depts.map(grp))]}
 function renderWizard(){
   const slot=$("#wizSlot");if(!slot||S.tab!=="build")return;
@@ -1159,7 +1167,7 @@ function renderWizard(){
 }
 function wStep0(){
   const groups=wGroups();
-  const cnt=G=>Object.values(S.staff).filter(o=>!o._pending&&o.store===S.store&&grp(o.dept)===G).length;
+  const cnt=G=>Object.values(S.staff).filter(o=>!o._pending&&o.store===S.store&&inGrp(o,G)).length;
   return `<h2 class="wh">Which week and department are you scheduling?</h2>
   <div class="wq">1. Store</div><div class="wchoices">${S.cfg.stores.map(st=>`<button class="wchoice ${st===S.store?"on":""}" data-wstore="${esc(st)}">${esc(st)}</button>`).join("")}</div>
   <div class="wq">2. Week</div><div class="wweek"><button class="btn" data-wweek="-1">‹ Previous</button><div><b>Week ${weekNo(S.week,S.cfg.wkOffset)}</b><span>${rangeLabel(S.week)}</span></div><button class="btn" data-wweek="1">Next ›</button></div>
@@ -1168,11 +1176,13 @@ function wStep0(){
 function wStep1(){
   const ppl=wPeople();const roles=grp(S.dept)===FE?S.cfg.depts.filter(d=>grp(d)===FE):[grp(S.dept)];
   return `<h2 class="wh">Who's on your ${esc(grp(S.dept))} team?</h2><p class="wsub">Remove anyone who no longer works here and add new people. Set full-time or part-time, and a weekly hour limit if someone needs one.</p>
-  <div class="wlist">${ppl.map(p=>`<div class="wrow"><div class="wname"><b>${esc(p.name)}</b>${roleTag(p)}</div>
+  <div class="wlist">${ppl.map(p=>`<div class="wrow"><div class="wname"><b>${esc(p.name)}</b>${roleTag(p)}${alsoTag(p,grp(S.dept))}</div>
     <div class="seg sm">${["FT","PT"].map(t=>`<button class="${(p.type||"PT")===t?"on":""}" data-wtype="${p.id}" data-v="${t}">${t==="FT"?"Full-time":"Part-time"}</button>`).join("")}</div>
     <label class="wmax">Max hrs <input type="number" min="1" max="60" step="0.5" value="${+p.maxHrs>0?+p.maxHrs:""}" placeholder="—" data-wmax="${p.id}"></label>
-    ${W.confirmDel===p.id?`<span class="wconf">Remove ${esc(p.name)}? <button class="btn sm danger" data-wdel="${p.id}">Yes, remove</button><button class="btn sm" data-wdelno>Keep</button></span>`:`<button class="btn sm" data-wdelask="${p.id}" aria-label="Remove ${esc(p.name)}">Remove</button>`}</div>`).join("")||`<p class="note">No one in this department yet. Add your first person below.</p>`}</div>
-  <div class="wadd"><input type="text" id="wNewName" placeholder="New person's name">${roles.length>1?`<select id="wNewRole">${roles.map(r=>`<option>${esc(r)}</option>`).join("")}</select>`:""}<select id="wNewType"><option value="FT">Full-time</option><option value="PT">Part-time</option></select><button class="btn primary" id="wAdd">+ Add</button></div>`;
+    ${grp(p.dept)!==grp(S.dept)?`<button class="btn sm" data-wunlink="${p.id}">Remove from ${esc(grp(S.dept))}</button>`:W.confirmDel===p.id?`<span class="wconf">Remove ${esc(p.name)}? <button class="btn sm danger" data-wdel="${p.id}">Yes, remove</button><button class="btn sm" data-wdelno>Keep</button></span>`:`<button class="btn sm" data-wdelask="${p.id}" aria-label="Remove ${esc(p.name)}">Remove</button>`}</div>`).join("")||`<p class="note">No one in this department yet. Add your first person below.</p>`}</div>
+  <div class="wadd"><input type="text" id="wNewName" placeholder="New person's name">${roles.length>1?`<select id="wNewRole">${roles.map(r=>`<option>${esc(r)}</option>`).join("")}</select>`:""}<select id="wNewType"><option value="FT">Full-time</option><option value="PT">Part-time</option></select><button class="btn primary" id="wAdd">+ Add</button></div>
+  ${(()=>{const G=grp(S.dept);const others=Object.entries(S.staff).filter(([id,o])=>!o._pending&&o.store===S.store&&!inGrp(o,G)).sort((a,b)=>a[1].name.localeCompare(b[1].name));
+    return others.length?`<div class="wadd"><select id="wBorrow"><option value="">Someone from another department also works here…</option>${others.map(([id,o])=>`<option value="${id}">${esc(o.name)} · ${esc(o.dept)}</option>`).join("")}</select><button class="btn" id="wBorrowGo">Add to ${esc(G)}</button></div>`:""})()}`;
 }
 function wShiftOpts(){const {slots}=slotsFor(grp(S.dept));const seen=new Set(),o=[];
   slots.forEach(sl=>{const k=sl.start+"-"+sl.end;if(!seen.has(k)){seen.add(k);o.push({s:sl.start,e:sl.end})}});
@@ -1192,7 +1202,7 @@ function wStep2(){
 function wApplyFixed(){
   const key=S.store+"|"+grp(S.dept)+"|"+ymd(S.week);if(W.applied===key)return;W.applied=key;if(S.readOnly)return;
   let n=0,ppl=0;for(const p of wPeople()){if(p.sched!=="fixed"||!p.fixed)continue;let any=false;
-    for(let d=0;d<7;d++){const t=p.fixed[d];if(!t||cellVal(p.id,d))continue;setCell(p.id,d,t.off?{off:true}:{s:t.s,e:t.e});n++;any=true}if(any)ppl++}
+    for(let d=0;d<7;d++){const t=p.fixed[d];if(!t||cellVal(p.id,d))continue;CTXG=grp(p.dept);setCell(p.id,d,t.off?{off:true}:{s:t.s,e:t.e});CTXG=null;n++;any=true}if(any)ppl++}
   if(n)toast(`Set schedules filled in for ${ppl} ${ppl===1?"person":"people"}`);
 }
 function wCell(p,d){
@@ -1270,6 +1280,8 @@ function wireWizard(){
     if("wdelno" in ds){W.confirmDel=null;renderWizard();return}
     if(ds.wdel){const id=ds.wdel;W.confirmDel=null;backend.delStaff(id).then(()=>toast("Removed")).catch(showErr);delete S.staff[id];renderWizard();return}
     if(ds.wav){wCycle(ds.wav,+ds.d);return}
+    if(ds.wunlink){const id=ds.wunlink,G=grp(S.dept);const a=(S.staff[id].also||[]).filter(x=>grp(x)!==G);wSaveStaff(id,{also:a.length?a:undefined});toast(S.staff[id].name+" removed from "+G);renderWizard();return}
+    if(t.id==="wBorrowGo"){const id=$("#wBorrow").value;if(!id){toast("Pick a person first.");return}const G=grp(S.dept);wSaveStaff(id,{also:[...(S.staff[id].also||[]),G]});toast(S.staff[id].name+" added to "+G);renderWizard();return}
     if(t.id==="wAdd"){const name=$("#wNewName").value.trim();if(!name){toast("Type a name first.");$("#wNewName").focus();return}
       const role=$("#wNewRole")?$("#wNewRole").value:grp(S.dept);const id=uid();const o={name,store:S.store,dept:role,type:$("#wNewType").value,notes:"",avail:anyAvail()};
       S.staff[id]=o;backend.saveStaff(id,o).then(()=>toast(name+" added")).catch(showErr);renderWizard();setTimeout(()=>{const n=$("#wNewName");if(n)n.focus()},0);return}
@@ -1317,18 +1329,18 @@ function slotsFor(dept){
 function renderShiftGrid(){$("#gridSlot").innerHTML=shiftGridHTML()}
 function shiftGridHTML(){
   const all=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&grpMatch(s)).sort((a,b)=>a.name.localeCompare(b.name));
-  const depts=[...new Set(all.map(s=>grp(s.dept)))].sort((a,b)=>{const f=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i};return f(a)-f(b)});
+  const depts=[...new Set(all.flatMap(s=>S.dept==="__all"?gsetOf(s):[grp(S.dept)]))].sort((a,b)=>{const f=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i};return f(a)-f(b)});
   const today=ymd(new Date());
   let h=totalsBar()+elsewhereHTML()+`<div class="gridbox"><table class="grid sgrid"><thead><tr><th class="who">Shift</th>`;
   for(let d=0;d<7;d++){const dt=addDays(S.week,d);h+=`<th class="${ymd(dt)===today?"today":""}">${DAYS[d]}<span class="d">${dt.getMonth()+1}/${dt.getDate()}</span></th>`}
   h+=`</tr></thead><tbody>`;
   for(const dept of depts){
-    const people=all.filter(s=>grp(s.dept)===dept);
+    const people=all.filter(s=>inGrp(s,dept));
     const {g,slots,fromGuide}=slotsFor(dept);
     const buckets=slots.map(()=>[[],[],[],[],[],[],[]]);
     const offs=[[],[],[],[],[],[],[]];
-    for(const st of people)for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(!v)continue;if(v.off){offs[d].push(st);continue}if(v.s){const i=slotOf(g,v);if(i>=0)buckets[i][d].push({st,v})}}
-    const dH=[0,0,0,0,0,0,0];for(const st of people)for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&v.s&&!v.off)dH[d]+=hoursOf(v,S.cfg)}
+    for(const st of people)for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(!v)continue;if(v.off){offs[d].push(st);continue}if(v.s&&shG(st,v)===dept){const i=slotOf(g,v);if(i>=0)buckets[i][d].push({st,v})}}
+    const dH=[0,0,0,0,0,0,0];for(const st of people)for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&v.s&&!v.off&&shG(st,v)===dept)dH[d]+=hoursOf(v,S.cfg)}
     const dT=dH.reduce((a,b)=>a+b,0);
     h+=`<tr class="grp"><td colspan="8">${esc(dept||"No department")}<span class="ct">${fmtH(dT)} hrs · ${people.length} ${people.length===1?"person":"people"} · ${fromGuide?"shifts from corporate guide":"no guide yet, using standard shift buttons"}</span></td></tr>`;
     slots.forEach((sl,i)=>{
@@ -1338,12 +1350,12 @@ function shiftGridHTML(){
         const shown=list.filter(x=>matchQ(x.st.name));
         const stc=need==null?"":list.length<need?"short":list.length>need?"over":"ok";
         const chips=shown.sort((a,b)=>a.st.name.localeCompare(b.st.name)).map(({st,v})=>{const f=fit(st,d,v);const custom=v.s!==sl.start||v.e!==sl.end;
-          return `<button class="nchip ${cellCls(f,v)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":""} title="${esc(st.name)} ${fmtRange(v.s,v.e)}${f==="bad"?" — outside availability ("+esc(availText(st,d))+")":""}"><span class="nn">${dot(st.id)}${hl(st.name)}${roleTag(st)}</span>${custom?`<span class="ct2">${fmtRange(v.s,v.e)}</span>`:""}</button>`}).join("");
+          return `<button class="nchip ${cellCls(f,v)}" data-sid="${st.id}" data-d="${d}" data-g="${esc(dept)}" ${S.readOnly?"disabled":""} title="${esc(st.name)} ${fmtRange(v.s,v.e)}${f==="bad"?" — outside availability ("+esc(availText(st,d))+")":""}"><span class="nn">${dot(st.id)}${hl(st.name)}${roleTag(st)}${alsoTag(st,dept)}</span>${custom?`<span class="ct2">${fmtRange(v.s,v.e)}</span>`:""}</button>`}).join("");
         h+=`<td class="scell"><div class="slist">${need!=null&&(need||list.length)?`<span class="cv ${stc}"><span>${list.length<need?"Need "+(need-list.length)+" more":list.length>need?(list.length-need)+" over":"Covered"}</span><span>${list.length}/${need}</span></span>`:""}${chips}${S.readOnly?"":`<button class="addp" data-add="${esc(dept)}" data-slot="${i}" data-d="${d}" aria-label="Add someone to ${esc(dept)} ${esc(sl.label)} ${DAYS_LONG[d]}">+ Add</button>`}</div></td>`;
       }
       h+=`</tr>`;
     });
-    h+=`<tr class="cov"><td class="who">Off</td>${offs.map(o=>`<td class="scell"><div class="slist">${o.filter(st=>matchQ(st.name)).map(st=>`<button class="nchip off" data-sid="${st.id}" data-d="${offs.indexOf(o)}" ${S.readOnly?"disabled":""}>${hl(st.name)}</button>`).join("")}</div></td>`).join("")}</tr>`;
+    h+=`<tr class="cov"><td class="who">Off</td>${offs.map(o=>`<td class="scell"><div class="slist">${o.filter(st=>matchQ(st.name)).map(st=>`<button class="nchip off" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${offs.indexOf(o)}" ${S.readOnly?"disabled":""}>${hl(st.name)}</button>`).join("")}</div></td>`).join("")}</tr>`;
   }
   if(!depts.length)h+=`<tr><td colspan="8" style="padding:24px;color:var(--muted)">No staff in this view.</td></tr>`;
   {const T=hourTotals();h+=`</tbody><tfoot><tr><td class="who">Total hours</td>${T.day.map((x,d)=>`<td><b>${fmtH(x)}</b><br>${T.heads[d]} ppl</td>`).join("")}</tr></tfoot><tbody>`;}
@@ -1352,8 +1364,9 @@ function shiftGridHTML(){
 }
 function weekHours(sid,skipDay){let h=0,days=0;for(let d=0;d<7;d++){if(d===skipDay)continue;const v=cellVal(sid,d);if(v&&v.s&&!v.off){h+=hoursOf(v,S.cfg);days++}}return{h,days}}
 function addPicker(dept,i,d){
+  CTXG=grp(dept);
   const {slots}=slotsFor(dept);const sl=slots[i];const v={s:sl.start,e:sl.end};const sh=slotHrs(sl);const dt=addDays(S.week,d);
-  const people=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&grp(s.dept)===grp(dept));
+  const people=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&inGrp(s,grp(dept)));
   const rows=people.map(st=>{const cur=cellVal(st.id,d);const wk=weekHours(st.id,d);const after=wk.h+sh;
     const f=fit(st,d,v);const busy=cur&&cur.s&&!cur.off;const same=busy&&cur.s===sl.start&&cur.e===sl.end;
     const warn=[];if(st.type==="PT"&&after>29.99)warn.push("PT over 29.99");if(+st.maxHrs>0&&after>+st.maxHrs+1e-9)warn.push("Over "+fmtH(+st.maxHrs)+" cap");if(after>40)warn.push("Over 40");if(wk.days+1>(S.cfg.maxDays||5))warn.push((wk.days+1)+" days");
@@ -1379,17 +1392,17 @@ let sampleFn=null;
 function capsFor(st){const base=st.type==="FT"?40:29.99;const m=+st.maxHrs;return m>0?Math.min(base,m):base}
 function genScope(){
   const all=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&grpMatch(s));
-  const depts=[...new Set(all.map(s=>grp(s.dept)))];
+  const depts=[...new Set(all.flatMap(s=>S.dept==="__all"?gsetOf(s):[grp(S.dept)]))];
   const withG=depts.filter(d=>guideFor(S.store,d)),noG=depts.filter(d=>!guideFor(S.store,d));
   return{all,depts:withG,noG};
 }
 let FIXED_N=0;
 function baseShifts(scope,mode){
   const sh=JSON.parse(JSON.stringify((S.sched&&S.sched.shifts)||{}));FIXED_N=0;
-  for(const st of scope.all){const inG=scope.depts.includes(grp(st.dept));const fx=st.sched==="fixed"&&st.fixed;
+  for(const st of scope.all){const inG=gsetOf(st).some(G=>scope.depts.includes(G));const fx=st.sched==="fixed"&&st.fixed;
     if(!(mode==="rebuild"&&inG)&&!fx)continue;const r=sh[st.id]||{};
-    for(let d=0;d<7;d++){const wipe=mode==="rebuild"&&inG;if(wipe&&r[d]&&!r[d].off)r[d]=null;
-      const t=fx&&fx[d];if(!t)continue;if(r[d]&&(r[d].off||!wipe))continue;
+    for(let d=0;d<7;d++){if(mode==="rebuild"&&r[d]&&!r[d].off&&scope.depts.includes(shG(st,r[d])))r[d]=null;
+      const t=fx&&fx[d];if(!t)continue;if(r[d])continue;
       r[d]=t.off?{off:true}:{s:t.s,e:t.e};FIXED_N++}
     sh[st.id]=r}
   return sh;
@@ -1406,15 +1419,15 @@ function canTake(sh,st,d,sl){
 function quickFill(scope,mode){
   const sh=baseShifts(scope,mode);const added=[];
   for(let d=0;d<7;d++)for(const dept of scope.depts){
-    const g=guideFor(S.store,dept);const people=scope.all.filter(s=>grp(s.dept)===dept);
+    const g=guideFor(S.store,dept);const people=scope.all.filter(s=>inGrp(s,dept));
     g.slots.forEach((sl,i)=>{
-      let have=people.filter(p=>{const v=cv(sh,p.id,d);return v&&v.s&&!v.off&&slotOf(g,v)===i}).length;
+      let have=people.filter(p=>{const v=cv(sh,p.id,d);return v&&v.s&&!v.off&&shG(p,v)===dept&&slotOf(g,v)===i}).length;
       const need=+(sl.need&&sl.need[d])||0;
       while(have<need){
         const c=people.filter(p=>!canTake(sh,p,d,sl)).map(p=>({p,s:stats(sh,p.id)}))
-          .sort((a,b)=>{const k=partOf({s:sl.start});const pm=x=>x.p.pref&&x.p.pref!=="any"?(prefIdx[x.p.pref]===k?0:2):1;return pm(a)-pm(b)||((a.p.type==="FT"&&a.s.h<30)?0:1)-((b.p.type==="FT"&&b.s.h<30)?0:1)||a.s.h-b.s.h||a.p.name.localeCompare(b.p.name)});
+          .sort((a,b)=>{const k=partOf({s:sl.start});const pm=x=>x.p.pref&&x.p.pref!=="any"?(prefIdx[x.p.pref]===k?0:2):1;return pm(a)-pm(b)||(grp(a.p.dept)===dept?0:1)-(grp(b.p.dept)===dept?0:1)||((a.p.type==="FT"&&a.s.h<30)?0:1)-((b.p.type==="FT"&&b.s.h<30)?0:1)||a.s.h-b.s.h||a.p.name.localeCompare(b.p.name)});
         if(!c.length)break;
-        const p=c[0].p;sh[p.id]=sh[p.id]||{};sh[p.id][d]={s:sl.start,e:sl.end};added.push([p.id,d]);have++;
+        const p=c[0].p;sh[p.id]=sh[p.id]||{};sh[p.id][d]=dept!==grp(p.dept)?{s:sl.start,e:sl.end,dept}:{s:sl.start,e:sl.end};added.push([p.id,d]);have++;
       }
     });
   }
@@ -1422,10 +1435,10 @@ function quickFill(scope,mode){
 }
 async function aiFill(scope,mode,extra,signal,onStatus){
   const sh=baseShifts(scope,mode);
-  const ids={},rev={};scope.all.filter(s=>scope.depts.includes(grp(s.dept))).forEach((s,i)=>{ids[s.id]="p"+i;rev["p"+i]=s});
+  const ids={},rev={};scope.all.filter(s=>gsetOf(s).some(G=>scope.depts.includes(G))).forEach((s,i)=>{ids[s.id]="p"+i;rev["p"+i]=s});
   const avs=(st,d)=>{const a=availOf(st,d);return a.mode==="any"?"any":a.mode==="no"?"no":a.from+"-"+a.to};
   const depts=scope.depts.map(dept=>{const g=guideFor(S.store,dept);return{dept,shifts:g.slots.map((sl,i)=>({slot:i,label:sl.label,time:sl.start+"-"+sl.end,hours:slotHrs(sl),need:DAYS.map((x,d)=>+(sl.need&&sl.need[d])||0)})),
-    people:scope.all.filter(s=>grp(s.dept)===dept).map(st=>({id:ids[st.id],name:st.name,role:st.dept,status:st.type||"PT",max_hours:capsFor(st),prefers:st.pref&&st.pref!=="any"?({am:"morning (starts before 10am)",mid:"mid (starts 10am-2pm)",pm:"afternoon/close (starts 2pm or later)"})[st.pref]:undefined,note:st.notes||undefined,availability:DAYS.map((x,d)=>avs(st,d)),locked:DAYS.map((x,d)=>{const v=cv(sh,st.id,d);return v?(v.off?"OFF":v.s+"-"+v.e):null})}))}});
+    people:scope.all.filter(s=>inGrp(s,dept)).map(st=>({id:ids[st.id],name:st.name,role:st.dept,status:st.type||"PT",max_hours:capsFor(st),prefers:st.pref&&st.pref!=="any"?({am:"morning (starts before 10am)",mid:"mid (starts 10am-2pm)",pm:"afternoon/close (starts 2pm or later)"})[st.pref]:undefined,note:st.notes||undefined,availability:DAYS.map((x,d)=>avs(st,d)),locked:DAYS.map((x,d)=>{const v=cv(sh,st.id,d);return v?(v.off?"OFF":v.s+"-"+v.e):null})}))}});
   const prompt=`You are building a weekly grocery store work schedule for Vista Markets, ${S.store} store, week of ${rangeLabel(S.week)}. Days are indexed 0=Sunday through 6=Saturday.
 
 HARD RULES (never break):
@@ -1433,7 +1446,7 @@ HARD RULES (never break):
 2. "locked" entries are already set: a person with a locked day (a shift or OFF) gets nothing more that day. At most one shift per person per day.
 3. Max ${S.cfg.maxDays||5} working days per person per week (locked shifts count).
 4. Each person's weekly hours must stay at or below their "max_hours" (part-time is 29.99 or less, some people have a lower personal cap). Nobody goes over 40 hours.
-5. Only assign people to shifts in their own department group. "Front End" is one group: cashiers, head cashiers, office and pricing staff all cover cashier shifts.
+5. Only assign people to shifts in a department they are listed under (a few people are listed under two departments; they still get at most one shift per day). "Front End" is one group: cashiers, head cashiers, office and pricing staff all cover cashier shifts.
 
 GOALS (in priority order):
 a. Fill each shift's "need" count for each day.
@@ -1446,17 +1459,17 @@ DATA:
 ${JSON.stringify(depts)}
 
 Reply with only JSON in this shape: {"a":[["p0",1,0],["p3",1,1]],"notes":["short note about any shift you could not fill and why"]}
-Each "a" entry is [person id, day 0-6, slot index within that person's department]. Include only NEW assignments, not locked ones. Keep notes to at most 6 short sentences.`;
+Each "a" entry is [person id, day 0-6, slot index within that department's shifts, department name exactly as given]. Include only NEW assignments, not locked ones. Keep notes to at most 6 short sentences.`;
   onStatus("The schedule assistant is building your week…");
   const out=await sampleFn.json(prompt,{modelTier:"complex",signal,cache:false});
   if(!out||!Array.isArray(out.a))throw{code:"invalid_json",message:"Claude's answer wasn't in the expected format."};
   const added=[],rejected=[];
   for(const row of out.a){
-    if(!Array.isArray(row))continue;const[pid,d,si]=row;const st=rev[pid];
+    if(!Array.isArray(row))continue;const[pid,d,si,dn]=row;const st=rev[pid];
     if(!st||!(d>=0&&d<=6)){rejected.push("an unknown person or day");continue}
-    const g=guideFor(S.store,st.dept);const sl=g&&g.slots[si];if(!sl){rejected.push(st.name+" on a shift that doesn't exist");continue}
+    const G=dn&&inGrp(st,grp(String(dn)))&&scope.depts.includes(grp(String(dn)))?grp(String(dn)):grp(st.dept);const g=guideFor(S.store,G);const sl=g&&g.slots[si];if(!sl){rejected.push(st.name+" on a shift that doesn't exist");continue}
     const why=canTake(sh,st,d,sl);if(why){rejected.push(st.name+" "+DAYS[d]+" "+sl.label+" ("+why+")");continue}
-    sh[st.id]=sh[st.id]||{};sh[st.id][d]={s:sl.start,e:sl.end};added.push([st.id,d]);
+    sh[st.id]=sh[st.id]||{};sh[st.id][d]=G!==grp(st.dept)?{s:sl.start,e:sl.end,dept:G}:{s:sl.start,e:sl.end};added.push([st.id,d]);
   }
   const notes=(Array.isArray(out.notes)?out.notes:[]).map(String).slice(0,6);
   if(rejected.length)notes.push("Removed "+rejected.length+" assignment"+(rejected.length===1?"":"s")+" that broke the rules: "+rejected.slice(0,5).join("; ")+(rejected.length>5?"…":""));
@@ -1464,9 +1477,9 @@ Each "a" entry is [person id, day 0-6, slot index within that person's departmen
 }
 function previewHTML(scope,res){
   let open=0,filled=0;const rows=[];
-  for(const dept of scope.depts){const g=guideFor(S.store,dept);const people=scope.all.filter(s=>grp(s.dept)===dept);
-    for(let d=0;d<7;d++)g.slots.forEach((sl,i)=>{const need=+(sl.need&&sl.need[d])||0;const have=people.filter(p=>{const v=cv(res.sh,p.id,d);return v&&v.s&&!v.off&&slotOf(g,v)===i}).length;filled+=Math.min(have,need);open+=Math.max(0,need-have)})}
-  for(const st of scope.all.filter(s=>scope.depts.includes(grp(s.dept)))){const s=stats(res.sh,st.id);const fl=[];
+  for(const dept of scope.depts){const g=guideFor(S.store,dept);const people=scope.all.filter(s=>inGrp(s,dept));
+    for(let d=0;d<7;d++)g.slots.forEach((sl,i)=>{const need=+(sl.need&&sl.need[d])||0;const have=people.filter(p=>{const v=cv(res.sh,p.id,d);return v&&v.s&&!v.off&&shG(p,v)===dept&&slotOf(g,v)===i}).length;filled+=Math.min(have,need);open+=Math.max(0,need-have)})}
+  for(const st of scope.all.filter(s=>gsetOf(s).some(G=>scope.depts.includes(G)))){const s=stats(res.sh,st.id);const fl=[];
     if(st.type==="FT"&&s.h<30)fl.push(["FT under 30",""]);if(st.type==="PT"&&s.h>29.99)fl.push(["PT over 29.99","bad"]);if(+st.maxHrs>0&&s.h>+st.maxHrs+1e-9)fl.push(["Over "+fmtH(+st.maxHrs)+" cap","bad"]);if(s.h>40)fl.push(["Over 40","bad"]);
     rows.push(`<tr><td style="text-align:left">${dot(st.id)}${esc(st.name)} <span class="pill ${st.type==="FT"?"ft":""}">${st.type||"PT"}</span></td><td style="text-align:left">${esc(st.dept)}</td><td>${s.days}</td><td><b>${fmtH(s.h)}</b></td><td>${fl.map(([t,c])=>`<span class="flag ${c}">${t}</span>`).join(" ")}</td></tr>`)}
   return `<div class="gstats">${FIXED_N?`<div><b>${FIXED_N}</b><span>set-schedule days placed</span></div>`:""}<div><b>${res.added.length}</b><span>shifts added</span></div><div><b>${filled}</b><span>guide spots filled</span></div><div class="${open?"short":""}"><b>${open}</b><span>spots still open</span></div></div>
@@ -1645,7 +1658,7 @@ function renderStaff(){
   $("#selReset").disabled=$("#selDel").disabled=!SEL.ids.size;
   if(!list.length&&S.q){$("#staffSlot").innerHTML=`<div class="card"><div class="empty"><h2>No one named “${esc(S.q)}” at any store</h2><button class="btn" data-act="clearq">Clear search</button></div></div>`;return}
   if(!list.length){$("#staffSlot").innerHTML=`<div class="card"><div class="empty"><h2>No employees here yet</h2><p>Use <b>Add employee</b> for one person, or <b>Paste a roster</b> to add a whole department at once and fill in availability after.</p></div></div>`;return}
-  $("#staffSlot").innerHTML=`<div class="stafflist">`+list.map(st=>`<div class="scard${SEL.on&&SEL.ids.has(st.id)?" picked":""}"${SEL.on?` data-pick-emp="${st.id}"`:""}><div class="top">${SEL.on?`<input type="checkbox" class="pickbox" data-pick-emp="${st.id}" ${SEL.ids.has(st.id)?"checked":""} aria-label="Select ${esc(st.name)}">`:""}<div style="flex:1;min-width:0"><div class="nm">${hl(st.name)}</div><div class="note">${S.q?esc(st.store)+" · ":""}${esc(st.dept)} · ${st.type==="FT"?"Full-time":"Part-time"}${+st.maxHrs>0?" · <b>max "+fmtH(+st.maxHrs)+" h/wk</b>":""}${st.notes?" · "+esc(st.notes):""}</div>${st.sched==="fixed"&&st.fixed&&Object.keys(st.fixed).length?`<div class="note"><span class="pill setp">Set schedule</span> ${DAYS.map((dn,d)=>{const v=st.fixed[d];return v?dn+" "+(v.off?"off":fmtRange(v.s,v.e)):""}).filter(Boolean).join(" · ")}</div>`:""}</div>${S.readOnly||SEL.on?"":`<button class="btn sm" data-edit="${st.id}">Edit</button>`}</div>
+  $("#staffSlot").innerHTML=`<div class="stafflist">`+list.map(st=>`<div class="scard${SEL.on&&SEL.ids.has(st.id)?" picked":""}"${SEL.on?` data-pick-emp="${st.id}"`:""}><div class="top">${SEL.on?`<input type="checkbox" class="pickbox" data-pick-emp="${st.id}" ${SEL.ids.has(st.id)?"checked":""} aria-label="Select ${esc(st.name)}">`:""}<div style="flex:1;min-width:0"><div class="nm">${hl(st.name)}</div><div class="note">${S.q?esc(st.store)+" · ":""}${esc(st.dept)} · ${st.type==="FT"?"Full-time":"Part-time"}${+st.maxHrs>0?" · <b>max "+fmtH(+st.maxHrs)+" h/wk</b>":""}${(st.also||[]).length?" · <b>also "+esc(st.also.join(", "))+"</b>":""}${st.notes?" · "+esc(st.notes):""}</div>${st.sched==="fixed"&&st.fixed&&Object.keys(st.fixed).length?`<div class="note"><span class="pill setp">Set schedule</span> ${DAYS.map((dn,d)=>{const v=st.fixed[d];return v?dn+" "+(v.off?"off":fmtRange(v.s,v.e)):""}).filter(Boolean).join(" · ")}</div>`:""}</div>${S.readOnly||SEL.on?"":`<button class="btn sm" data-edit="${st.id}">Edit</button>`}</div>
     <div class="avrow">${DAYS.map((dn,d)=>{const a=availOf(st,d);return `<div class="avd ${a.mode==="no"?"no":a.mode==="times"?"part":""}"><b>${dn}</b>${a.mode==="any"?"Any":a.mode==="no"?"—":fmtT(a.from)+"<br>"+fmtT(a.to)}</div>`}).join("")}</div></div>`).join("")+`</div>`;
 }
 const TEMPLATE=[{label:"AM",start:"06:00",end:"14:00"},{label:"Mid",start:"10:00",end:"18:00"},{label:"PM",start:"14:00",end:"22:00"},{label:"After 5",start:"17:00",end:"22:00"}];
@@ -1744,7 +1757,7 @@ function renderNotes(){
   const slot=$("#notesSlot");if(!slot)return;
   const ae=document.activeElement;if(ae&&ae.dataset&&ae.dataset.task&&slot.contains(ae))return;
   if(!S.store||S.tab!=="schedule"){slot.innerHTML="";return}
-  const groups=S.dept==="__all"?[...new Set(Object.values(S.staff).filter(o=>!o._pending&&o.store===S.store).map(o=>grp(o.dept)))].sort((a,b)=>{const f=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i};return f(a)-f(b)}):[grp(S.dept)];
+  const groups=S.dept==="__all"?[...new Set(Object.values(S.staff).filter(o=>!o._pending&&o.store===S.store).flatMap(o=>gsetOf(o)))].sort((a,b)=>{const f=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i};return f(a)-f(b)}):[grp(S.dept)];
   if(!groups.length){slot.innerHTML="";return}
   slot.innerHTML=`<div class="row"><h2 class="sec">Notes &amp; duties · ${esc(S.store)}</h2><div class="spacer"></div><span class="note">These print under each department's schedule.</span></div>
   <div class="ngrid">${groups.map(G=>{const t=tasksFor(S.store,G);const box=dutiesBox(S.store,G);const ed=NOTE.edit===G;
@@ -1756,7 +1769,7 @@ function renderNotes(){
 function printGroups(){
   const list=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&grpMatch(s));
   const order=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i};
-  const groups=[...new Set(list.map(s=>grp(s.dept)))].sort((a,b)=>order(a)-order(b));
+  const groups=[...new Set(list.flatMap(s=>S.dept==="__all"?gsetOf(s):[grp(S.dept)]))].sort((a,b)=>order(a)-order(b));
   return{list,groups};
 }
 function pageHead(G,sub){const wk=weekNo(S.week,S.cfg.wkOffset);
@@ -1765,12 +1778,12 @@ const pageFoot=``;
 function dayHead(first){let h=`<thead><tr><th style="text-align:left;width:${first}">`;return h}
 function printHTML(){
   const{list,groups}=printGroups();if(!groups.length)return `<div class="pv"><div class="pg">No employees</div></div>`;
-  return `<div class="pv">`+groups.map(G=>{const ppl=list.filter(s=>grp(s.dept)===G).sort((a,b)=>a.name.localeCompare(b.name));
+  return `<div class="pv">`+groups.map(G=>{const ppl=list.filter(s=>inGrp(s,G)).sort((a,b)=>a.name.localeCompare(b.name));
     let h=`<div class="pg">`+pageHead(G,"Horario semanal / Weekly schedule")+`<table><thead><tr><th style="text-align:left;width:20%">Employee / Empleado</th>`;
     for(let d=0;d<7;d++){const dt=addDays(S.week,d);h+=`<th>${DAYS[d]} / ${DAYS_ES[d]}<br>${dt.getMonth()+1}/${dt.getDate()}</th>`}
     h+=`<th>Hrs</th></tr></thead><tbody>`;let gt=0;const gd=[0,0,0,0,0,0,0];
     for(const st of ppl){let tot=0;h+=`<tr><td class="n">${esc(st.name)}${grp(st.dept)!==st.dept?` <span style="font-weight:400;font-size:10.5px">· ${esc(st.dept)}</span>`:""}</td>`;
-      for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&v.s&&!v.off){const x=hoursOf(v,S.cfg);tot+=x;gd[d]+=x;h+=`<td>${fmtRange(v.s,v.e)}</td>`}else h+=`<td class="o">OFF</td>`}
+      for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&v.s&&!v.off&&shG(st,v)===G){const x=hoursOf(v,S.cfg);tot+=x;gd[d]+=x;h+=`<td>${fmtRange(v.s,v.e)}</td>`}else if(v&&v.s&&!v.off)h+=`<td class="o">${esc(shG(st,v))}</td>`;else h+=`<td class="o">OFF</td>`}
       gt+=tot;h+=`<td>${fmtH(tot)}</td></tr>`}
     h+=`<tr class="tot"><td class="n">Total hrs</td>${gd.map(x=>`<td>${fmtH(x)}</td>`).join("")}<td>${fmtH(gt)}</td></tr></tbody></table>`;
     return h+dutiesBox(S.store,G)+pageFoot+`</div>`}).join("")+`</div>`;
@@ -1778,11 +1791,11 @@ function printHTML(){
 function printShiftHTML(){
   const{list,groups}=printGroups();if(!groups.length)return `<div class="pv"><div class="pg">No employees</div></div>`;
   return `<div class="pv">`+groups.map(G=>{
-    const people=list.filter(s=>grp(s.dept)===G);const {slots,fromGuide}=slotsFor(G);
+    const people=list.filter(s=>inGrp(s,G));const {slots,fromGuide}=slotsFor(G);
     const rows=new Map();const rk=(a,b)=>a+"-"+b;
     if(fromGuide)slots.forEach(sl=>{if((sl.need||[]).some(n=>+n>0))rows.set(rk(sl.start,sl.end),{s:sl.start,e:sl.end,d:[[],[],[],[],[],[],[]]})});
     const pH=[0,0,0,0,0,0,0];
-    for(const st of people)for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&v.s&&!v.off){pH[d]+=hoursOf(v,S.cfg);const k=rk(v.s,v.e);if(!rows.has(k))rows.set(k,{s:v.s,e:v.e,d:[[],[],[],[],[],[],[]]});rows.get(k).d[d].push(st)}}
+    for(const st of people)for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&v.s&&!v.off&&shG(st,v)===G){pH[d]+=hoursOf(v,S.cfg);const k=rk(v.s,v.e);if(!rows.has(k))rows.set(k,{s:v.s,e:v.e,d:[[],[],[],[],[],[],[]]});rows.get(k).d[d].push(st)}}
     const ordered=[...rows.values()].sort((a,b)=>toMin(a.s)-toMin(b.s)||toMin(a.e)-toMin(b.e));
     let h=`<div class="pg">`+pageHead(G,"Horario por turno / Schedule by shift")+`<table class="ps"><thead><tr><th style="text-align:left;width:11%">Time / Hora</th>`;
     for(let d=0;d<7;d++){const dt=addDays(S.week,d);h+=`<th>${DAYS[d]} / ${DAYS_ES[d]}<br>${dt.getMonth()+1}/${dt.getDate()}</th>`}
@@ -1820,26 +1833,30 @@ async function doPrint(){
 function openModal(html,wide){$("#modalSlot").innerHTML=`<div class="scrim" id="scrim"><div class="modal ${wide?"wide":""}" role="dialog" aria-modal="true">${html}</div></div>`;
   $("#scrim").addEventListener("click",e=>{if(e.target.id==="scrim"||e.target.hasAttribute("data-close"))closeModal()});
   const f=$("#modalSlot").querySelector("button,input,select");if(f)f.focus()}
-function closeModal(){$("#modalSlot").innerHTML=""}
+function closeModal(){$("#modalSlot").innerHTML="";CTXG=null}
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
 
 function meta(){return{store:S.store,weekStart:ymd(S.week)}}
-function setCell(sid,d,v){backend.setCell(key(),meta(),sid,d,v).catch(showErr)}
+function stampDept(sid,v){if(!v||!v.s||v.off)return v;const st=S.staff[sid];if(!st)return v;const G=CTXG||(S.dept!=="__all"?grp(S.dept):null)||v.dept||null;const n={s:v.s,e:v.e};if(G&&G!==grp(st.dept)&&inGrp(st,G))n.dept=G;return n}
+function setCell(sid,d,v){backend.setCell(key(),meta(),sid,d,stampDept(sid,v)).catch(showErr)}
 
 function shiftPicker(sid,d){
   const st={id:sid,...S.staff[sid]};const cur=cellVal(sid,d);const dt=addDays(S.week,d);
-  const g=guideFor(st.store,st.dept);
+  const PG=CTXG&&inGrp(st,CTXG)?CTXG:(cur&&cur.dept&&inGrp(st,cur.dept)?cur.dept:grp(st.dept));CTXG=PG;const multi=gsetOf(st).length>1;
+  const g=guideFor(st.store,PG);
   const pb=(p,attr,extra)=>{const f=fit(st,d,{s:p.start,e:p.end});return `<button class="pbtn ${f}" ${attr}><span class="pl">${esc(p.label)}${extra||""}</span><span class="pt">${fmtRange(p.start,p.end)}</span><span class="why">${f==="good"?"Fits availability":"Outside availability"} · ${fmtH(hoursOf({s:p.start,e:p.end},S.cfg))} h</span></button>`};
   let pres="";
   if(g){
-    const cnt=g.slots.map(()=>0);Object.entries(S.staff).forEach(([id,o])=>{if(o.store===st.store&&grp(o.dept)===grp(st.dept)){const v=cellVal(id,d);if(v&&v.s&&!v.off){const i=slotOf(g,v);if(i>=0)cnt[i]++}}});
-    pres=`<div class="ptitle">${esc(grp(st.dept))} shifts (corporate guide)</div><div class="presets">${g.slots.map((sl,i)=>pb(sl,`data-gs="${i}"`,` <span style="font-weight:500;font-size:12px">· ${cnt[i]}/${+(sl.need&&sl.need[d])||0} filled</span>`)).join("")}</div><div class="ptitle">Other shifts</div>`;
+    const cnt=g.slots.map(()=>0);Object.entries(S.staff).forEach(([id,o])=>{if(o.store===st.store&&inGrp(o,PG)){const v=cellVal(id,d);if(v&&v.s&&!v.off&&shG(o,v)===PG){const i=slotOf(g,v);if(i>=0)cnt[i]++}}});
+    pres=`<div class="ptitle">${esc(PG)} shifts (corporate guide)</div><div class="presets">${g.slots.map((sl,i)=>pb(sl,`data-gs="${i}"`,` <span style="font-weight:500;font-size:12px">· ${cnt[i]}/${+(sl.need&&sl.need[d])||0} filled</span>`)).join("")}</div><div class="ptitle">Other shifts</div>`;
   }
   pres+=`<div class="presets">${S.cfg.presets.map((p,i)=>pb(p,`data-pi="${i}"`)).join("")}</div>`;
   openModal(`<div><h3>${esc(st.name)}</h3><div class="ctx">${DAYS_LONG[d]} ${dt.getMonth()+1}/${dt.getDate()} · ${esc(st.dept)} · Available: <b>${esc(availText(st,d))}</b></div></div>
+    ${multi?`<div class="row"><span class="note">Working in</span><div class="seg sm">${gsetOf(st).map(G=>`<button class="${G===PG?"on":""}" data-pg="${esc(G)}">${esc(G)}</button>`).join("")}</div></div>`:""}
     ${pres}
     <div class="row"><span class="note">Custom</span><input type="time" id="cS" value="${cur&&cur.s||"08:00"}"><span>to</span><input type="time" id="cE" value="${cur&&cur.e||"16:00"}"><button class="btn" id="cApply">Set</button></div>
     <div class="row"><button class="btn" id="cOff">Mark day off</button><button class="btn danger" id="cClear">Clear</button><div class="spacer"></div><button class="btn" data-close>Cancel</button></div>`);
+  document.querySelectorAll("[data-pg]").forEach(b=>b.onclick=()=>{CTXG=b.dataset.pg;shiftPicker(sid,d)});
   document.querySelectorAll("[data-pi]").forEach(b=>b.onclick=()=>{const p=S.cfg.presets[+b.dataset.pi];setCell(sid,d,{s:p.start,e:p.end});closeModal()});
   document.querySelectorAll("[data-gs]").forEach(b=>b.onclick=()=>{const p=g.slots[+b.dataset.gs];setCell(sid,d,{s:p.start,e:p.end});closeModal()});
   $("#cApply").onclick=()=>{const s=$("#cS").value,e=$("#cE").value;if(!s||!e||s===e){toast("Enter a start and end time.");return}setCell(sid,d,{s,e});closeModal()};
@@ -1859,6 +1876,7 @@ function staffEditor(id){
       <label class="field"><span>Name</span><input type="text" id="eName" value="${esc(st.name)}"></label>
       <label class="field"><span>Store</span><select id="eStore">${S.cfg.stores.map(s=>`<option ${s===st.store?"selected":""}>${esc(s)}</option>`).join("")}</select></label>
       <label class="field"><span>Department</span><select id="eDept">${S.cfg.depts.map(s=>`<option ${s===st.dept?"selected":""}>${esc(s)}</option>`).join("")}</select></label>
+      <div class="field" style="grid-column:1/-1"><span>Also works in (optional)</span><div class="chips" id="eAlso">${[...new Set(S.cfg.depts.map(grp))].map(G=>`<label class="chip" style="display:inline-flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" value="${esc(G)}" ${(st.also||[]).map(grp).includes(G)?"checked":""}>${esc(G)}</label>`).join("")}</div><div class="note">They show up in these departments too, and auto fill can use them there. Hours count toward whichever department each shift is in.</div></div>
       <label class="field"><span>Status</span><select id="eType"><option value="FT" ${st.type==="FT"?"selected":""}>Full-time (30+ hrs)</option><option value="PT" ${st.type!=="FT"?"selected":""}>Part-time (under 30)</option></select></label>
     </div>
     <div class="formgrid">
@@ -1887,7 +1905,7 @@ function staffEditor(id){
     const avail={};for(let d=0;d<7;d++){const m=$("#am"+d).value;avail[d]=m==="times"?{mode:"times",from:$("#af"+d).value,to:$("#at"+d).value}:{mode:m}}
     const fixed={};for(let d=0;d<7;d++){const v=$("#fx"+d).value;if(!v)continue;if(v==="off")fixed[d]={off:true};else if(v==="custom"){const a=$("#fs"+d).value,b=$("#fe"+d).value;if(!a||!b||a===b){toast("Enter a start and end time for "+DAYS_LONG[d]+".");return}fixed[d]={s:a,e:b}}else{const[a,b]=v.split("-");fixed[d]={s:a,e:b}}}
     if(eSched==="fixed"&&!Object.keys(fixed).length){toast("Pick at least one day for the set schedule, or choose Rotates.");return}
-    const o={...(id&&S.staff[id]||{}),name,store:$("#eStore").value,dept:$("#eDept").value,type:$("#eType").value,notes:$("#eNotes").value.trim(),avail,sched:eSched,fixed};delete o._pending;delete o.maxHrs;const mx=parseFloat($("#eMax").value);if(mx>0)o.maxHrs=Math.round(mx*2)/2;
+    const o={...(id&&S.staff[id]||{}),name,store:$("#eStore").value,dept:$("#eDept").value,type:$("#eType").value,notes:$("#eNotes").value.trim(),avail,sched:eSched,fixed};o.also=[...document.querySelectorAll("#eAlso input:checked")].map(x=>x.value).filter(G=>G!==grp(o.dept));if(!o.also.length)delete o.also;delete o._pending;delete o.maxHrs;const mx=parseFloat($("#eMax").value);if(mx>0)o.maxHrs=Math.round(mx*2)/2;
     backend.saveStaff(id||uid(),o).then(()=>toast(isNew?"Employee added":"Saved")).catch(showErr);closeModal();
   };
   const del=$("#eDel");if(del)del.onclick=()=>{
@@ -1941,7 +1959,7 @@ function startSample(){
 
 /* ---------- events ---------- */
 document.addEventListener("click",e=>{
-  const c=e.target.closest(".cbtn,.nchip");if(c&&!c.disabled){shiftPicker(c.dataset.sid,+c.dataset.d);return}
+  const c=e.target.closest(".cbtn,.nchip");if(c&&!c.disabled){CTXG=c.dataset.g||null;shiftPicker(c.dataset.sid,+c.dataset.d);return}
   const ds=e.target.closest("[data-dstore]");if(ds&&S.tab==="dash"){DASH.store=ds.dataset.dstore;TRAF.store=DASH.store;renderDash();window.scrollTo({top:0,behavior:"smooth"});return}
   const go=e.target.closest("[data-goschedule]");if(go){S.store=go.dataset.goschedule;S.dept="__all";S.tab="schedule";savePrefs();renderAll();resub();return}
   const gs=e.target.closest("[data-gostore]");if(gs&&S.tab==="dash"){S.store=gs.dataset.gostore;S.dept=gs.dataset.godept||"__all";S.tab="schedule";savePrefs();renderAll();resub();return}
