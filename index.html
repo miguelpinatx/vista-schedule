@@ -496,6 +496,27 @@ header.top{align-items:center}
 .avtimes{display:inline-flex;gap:6px;align-items:center}
 .cshort{color:var(--bad-fg)}.cover{color:var(--blue)}.cok{color:var(--good-fg)}
 .cv.over{background:#d6ecfa;color:#08507f}
+.sgrid.dnd .addp{opacity:0;border:1px dashed transparent;min-height:26px;font-size:16px;padding:0}
+.sgrid.dnd td.scell:hover .addp,.sgrid.dnd .addp:focus{opacity:1;border-color:#c9c2d6}
+.sgrid.dnd .nchip[draggable="true"]{cursor:grab}.sgrid.dnd .nchip[draggable="true"]:active{cursor:grabbing}
+.cvmini{align-self:flex-start;font-size:11px;font-weight:700;border-radius:99px;padding:1px 7px}.cvmini.short{background:var(--bad-bg);color:var(--bad-fg)}.cvmini.over{background:#d6ecfa;color:#08507f}
+body.dragging td.dz-ok{background:#e3f5e8!important;outline:2px dashed var(--good-fg);outline-offset:-3px}
+body.dragging td.dz-bad{background:#fbe7e4!important;outline:2px dashed var(--bad-line);outline-offset:-3px}
+body.dragging td.dz-hov{outline:3px solid var(--brand)!important;outline-offset:-3px}
+.nchip.dz-src{opacity:.4}
+td.offcell{background:#faf9fc}
+.sumhead{display:flex;flex-direction:column;gap:2px;margin-bottom:10px}
+.sx{overflow-x:auto}
+.stab{border-collapse:collapse;width:100%;min-width:760px;font-variant-numeric:tabular-nums}
+.stab th,.stab td{padding:7px 6px;text-align:center;border-bottom:1px solid var(--line);font-size:14px}
+.stab th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;font-weight:700}
+.stab th small,.stab td small{display:block;font-size:11px;color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0}
+.stab .l{text-align:left}
+.stab tfoot td{font-weight:800;border-top:2px solid var(--ink);border-bottom:0}
+.stab tr.sg td{background:var(--surface2);font-weight:800;text-align:left;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.stab td.short{background:var(--bad-bg);color:var(--bad-fg);font-weight:700}.stab td.over{background:#d6ecfa;color:#08507f;font-weight:700}
+span.short{color:var(--bad-fg);font-weight:700}span.over{color:#08507f;font-weight:700}
+#view-sum .card{margin-bottom:12px}#view-sum .tcard>.ptitle{display:none}.sw.offa{background:#f1eff5;border:1px solid #d9d4e2}#view-sum .dtiles{margin-bottom:12px}
 .nchip.unsched{background:#e9e6ef;border:1.5px dashed #b9b2c6;color:#4b4459}
 .cbtn.offauto{background:#f1eff5;color:#5c566b}.cbtn.offauto .t{font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:12px}.cbtn.offauto .av{font-size:11px}.nchip.unsched:hover{border-color:var(--brand);border-style:solid}
 .nchip .ct2{display:block;font-size:10.5px;font-weight:500;opacity:.8}
@@ -515,6 +536,7 @@ header.top{align-items:center}
       <button role="tab" id="tab-schedule" aria-selected="true" data-tab="schedule" class="navbig"><span class="ni" aria-hidden="true">📅</span>See full schedule</button>
       <button role="tab" id="tab-build" aria-selected="false" data-tab="build" class="navbig"><span class="ni" aria-hidden="true">✏️</span>Build schedule</button>
       <button role="tab" id="tab-staff" aria-selected="false" data-tab="staff" class="navbig"><span class="ni" aria-hidden="true">👥</span>Staff &amp; availability</button>
+      <button role="tab" id="tab-sum" aria-selected="false" data-tab="sum" class="navbig"><span class="ni" aria-hidden="true">📊</span>Summary</button>
       <span class="navsp"></span>
       <button role="tab" id="tab-dash" aria-selected="false" data-tab="dash" class="navsm">Dashboard</button>
       <button role="tab" id="tab-guide" aria-selected="false" data-tab="guide" class="navsm">Staffing guide</button>
@@ -555,15 +577,15 @@ header.top{align-items:center}
     <div class="legend">
       <span class="lg-av"><i class="sw good"></i>Matches availability</span>
       <span class="lg-av"><i class="sw bad"></i>Outside availability</span>
+      <span class="lg-off"><i class="sw offa"></i>Off</span>
       <span class="lg-tm" hidden><i class="sw tam"></i>Morning (before 10a)</span>
       <span class="lg-tm" hidden><i class="sw tmid"></i>Mid (10a–2p)</span>
       <span class="lg-tm" hidden><i class="sw tpm"></i>Afternoon / close (2p+)</span>
       <span class="lg-tm" hidden><i class="sw tbad"></i>Red border = outside availability</span>
-      <span><i class="sw off"></i>Day off</span>
-      <span><i class="sw na"></i>Not available that day</span>
+      <span><i class="sw off"></i>Requested off</span>
       <span id="legendHint">Click any day to set a shift. Under each department: <b style="color:var(--bad-fg)">red = short staffed</b>, <b style="color:var(--blue)">blue = over staffed</b> vs. the staffing guide.</span>
       <span class="spacer"></span>
-      <div class="tabs vtog" role="group" aria-label="Color by"><button data-color="avail" aria-pressed="true">Color: availability</button><button data-color="time" aria-pressed="false">Color: time of day</button></div>
+      <div class="tabs vtog" role="group" aria-label="Color by" hidden><button data-color="avail" aria-pressed="true">Color: availability</button><button data-color="time" aria-pressed="false">Color: time of day</button></div>
       <div class="tabs vtog" role="group" aria-label="Schedule view"><button data-view="person" aria-pressed="true">By employee</button><button data-view="shift" aria-pressed="false">By shift</button></div>
     </div>
     <div id="budgetSlot"></div>
@@ -590,6 +612,8 @@ header.top{align-items:center}
     </div>
     <div id="staffSlot"></div>
   </section>
+
+  <section id="view-sum" class="panel" hidden><div id="sumTabSlot"></div></section>
 
   <section id="view-dash" class="panel" hidden>
     <div id="dashSlot"></div>
@@ -966,7 +990,7 @@ function attach(b){
 function resub(){if(unsubSched)unsubSched();if(!S.store)return;S.sched=null;S.pub=null;loadPub();S.sales=null;loadSales();unsubSched=backend.subSched(key(),d=>{S.sched=d;renderGrid();renderPrint();renderWizard();updFinal()})}
 
 /* ---------- render ---------- */
-function renderAll(){if(typeof renderChat==="function")renderChat();renderNotes();renderMode();renderBanner();renderControls();renderGrid();renderStaff();renderGuide();renderSettings();renderGoals();renderPrint();renderWizard();if(S.tab==="dash"){if(DASH.week!==ymd(S.week))loadDash();else renderDash()}}
+function renderAll(){if(typeof renderChat==="function")renderChat();renderNotes();renderMode();renderBanner();renderControls();renderGrid();renderStaff();renderGuide();renderSettings();renderGoals();renderPrint();renderWizard();renderSumTab();if(S.tab==="dash"){if(DASH.week!==ymd(S.week))loadDash();else renderDash()}}
 function renderMode(){
   $("#modeLine").textContent=S.mode==="sample"?"Sample crew — nothing is saved":S.mode==="shared"?(LOCK?LOCK+" store":"Saved for everyone with this link"):S.mode==="local"?"Saved on this device only":"Loading…";
 }
@@ -985,12 +1009,12 @@ function renderControls(){
   $("#jumpDate").value=ymd(S.week);
   document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));
   if(!S.canEdit&&(S.tab==="guide"||S.tab==="settings"))S.tab="build";if(LOCK&&S.tab==="dash")S.tab="build";$("#tab-dash").hidden=!!LOCK;
-  ["build","schedule","staff","dash","guide","settings"].forEach(t=>$("#view-"+t).hidden=t!==S.tab);
+  ["build","schedule","staff","sum","dash","guide","settings"].forEach(t=>$("#view-"+t).hidden=t!==S.tab);
   $("#tab-guide").hidden=!S.canEdit;$("#tab-settings").hidden=!S.canEdit;
   $("#mainBar").hidden=S.tab==="build";
   document.querySelector('#storeSel').closest('.field').hidden=S.tab==="dash";document.querySelector('#deptSel').closest('.field').hidden=S.tab==="dash";
   $("#searchField").hidden=!(S.tab==="schedule"||S.tab==="staff");
-  $("#weekField").hidden=S.tab!=="schedule"&&S.tab!=="dash";$("#schedActions").hidden=S.tab!=="schedule";
+  $("#weekField").hidden=S.tab!=="schedule"&&S.tab!=="dash"&&S.tab!=="sum";$("#schedActions").hidden=S.tab!=="schedule";
   ["genBtn","copyPrev","clearWeek"].forEach(id=>$("#"+id).disabled=S.readOnly);
 }
 function crew(all){
@@ -1028,7 +1052,7 @@ function coverageCells(dept,all){
   }
   return{cells,short,over};
 }
-function renderSum(){const el=$("#sumSlot");if(!el)return;if(!S.store||S.tab!=="schedule"){el.innerHTML="";return}
+function renderSum(){const el=$("#sumSlot");if(!el)return;el.innerHTML="";return;
   const ppl=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&grpMatch(s)&&(!S.q||matchQ(s.name)))
     .sort((a,b)=>deptOrder(grp(a.dept))-deptOrder(grp(b.dept))||grp(a.dept).localeCompare(grp(b.dept))||a.name.localeCompare(b.name));
   el.innerHTML=`<div style="margin-top:12px">${summaryHTML(ppl,S.dept==="__all")}</div>`;
@@ -1038,7 +1062,7 @@ function renderGrid(){renderSum();renderPay();
   document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===S.view)));
   document.querySelectorAll("[data-color]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.color===S.colorBy)));
   document.querySelectorAll(".lg-av").forEach(e=>e.hidden=S.colorBy==="time");document.querySelectorAll(".lg-tm").forEach(e=>e.hidden=S.colorBy!=="time");
-  $("#legendHint").innerHTML=(S.view==="shift"?"Click + Add to fill a shift, or a name to change it.":"Click any day to set a shift.")+` <span>Under each department:</span> <b style="color:var(--bad-fg)">red = short staffed</b>, <b style="color:var(--blue)">blue = over staffed</b> <span>vs. the staffing guide.</span>`;
+  $("#legendHint").innerHTML=S.view==="shift"?"Drag names between shifts and Off.":"Click any day to set a shift.";
   if(S.view==="shift"&&Object.values(S.staff).some(s=>s.store===S.store)){renderShiftGrid();return}
   const list=crew(),all=crew(true);
   if(!list.length&&S.q){
@@ -1051,7 +1075,7 @@ function renderGrid(){renderSum();renderPay();
     return;
   }
   const today=ymd(new Date());
-  let h=totalsBar()+elsewhereHTML()+`<div class="gridbox"><table class="grid"><thead><tr><th class="who">Employee</th>`;
+  let h=elsewhereHTML()+`<div class="gridbox"><table class="grid"><thead><tr><th class="who">Employee</th>`;
   for(let d=0;d<7;d++){const dt=addDays(S.week,d);h+=`<th class="${ymd(dt)===today?"today":""}">${DAYS[d]}<span class="d">${dt.getMonth()+1}/${dt.getDate()}</span></th>`}
   h+=`<th>Hours</th></tr></thead><tbody>`;
   const dayCount=[0,0,0,0,0,0,0],dayHrs=[0,0,0,0,0,0,0];let total=0;
@@ -1074,11 +1098,8 @@ function renderGrid(){renderSum();renderPay();
       }
       total+=here;h+=`<td class="tot"><div class="hrs">${fmtH(r.h)}</div>${gsetOf(st).length>1?`<div class="meta">${fmtH(here)} h in ${esc(dept)}</div>`:""}<div class="flags">${r.flags.map(([t,c])=>`<span class="flag ${c}">${t}</span>`).join("")}</div></td></tr>`;
     }
-    if(cov)h+=`<tr class="cov"><td class="who">Staffed vs. guide</td>${cov.cells.map(c=>`<td>${c}</td>`).join("")}<td></td></tr>`;
   }
-  h+=`</tbody><tfoot><tr><td class="who">${S.q?"Shown":"On schedule"} / hours</td>`;
-  for(let d=0;d<7;d++)h+=`<td><b>${dayCount[d]}</b> people<br>${fmtH(dayHrs[d])} h</td>`;
-  h+=`<td><b>${fmtH(total)}</b> h</td></tr></tfoot></table></div>`;
+  h+=`</tbody></table></div><p class="note" style="margin:6px 2px">Totals by day, shift and department are on the <b>Summary</b> tab.</p>`;
   slot.innerHTML=h;
 }
 /* ---------- hour totals ---------- */
@@ -1402,9 +1423,9 @@ function pickEmpModal(){const list=Object.entries(S.staff).filter(([id,s])=>!s._
   $("#peQ").oninput=e=>{const q=norm(e.target.value);document.querySelectorAll("#peList .prow").forEach(b=>{b.hidden=q&&!norm(b.textContent).includes(q)})};setTimeout(()=>$("#peQ").focus(),0)}
 function wStep4(){
   const g=guideFor(S.store,grp(S.dept));
-  return `<h2 class="wh">Place people on shifts</h2><p class="wsub">Tap <b>+ Add</b> on any shift to pick who works it. Green = fits their availability, red = doesn't. When you're ready, let auto-fill finish the rest.</p>
+  return `<h2 class="wh">Place people on shifts</h2><p class="wsub"><b>Drag a name</b> from the Off row onto a shift. Drag it to another shift to move it, or back to Off to remove it. While you drag, <span class="wk ok">green</span> = they're available, <span class="wk no">red</span> = they're not. You can also click an empty spot to pick from a list.</p>
   <div class="wauto"><button class="btn primary" id="wFill">Fill the rest automatically</button><span class="note">${g?"Fills the open shifts for you. You choose how, see a preview, and approve before anything saves.":"No staffing guide for this department yet, so auto-fill can't run. Ask corporate to set one up, or place shifts by hand."}</span></div>
-  ${wAlertsHTML(wPeople())}<div id="wBoard">${shiftGridHTML(true)}</div>${wSummaryHTML()}`;
+  ${wAlertsHTML(wPeople())}<div id="wBoard">${shiftGridHTML(true)}</div>`;
 }
 function wStep5(){
   const ppl=wPeople();let tot=0;const rows=ppl.map(p=>{const r=rowStats(p);tot+=r.h;return `<tr><td class="wname" style="text-align:left"><b>${esc(p.name)}</b>${roleTag(p)}</td>${DAYS.map((x,d)=>{const v=cellVal(p.id,d);return `<td class="${v&&v.s&&!v.off?"":"wo"}">${v&&v.s&&!v.off?fmtRange(v.s,v.e):"OFF"}</td>`}).join("")}<td>${r.days}</td><td><b>${fmtH(r.h)}</b></td><td style="text-align:left">${r.flags.map(([t,c])=>`<span class="flag ${c}">${t}</span>`).join(" ")||`<span class="okpill">OK</span>`}</td></tr>`}).join("");
@@ -1517,7 +1538,7 @@ function shiftGridHTML(noCov){
   const all=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&grpMatch(s)).sort((a,b)=>a.name.localeCompare(b.name));
   const depts=[...new Set(all.flatMap(s=>S.dept==="__all"?gsetOf(s):[grp(S.dept)]))].sort((a,b)=>{const f=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i};return f(a)-f(b)});
   const today=ymd(new Date());
-  let h=totalsBar()+elsewhereHTML()+`<div class="gridbox"><table class="grid sgrid"><thead><tr><th class="who">Shift</th>`;
+  let h=elsewhereHTML()+`<div class="gridbox"><table class="grid sgrid dnd"><thead><tr><th class="who">Shift</th>`;
   for(let d=0;d<7;d++){const dt=addDays(S.week,d);h+=`<th class="${ymd(dt)===today?"today":""}">${DAYS[d]}<span class="d">${dt.getMonth()+1}/${dt.getDate()}</span></th>`}
   h+=`</tr></thead><tbody>`;
   for(const dept of depts){
@@ -1528,7 +1549,7 @@ function shiftGridHTML(noCov){
     for(const st of people)for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(!v)continue;if(v.off){offs[d].push(st);continue}if(v.s&&shG(st,v)===dept){const i=slotOf(g,v);if(i>=0)buckets[i][d].push({st,v})}}
     const dH=[0,0,0,0,0,0,0];for(const st of people)for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&v.s&&!v.off&&shG(st,v)===dept)dH[d]+=hoursOf(v,S.cfg)}
     const dT=dH.reduce((a,b)=>a+b,0);
-    h+=`<tr class="grp"><td colspan="8">${esc(dept||"No department")}<span class="ct">${fmtH(dT)} hrs · ${people.length} ${people.length===1?"person":"people"} · ${fromGuide?"shifts from corporate guide":"no guide yet, using standard shift buttons"}</span></td></tr>`;
+    h+=`<tr class="grp"><td colspan="8">${esc(dept||"No department")}<span class="ct">${fmtH(dT)} hrs · ${people.length} ${people.length===1?"person":"people"}</span></td></tr>`;
     slots.forEach((sl,i)=>{
       h+=`<tr><td class="who"><div class="nm">${esc(sl.label)}</div><div class="meta">${fmtRange(sl.start,sl.end)} · ${fmtH(slotHrs(sl))} h</div></td>`;
       for(let d=0;d<7;d++){
@@ -1536,16 +1557,15 @@ function shiftGridHTML(noCov){
         const shown=list.filter(x=>matchQ(x.st.name));
         const stc=need==null?"":list.length<need?"short":list.length>need?"over":"ok";
         const chips=shown.sort((a,b)=>a.st.name.localeCompare(b.st.name)).map(({st,v})=>{const f=fit(st,d,v);const custom=v.s!==sl.start||v.e!==sl.end;
-          return `<button class="nchip ${cellCls(f,v)}" data-sid="${st.id}" data-d="${d}" data-g="${esc(dept)}" ${S.readOnly?"disabled":""} title="${esc(st.name)} ${fmtRange(v.s,v.e)}${f==="bad"?" — outside availability ("+esc(availText(st,d))+")":""}"><span class="nn">${dot(st.id)}${hl(st.name)}${roleTag(st)}${alsoTag(st,dept)}</span>${custom?`<span class="ct2">${fmtRange(v.s,v.e)}</span>`:""}</button>`}).join("");
-        h+=`<td class="scell"><div class="slist">${!noCov&&need!=null&&(need||list.length)?`<span class="cv ${stc}"><span>${list.length<need?"Need "+(need-list.length)+" more":list.length>need?(list.length-need)+" over":"Covered"}</span><span>${list.length}/${need}</span></span>`:""}${chips}${S.readOnly?"":`<button class="addp" data-add="${esc(dept)}" data-slot="${i}" data-d="${d}" aria-label="Add someone to ${esc(dept)} ${esc(sl.label)} ${DAYS_LONG[d]}">+ Add</button>`}</div></td>`;
+          return `<button class="nchip ${cellCls(f,v)}" data-sid="${st.id}" data-d="${d}" data-g="${esc(dept)}" ${S.readOnly?"disabled":`draggable="true" data-drag="shift"`} title="${esc(st.name)} ${fmtRange(v.s,v.e)}${f==="bad"?" — outside availability ("+esc(availText(st,d))+")":""}"><span class="nn">${dot(st.id)}${hl(st.name)}${roleTag(st)}${alsoTag(st,dept)}</span>${custom?`<span class="ct2">${fmtRange(v.s,v.e)}</span>`:""}</button>`}).join("");
+        h+=`<td class="scell" data-drop="slot" data-dept="${esc(dept)}" data-slot="${i}" data-d="${d}"><div class="slist">${!noCov&&need!=null&&stc&&stc!=="ok"?`<span class="cvmini ${stc}">${list.length<need?"Need "+(need-list.length):"+"+(list.length-need)+" over"}</span>`:""}${chips}${S.readOnly?"":`<button class="addp" data-add="${esc(dept)}" data-slot="${i}" data-d="${d}" aria-label="Add someone to ${esc(dept)} ${esc(sl.label)} ${DAYS_LONG[d]}">+</button>`}</div></td>`;
       }
       h+=`</tr>`;
     });
-    h+=`<tr class="cov"><td class="who"><div class="nm">Off</div><div class="meta">Anyone without a shift is off. Tap a name to give them one.</div></td>${offs.map((o,d)=>{const free=people.filter(st=>!cellVal(st.id,d)&&availOf(st,d).mode!=="no"&&matchQ(st.name)).sort((a,b)=>a.name.localeCompare(b.name));
-      return `<td class="scell"><div class="slist">${o.filter(st=>matchQ(st.name)).map(st=>`<button class="nchip off" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":""} title="Day off">${hl(st.name)}<span class="ct2">Requested off</span></button>`).join("")}${free.map(st=>`<button class="nchip unsched" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":""} title="Off (no shift yet). Tap to give them a shift.">${dot(st.id)}${hl(st.name)}<span class="ct2">Off</span></button>`).join("")}</div></td>`}).join("")}</tr>`;
+    h+=`<tr class="cov"><td class="who"><div class="nm">Off</div><div class="meta">Drag a name up onto a shift</div></td>${offs.map((o,d)=>{const free=people.filter(st=>!cellVal(st.id,d)&&availOf(st,d).mode!=="no"&&matchQ(st.name)).sort((a,b)=>a.name.localeCompare(b.name));
+      return `<td class="scell offcell" data-drop="off" data-dept="${esc(dept)}" data-d="${d}"><div class="slist">${o.filter(st=>matchQ(st.name)).map(st=>`<button class="nchip off" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":`draggable="true" data-drag="req"`} title="Day off">${hl(st.name)}<span class="ct2">Requested off</span></button>`).join("")}${free.map(st=>`<button class="nchip unsched" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":`draggable="true" data-drag="off"`} title="Off (no shift yet). Drag onto a shift, or tap to pick one.">${dot(st.id)}${hl(st.name)}<span class="ct2">Off</span></button>`).join("")}</div></td>`}).join("")}</tr>`;
   }
   if(!depts.length)h+=`<tr><td colspan="8" style="padding:24px;color:var(--muted)">No staff in this view.</td></tr>`;
-  {const T=hourTotals();h+=`</tbody><tfoot><tr><td class="who">Total hours</td>${T.day.map((x,d)=>`<td><b>${fmtH(x)}</b><br>${T.heads[d]} ppl</td>`).join("")}</tr></tfoot><tbody>`;}
   h+=`</tbody></table></div>`;
   return h;
 }
@@ -2237,18 +2257,75 @@ $("#mealDeduct").onchange=e=>backend.saveCfg({...S.cfg,mealDeduct:e.target.check
 $("#maxDays").onchange=e=>backend.saveCfg({...S.cfg,maxDays:Math.max(1,Math.min(7,+e.target.value||5))}).catch(showErr);
 $("#wkOffset").onchange=e=>backend.saveCfg({...S.cfg,wkOffset:Math.round(+e.target.value||0)}).catch(showErr);
 
+
+/* ---------- drag & drop on the shift board ---------- */
+let DRAG=null;
+function dndClear(){document.querySelectorAll(".dz-ok,.dz-bad,.dz-hov,.dz-src").forEach(e=>e.classList.remove("dz-ok","dz-bad","dz-hov","dz-src"));document.body.classList.remove("dragging")}
+function dndCanDrop(td){if(!DRAG||!td)return false;const st=S.staff[DRAG.sid];if(!st)return false;const G=td.dataset.dept;if(!inGrp(st,G))return false;
+  if(td.dataset.drop==="off")return DRAG.kind==="shift"&&+td.dataset.d===DRAG.d;return true}
+function dndFit(td){const st={id:DRAG.sid,...S.staff[DRAG.sid]};const d=+td.dataset.d;const {slots}=slotsFor(td.dataset.dept);const sl=slots[+td.dataset.slot];if(!sl)return"bad";
+  const cur=cellVal(DRAG.sid,d);if(cur&&cur.off)return"bad";return fit(st,d,{s:sl.start,e:sl.end})==="good"?"ok":"bad"}
+document.addEventListener("dragstart",e=>{const c=e.target.closest&&e.target.closest("[data-drag]");if(!c||c.disabled)return;
+  DRAG={sid:c.dataset.sid,d:+c.dataset.d,kind:c.dataset.drag,dept:c.dataset.g};try{e.dataTransfer.setData("text/plain",DRAG.sid);e.dataTransfer.effectAllowed="move"}catch(x){}
+  document.body.classList.add("dragging");c.classList.add("dz-src");
+  document.querySelectorAll("td[data-drop]").forEach(td=>{if(!dndCanDrop(td))return;if(td.dataset.drop==="off"){td.classList.add("dz-ok");return}td.classList.add(dndFit(td)==="ok"?"dz-ok":"dz-bad")})});
+document.addEventListener("dragend",()=>{DRAG=null;dndClear()});
+document.addEventListener("dragover",e=>{const td=e.target.closest&&e.target.closest("td[data-drop]");if(!td||!dndCanDrop(td))return;e.preventDefault();try{e.dataTransfer.dropEffect="move"}catch(x){}
+  document.querySelectorAll(".dz-hov").forEach(x=>{if(x!==td)x.classList.remove("dz-hov")});td.classList.add("dz-hov")});
+document.addEventListener("drop",e=>{const td=e.target.closest&&e.target.closest("td[data-drop]");if(!td||!DRAG||!dndCanDrop(td))return;e.preventDefault();
+  const D=DRAG;DRAG=null;dndClear();const st=S.staff[D.sid];const d=+td.dataset.d;
+  if(td.dataset.drop==="off"){setCell(D.sid,d,null);toast(st.name+" is off "+DAYS_LONG[d]);return}
+  const G=td.dataset.dept;const {slots}=slotsFor(G);const sl=slots[+td.dataset.slot];const nv={s:sl.start,e:sl.end};
+  const cur=cellVal(D.sid,d);const move=D.kind==="shift"&&D.d!==d;
+  const go=()=>{if(move)setCell(D.sid,D.d,null);
+    const wk=weekHours(D.sid,d);let h=wk.h+hoursOf(nv,S.cfg),days=wk.days+1;if(move){const ov=cellVal(D.sid,D.d);if(ov&&ov.s&&!ov.off){h-=hoursOf(ov,S.cfg);days--}}
+    CTXG=G;backend.setCell(key(),meta(),D.sid,d,stampDept(D.sid,nv)).catch(showErr);CTXG=null;
+    const msgs=limitMsgs(st,h,days);const a=availOf(st,d);if(fit({id:D.sid,...st},d,nv)==="bad")msgs.unshift(a.mode==="no"?"Can't work on "+DAYS_LONG[d]+"s":"Only available "+fmtRange(a.from,a.to));
+    if(cur&&cur.s&&!cur.off&&!(cur.s===nv.s&&cur.e===nv.e)&&D.d!==d)msgs.push("Replaced their "+fmtRange(cur.s,cur.e)+" shift that day");
+    if(msgs.length)alertBox(`<b>⚠ Check ${esc(st.name)}</b><br>${msgs.map(esc).join("<br>")}`);else toast(st.name+" · "+DAYS[d]+" "+fmtRange(nv.s,nv.e))};
+  if(cur&&cur.off){openModal(`<h3>${esc(st.name)} asked for ${DAYS_LONG[d]} off</h3><div class="ctx">Schedule them anyway?</div><div class="row"><div class="spacer"></div><button class="btn" data-close>No, keep the day off</button><button class="btn primary" id="dndYes">Yes, schedule them</button></div>`);$("#dndYes").onclick=()=>{closeModal();go()};return}
+  go()});
+/* ---------- Summary tab ---------- */
+const slotName=sl=>{const t=fmtRange(sl.start,sl.end);const n=x=>String(x||"").toLowerCase().replace(/[^a-z0-9]/g,"");return !sl.label||n(sl.label)===n(t)?t:sl.label+" · "+t};
+function sumData(){const ppl=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store);
+  const F=S.dept==="__all"?null:grp(S.dept);const D={},T={ids:new Set(),h:0,n:0,day:DAYS.map(()=>({h:0,ids:new Set(),part:[0,0,0]}))};
+  for(const p of ppl)for(let d=0;d<7;d++){const v=cellVal(p.id,d);if(!(v&&v.s&&!v.off))continue;const G=shG(p,v);if(F&&G!==F)continue;const h=hoursOf(v,S.cfg),k=partOf(v);
+    const R=D[G]=D[G]||{ids:new Set(),h:0,n:0,day:DAYS.map(()=>({h:0,ids:new Set()})),slots:{}};
+    for(const X of[R,T]){X.ids.add(p.id);X.h+=h;X.n++;X.day[d].h+=h;X.day[d].ids.add(p.id)}T.day[d].part[k]++;
+    const {g,slots}=slotsFor(G);let i=g?slotOf(g,v):-1;const lbl=i>=0?slotName(slots[i]):fmtRange(v.s,v.e);const sk=(i>=0?String(i).padStart(3,"0"):"z"+v.s+v.e);
+    const S2=R.slots[sk]=R.slots[sk]||{lbl,i,cnt:[0,0,0,0,0,0,0]};S2.cnt[d]++}
+  const order=Object.keys(D).sort((a,b)=>deptOrder(a)-deptOrder(b));
+  return{D,T,order,ppl:ppl.filter(p=>!F||inGrp(p,F)),F}}
+function renderSumTab(){const el=$("#sumTabSlot");if(!el)return;if(S.tab!=="sum"||!S.store){el.innerHTML="";return}
+  const {D,T,order,ppl,F}=sumData();const r1=x=>fmtH(Math.round(x*10)/10);const cell=(h,n)=>h?`<b>${r1(h)}</b><small>${n} ${n===1?"person":"people"}</small>`:`<span class="note">—</span>`;
+  const dh=DAYS.map((x,d)=>{const dt=addDays(S.week,d);return `<th>${x}<small>${dt.getMonth()+1}/${dt.getDate()}</small></th>`}).join("");
+  const deptRows=order.map(G=>{const R=D[G];return `<tr><td class="l"><b>${esc(G)}</b></td><td>${R.ids.size}</td><td>${R.n}</td><td><b>${r1(R.h)}</b></td>${R.day.map(x=>`<td>${cell(x.h,x.ids.size)}</td>`).join("")}</tr>`}).join("");
+  const shiftBlocks=order.map(G=>{const R=D[G];const {g,slots}=slotsFor(G);const rows=Object.keys(R.slots).sort().map(k=>R.slots[k]);
+    if(g)slots.forEach((sl,i)=>{const k=String(i).padStart(3,"0");if(!R.slots[k]&&(sl.need||[]).some(n=>+n>0))rows.push({lbl:slotName(sl),i,cnt:[0,0,0,0,0,0,0]})});
+    rows.sort((a,b)=>(a.i<0?999:a.i)-(b.i<0?999:b.i));
+    return `<tr class="sg"><td colspan="8">${esc(G)}</td></tr>`+rows.map(x=>`<tr><td class="l">${esc(x.lbl)}</td>${x.cnt.map((c,d)=>{const need=g&&x.i>=0?(+(slots[x.i].need&&slots[x.i].need[d])||0):null;const st=need==null?"":c<need?"short":c>need?"over":"ok";
+      return `<td class="${st}">${c||(need?0:"—")}${need!=null&&(need||c)?`<small>of ${need}</small>`:""}</td>`}).join("")}</tr>`).join("")}).join("");
+  el.innerHTML=`<div class="sumhead"><h2 class="sec">Summary · ${esc(S.store)}${F?" · "+esc(F):""}</h2><div class="note">Week ${weekNo(S.week,S.cfg.wkOffset)} · ${rangeLabel(S.week)}${S.cfg.mealDeduct?" · hours exclude a 30-min meal on 6h+ shifts":""}</div></div>
+  <div class="dtiles"><div class="dtile"><span>Total hours</span><b>${r1(T.h)}</b></div><div class="dtile"><span>Employees working</span><b>${T.ids.size}</b><small>of ${ppl.length} on the team</small></div><div class="dtile"><span>Shifts</span><b>${T.n}</b></div><div class="dtile"><span>Avg hours per person</span><b>${T.ids.size?r1(T.h/T.ids.size):0}</b></div></div>
+  <div class="card"><h3 class="sec">By department</h3><div class="sx"><table class="stab"><thead><tr><th class="l">Department</th><th>Employees</th><th>Shifts</th><th>Hours</th>${dh}</tr></thead><tbody>${deptRows||`<tr><td colspan="11" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody>
+  <tfoot><tr><td class="l">All departments</td><td>${T.ids.size}</td><td>${T.n}</td><td>${r1(T.h)}</td>${T.day.map(x=>`<td>${cell(x.h,x.ids.size)}</td>`).join("")}</tr></tfoot></table></div></div>
+  <div class="card"><h3 class="sec">By day</h3><div class="sx"><table class="stab"><thead><tr><th class="l">Day</th><th>Employees</th><th>Hours</th><th>Morning<small>before 10a</small></th><th>Mid<small>10a–2p</small></th><th>Closing<small>2p+</small></th></tr></thead><tbody>
+  ${T.day.map((x,d)=>{const dt=addDays(S.week,d);return `<tr><td class="l"><b>${DAYS_LONG[d]}</b> <span class="note">${dt.getMonth()+1}/${dt.getDate()}</span></td><td>${x.ids.size}</td><td><b>${r1(x.h)}</b></td>${x.part.map(n=>`<td>${n||"—"}</td>`).join("")}</tr>`}).join("")}</tbody>
+  <tfoot><tr><td class="l">Week</td><td>${T.ids.size}</td><td>${r1(T.h)}</td>${[0,1,2].map(k=>`<td>${T.day.reduce((a,x)=>a+x.part[k],0)}</td>`).join("")}</tr></tfoot></table></div></div>
+  <div class="card"><h3 class="sec">By shift <span class="note" style="font-weight:500">people on each shift · <span class="short">red = short</span> · <span class="over">blue = over</span> the staffing guide</span></h3><div class="sx"><table class="stab shifts"><thead><tr><th class="l">Shift</th>${dh}</tr></thead><tbody>${shiftBlocks||`<tr><td colspan="8" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody></table></div></div>
+  <div class="card"><h3 class="sec">By employee</h3>${summaryHTML([...ppl].sort((a,b)=>deptOrder(grp(a.dept))-deptOrder(grp(b.dept))||grp(a.dept).localeCompare(grp(b.dept))||a.name.localeCompare(b.name)),!F)}</div>`}
 /* ---------- English / Español ---------- */
 let LANG=(()=>{try{return localStorage.getItem("vsb-lang")==="es"?"es":"en"}catch(e){return"en"}})();
 const DAY_ES={Sun:"Dom",Mon:"Lun",Tue:"Mar",Wed:"Mié",Thu:"Jue",Fri:"Vie",Sat:"Sáb",SUN:"DOM",MON:"LUN",TUE:"MAR",WED:"MIÉ",THU:"JUE",FRI:"VIE",SAT:"SÁB"};
 const DAYL_ES={Sunday:"Domingo",Monday:"Lunes",Tuesday:"Martes",Wednesday:"Miércoles",Thursday:"Jueves",Friday:"Viernes",Saturday:"Sábado",Sundays:"domingos",Mondays:"lunes",Tuesdays:"martes",Wednesdays:"miércoles",Thursdays:"jueves",Fridays:"viernes",Saturdays:"sábados"};
 const MON_ES={Jan:"ene",Feb:"feb",Mar:"mar",Apr:"abr",May:"may",Jun:"jun",Jul:"jul",Aug:"ago",Sep:"sep",Oct:"oct",Nov:"nov",Dec:"dic"};
 const ES={
-"See full schedule":"Ver horario completo","Build schedule":"Hacer horario","Staff & availability":"Personal y disponibilidad","Dashboard":"Panel","Staffing guide":"Guía de personal","Settings":"Ajustes",
+"See full schedule":"Ver horario completo","Build schedule":"Hacer horario","Staff & availability":"Personal y disponibilidad","Dashboard":"Panel","Summary":"Resumen","By department":"Por departamento","By day":"Por día","By shift":"Por turno","By employee":"Por empleado","Employees":"Empleados","Shifts":"Turnos","All departments":"Todos los departamentos","Employees working":"Empleados trabajando","Avg hours per person":"Promedio de horas por persona","Nothing scheduled this week yet.":"Todavía no hay nada programado esta semana.","Day":"Día","Morning":"Mañana","before 10a":"antes de 10a","Closing":"Cierre","2p+":"2p o después","people on each shift ·":"personas en cada turno ·","red = short":"rojo = falta","blue = over":"azul = de más","the staffing guide":"la guía de personal","Drag a name up onto a shift":"Arrastra un nombre a un turno","Off (no shift yet). Drag onto a shift, or tap to pick one.":"Libre (sin turno). Arrástralo a un turno o tócalo para elegir uno.","Schedule them anyway?":"¿Programarlo de todos modos?","No, keep the day off":"No, dejar el día libre","Yes, schedule them":"Sí, programarlo","Totals by day, shift and department are on the":"Los totales por día, turno y departamento están en la pestaña","tab.":".","Drag a name":"Arrastra un nombre","from the Off row onto a shift. Drag it to another shift to move it, or back to Off to remove it. While you drag,":"de la fila Libre a un turno. Arrástralo a otro turno para moverlo, o de regreso a Libre para quitarlo. Mientras arrastras,","green":"verde","= they're available,":"= está disponible,","red":"rojo","= they're not. You can also click an empty spot to pick from a list.":"= no está disponible. También puedes hacer clic en un espacio vacío para elegir de una lista.","Staffing guide":"Guía de personal","Settings":"Ajustes",
 "Store":"Tienda","Department":"Departamento","Find employee":"Buscar empleado","Week":"Semana","This week":"Esta semana","All departments":"Todos los departamentos","Front End (all cashier, office & pricing roles)":"Front End (cajeros, oficina y precios)",
 "Fill automatically":"Llenar automáticamente","Copy last week":"Copiar semana pasada","Clear week":"Borrar semana","Print schedule":"Imprimir horario","Print":"Imprimir","Mark final & share":"Marcar final y compartir","✓ Final · shared":"✓ Final · compartido","Update final (changes not shared)":"Actualizar final (cambios sin compartir)",
 "Matches availability":"Dentro de su disponibilidad","Outside availability":"Fuera de su disponibilidad","Day off":"Día libre","Not available that day":"No disponible ese día","Color: availability":"Color: disponibilidad","Color: time of day":"Color: hora del día","By employee":"Por empleado","By shift":"Por turno",
 "Morning (before 10a)":"Mañana (antes de 10a)","Mid (10a–2p)":"Medio (10a–2p)","Afternoon / close (2p+)":"Tarde / cierre (2p+)","Red border = outside availability":"Borde rojo = fuera de su disponibilidad",
-"Click any day to set a shift. Under each department:":"Haz clic en un día para poner un turno. Debajo de cada departamento:","Under each department:":"Debajo de cada departamento:","red = short staffed":"rojo = falta personal","blue = over staffed":"azul = personal de más","vs. the staffing guide.":"según la guía de personal.","Click any day to set a shift.":"Haz clic en un día para poner un turno.","Click + Add to fill a shift, or a name to change it.":"Haz clic en + Agregar para llenar un turno, o en un nombre para cambiarlo.",
+"Click any day to set a shift. Under each department:":"Haz clic en un día para poner un turno. Debajo de cada departamento:","Under each department:":"Debajo de cada departamento:","red = short staffed":"rojo = falta personal","blue = over staffed":"azul = personal de más","vs. the staffing guide.":"según la guía de personal.","Click any day to set a shift.":"Haz clic en un día para poner un turno.","Drag names between shifts and Off.":"Arrastra nombres entre turnos y Libre.","Requested off":"Pidió libre","Click + Add to fill a shift, or a name to change it.":"Haz clic en + Agregar para llenar un turno, o en un nombre para cambiarlo.",
 "Employee":"Empleado","Hours":"Horas","Shift":"Turno","Name":"Nombre","Days":"Días","Check":"Revisión","OK":"OK","Any time":"Cualquier hora","Unavailable":"No disponible","Can't work":"No puede","Can't":"No puede","Certain hours":"Ciertas horas","Day off this week":"Día libre esta semana","OFF":"LIBRE","Off":"Libre",
 "Staffed vs. guide":"Personal vs. guía","vs. staffing guide":"según la guía","✓ matches staffing guide":"✓ cumple con la guía","Total hours":"Total de horas","+ Add":"+ Agregar","Covered":"Cubierto","person":"persona","people":"personas",
 "Week & department":"Semana y departamento","Your team":"Tu equipo","Set or rotating":"Fijo o rotativo","Availability this week":"Disponibilidad esta semana","Place shifts":"Asignar turnos","Review & print":"Revisar e imprimir","← Back":"← Atrás","Finish":"Terminar",
@@ -2300,7 +2377,7 @@ const ES_RE=[
 [/^Tap a name to put them on this shift\. Hours include this shift\.$/,"Toca un nombre para ponerlo en este turno. Las horas incluyen este turno."],
 [/^ · Tap a name to put them on this shift\. Hours include this shift\.$/," · Toca un nombre para ponerlo en este turno. Las horas incluyen este turno."],
 [/^(\d+) (people|person)$/,m=>m[1]+" "+(m[2]==="person"?"persona":"personas")],
-[/^(\d+) short$/,"faltan $1"],[/^(\d+) over$/,"$1 de más"],[/^Need (\d+) more$/,"Faltan $1"],
+[/^(\d+) short$/,"faltan $1"],[/^(\d+) over$/,"$1 de más"],[/^Need (\d+) more$/,"Faltan $1"],[/^Need (\d+)$/,"Faltan $1"],[/^\+(\d+) over$/,"+$1 de más"],[/^of (\d+)$/,"de $1"],[/^Summary · (.+)$/,"Resumen · $1"],[/^of (\d+) on the team$/,"de $1 en el equipo"],[/^(.+) asked for (\w+) off$/,m=>m[1]+" pidió el "+(DAYL_ES[m[2]]||m[2])+" libre"],[/^(.+) is off (\w+)$/,m=>m[1]+" libre el "+(DAYL_ES[m[2]]||m[2])],[/^Replaced their (.+) shift that day$/,"Se reemplazó su turno de $1 ese día"],
 [/^of (\d+) (answered|checked)$/,m=>"de "+m[1]+" "+(m[2]==="answered"?"contestados":"revisados")],
 [/^(\d+) shifts$/,"$1 turnos"],[/^Total · (\d+) people$/,"Total · $1 personas"],[/^(\d+) ppl$/,"$1 pers."],
 [/^\/ (\S+) max$/,"/ $1 máx."],
@@ -2341,7 +2418,7 @@ function setLang(l){LANG=l==="es"?"es":"en";try{localStorage.setItem("vsb-lang",
 document.addEventListener("click",e=>{const b=e.target.closest("[data-lang]");if(b){e.preventDefault();setLang(b.dataset.lang)}});
 setLang(LANG);
 
-if(prefs.dept)S.dept=prefs.dept;S.view=prefs.view==="shift"?"shift":"person";S.colorBy=prefs.colorBy==="time"?"time":"avail";S.tab="schedule";if(prefs.store)S.store=prefs.store;
+if(prefs.dept)S.dept=prefs.dept;S.view=prefs.view==="shift"?"shift":"person";S.colorBy="avail";S.tab="schedule";if(prefs.store)S.store=prefs.store;
 
 wireWizard();
 renderControls();
