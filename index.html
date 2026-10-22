@@ -496,7 +496,8 @@ header.top{align-items:center}
 .avtimes{display:inline-flex;gap:6px;align-items:center}
 .cshort{color:var(--bad-fg)}.cover{color:var(--blue)}.cok{color:var(--good-fg)}
 .cv.over{background:#d6ecfa;color:#08507f}
-.nchip.unsched{background:#fff;border:1.5px dashed #b9b2c6;color:var(--ink)}.nchip.unsched:hover{border-color:var(--brand);border-style:solid}
+.nchip.unsched{background:#e9e6ef;border:1.5px dashed #b9b2c6;color:#4b4459}
+.cbtn.offauto{background:#f1eff5;color:#5c566b}.cbtn.offauto .t{font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:12px}.cbtn.offauto .av{font-size:11px}.nchip.unsched:hover{border-color:var(--brand);border-style:solid}
 .nchip .ct2{display:block;font-size:10.5px;font-weight:500;opacity:.8}
 .lnkbtn{border:0;background:none;color:var(--brand);font-weight:600;text-decoration:underline;cursor:pointer;padding:0 4px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -1067,7 +1068,7 @@ function renderGrid(){renderSum();renderPay();
         let inner,cls=f;
         if(v&&v.off)inner=`<span class="t">OFF</span>`;
         else if(v&&v.s){const hh=hoursOf(v,S.cfg);const og=shG(st,v);if(og===dept){dayCount[d]++;dayHrs[d]+=hh;here+=hh}inner=`<span class="t">${fmtRange(v.s,v.e)}</span><span class="h">${og!==dept?"in "+esc(og):fmtH(hh)+" h"}${f==="bad"?" · avail "+esc(availText(st,d)):""}</span>`}
-        else{cls=a.mode==="no"?"na":"";inner=`<span class="av">${a.mode==="no"?"Unavailable":esc(availText(st,d))}</span>`}
+        else{cls="offauto"+(a.mode==="no"?" na":"");inner=`<span class="t">Off</span><span class="av">${a.mode==="no"?"Can't work":"Avail "+esc(availText(st,d))}</span>`}
         if(v&&v.s&&!v.off)cls=cellCls(f,v)+(shG(st,v)!==dept?" oth":"");
         h+=`<td class="cell"><button class="cbtn ${cls}" data-sid="${st.id}" data-d="${d}" data-g="${esc(dept)}" ${S.readOnly?"disabled":""} aria-label="${esc(st.name)}, ${DAYS_LONG[d]}">${inner}</button></td>`;
       }
@@ -1406,7 +1407,7 @@ function wStep4(){
   ${wAlertsHTML(wPeople())}<div id="wBoard">${shiftGridHTML(true)}</div>${wSummaryHTML()}`;
 }
 function wStep5(){
-  const ppl=wPeople();let tot=0;const rows=ppl.map(p=>{const r=rowStats(p);tot+=r.h;return `<tr><td class="wname" style="text-align:left"><b>${esc(p.name)}</b>${roleTag(p)}</td>${DAYS.map((x,d)=>{const v=cellVal(p.id,d);return `<td class="${v&&v.off?"wo":""}">${v&&v.off?"OFF":v&&v.s?fmtRange(v.s,v.e):"—"}</td>`}).join("")}<td>${r.days}</td><td><b>${fmtH(r.h)}</b></td><td style="text-align:left">${r.flags.map(([t,c])=>`<span class="flag ${c}">${t}</span>`).join(" ")||`<span class="okpill">OK</span>`}</td></tr>`}).join("");
+  const ppl=wPeople();let tot=0;const rows=ppl.map(p=>{const r=rowStats(p);tot+=r.h;return `<tr><td class="wname" style="text-align:left"><b>${esc(p.name)}</b>${roleTag(p)}</td>${DAYS.map((x,d)=>{const v=cellVal(p.id,d);return `<td class="${v&&v.s&&!v.off?"":"wo"}">${v&&v.off?"OFF · req.":v&&v.s?fmtRange(v.s,v.e):"OFF"}</td>`}).join("")}<td>${r.days}</td><td><b>${fmtH(r.h)}</b></td><td style="text-align:left">${r.flags.map(([t,c])=>`<span class="flag ${c}">${t}</span>`).join(" ")||`<span class="okpill">OK</span>`}</td></tr>`}).join("");
   const cov=coverageCells(grp(S.dept),ppl);const probs=ppl.reduce((a,p)=>a+rowStats(p).flags.filter(f=>f[1]==="bad").length,0);
   return `<h2 class="wh">Review your ${esc(grp(S.dept))} schedule</h2>
   <div class="dtiles"><div class="dtile"><span>Total hours</span><b>${fmtH(tot)}</b><small>${ppl.length} people</small></div>
@@ -1540,8 +1541,8 @@ function shiftGridHTML(noCov){
       }
       h+=`</tr>`;
     });
-    h+=`<tr class="cov"><td class="who"><div class="nm">Off / not scheduled</div><div class="meta">Tap a name to give them a shift</div></td>${offs.map((o,d)=>{const free=people.filter(st=>!cellVal(st.id,d)&&availOf(st,d).mode!=="no"&&matchQ(st.name)).sort((a,b)=>a.name.localeCompare(b.name));
-      return `<td class="scell"><div class="slist">${o.filter(st=>matchQ(st.name)).map(st=>`<button class="nchip off" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":""} title="Day off">${hl(st.name)}<span class="ct2">Day off</span></button>`).join("")}${free.map(st=>`<button class="nchip unsched" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":""} title="Not scheduled yet. Tap to give them a shift.">${dot(st.id)}${hl(st.name)}<span class="ct2">Not scheduled</span></button>`).join("")}</div></td>`}).join("")}</tr>`;
+    h+=`<tr class="cov"><td class="who"><div class="nm">Off</div><div class="meta">Anyone without a shift is off. Tap a name to give them one.</div></td>${offs.map((o,d)=>{const free=people.filter(st=>!cellVal(st.id,d)&&availOf(st,d).mode!=="no"&&matchQ(st.name)).sort((a,b)=>a.name.localeCompare(b.name));
+      return `<td class="scell"><div class="slist">${o.filter(st=>matchQ(st.name)).map(st=>`<button class="nchip off" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":""} title="Day off">${hl(st.name)}<span class="ct2">Requested off</span></button>`).join("")}${free.map(st=>`<button class="nchip unsched" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":""} title="Off (no shift yet). Tap to give them a shift.">${dot(st.id)}${hl(st.name)}<span class="ct2">Off</span></button>`).join("")}</div></td>`}).join("")}</tr>`;
   }
   if(!depts.length)h+=`<tr><td colspan="8" style="padding:24px;color:var(--muted)">No staff in this view.</td></tr>`;
   {const T=hourTotals();h+=`</tbody><tfoot><tr><td class="who">Total hours</td>${T.day.map((x,d)=>`<td><b>${fmtH(x)}</b><br>${T.heads[d]} ppl</td>`).join("")}</tr></tfoot><tbody>`;}
@@ -2259,7 +2260,7 @@ const ES={
 "answered":"contestados","checked":"revisados","Yes, same every week":"Sí, el mismo cada semana","No, it changes week to week":"No, cambia cada semana",
 "Morning":"Mañana","Mid":"Medio","Closing":"Cierre","Any shift":"Cualquier turno","starts before 10a":"empieza antes de 10a","starts 10a–2p":"empieza 10a–2p","starts 2p or later":"empieza 2p o después","no preference":"sin preferencia","Add people in step 2 first.":"Primero agrega personas en el paso 2.",
 "Check each person's availability for this week":"Revisa la disponibilidad de cada persona esta semana","Answer both questions for each person. Colors:":"Contesta las dos preguntas para cada persona. Colores:",
-"Yes, same as last week":"Sí, igual que la semana pasada","No, change it":"No, cambiarla","No days off":"Sin días libres","Yes, pick the days":"Sí, elegir los días","Pick days off":"Elegir días libres","Skip this if they didn't ask for any days off.":"Sáltalo si no pidió días libres.","Close":"Cerrar","Off / not scheduled":"Libre / sin turno","Tap a name to give them a shift":"Toca un nombre para darle turno","Not scheduled":"Sin turno","Not scheduled yet. Tap to give them a shift.":"Sin turno todavía. Toca para darle uno.","Tap each day they asked off. Tap again to undo.":"Toca cada día que pidió libre. Toca otra vez para deshacer.",
+"Yes, same as last week":"Sí, igual que la semana pasada","No, change it":"No, cambiarla","No days off":"Sin días libres","Yes, pick the days":"Sí, elegir los días","Pick days off":"Elegir días libres","Skip this if they didn't ask for any days off.":"Sáltalo si no pidió días libres.","Close":"Cerrar","Requested off":"Pidió libre","Anyone without a shift is off. Tap a name to give them one.":"Quien no tiene turno está libre. Toca un nombre para darle turno.","Off (no shift yet). Tap to give them a shift.":"Libre (sin turno). Toca para darle uno.","OFF · req.":"LIBRE · pidió","Tap each day they asked off. Tap again to undo.":"Toca cada día que pidió libre. Toca otra vez para deshacer.",
 "Place people on shifts":"Pon a la gente en los turnos","Fill the rest automatically":"Llenar el resto automáticamente","⚠ Check these before you finish":"⚠ Revisa esto antes de terminar",
 "Fills the open shifts for you. You choose how, see a preview, and approve before anything saves.":"Llena los turnos abiertos por ti. Tú eliges cómo, ves una vista previa y apruebas antes de guardar.",
 "Total hours ":"Total de horas ","Problems":"Problemas","fix the red flags below":"corrige lo marcado en rojo","everything is within the rules":"todo está dentro de las reglas","Duties printed with this schedule":"Tareas que se imprimen con este horario","Schedule another department":"Programar otro departamento","See dashboard":"Ver panel","Save duties":"Guardar tareas","Cancel":"Cancelar","Use company list":"Usar lista de la compañía","Company list":"Lista de la compañía",
