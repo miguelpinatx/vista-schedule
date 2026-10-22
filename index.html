@@ -339,6 +339,8 @@ details.card>summary::before{content:"▸ ";color:var(--muted)}details.card[open
 @media (max-width:640px){.wfix{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .pill.setp{border-color:var(--brand);color:var(--brand)}
 .cbtn.oth{opacity:.55;border-style:dashed}
+tr.sumg td{background:var(--surface2);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+@media print{#sumSlot{display:none}}
 .gq{display:flex;flex-direction:column;gap:6px}
 .gopt{display:flex;gap:10px;align-items:flex-start;border:2px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer}
 .gopt:has(input:checked){border-color:var(--brand);background:color-mix(in srgb,var(--brand) 8%,var(--surface))}
@@ -497,6 +499,7 @@ details.card>summary::before{content:"▸ ";color:var(--muted)}details.card[open
       <div class="tabs vtog" role="group" aria-label="Schedule view"><button data-view="person" aria-pressed="true">By employee</button><button data-view="shift" aria-pressed="false">By shift</button></div>
     </div>
     <div id="gridSlot"></div>
+    <div id="sumSlot"></div>
     <div id="notesSlot" style="display:flex;flex-direction:column;gap:10px;margin-top:6px"></div>
   </section>
 
@@ -893,7 +896,12 @@ function coverageCells(dept,all){
   }
   return{cells,short};
 }
-function renderGrid(){
+function renderSum(){const el=$("#sumSlot");if(!el)return;if(!S.store||S.tab!=="schedule"){el.innerHTML="";return}
+  const ppl=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&grpMatch(s)&&(!S.q||matchQ(s.name)))
+    .sort((a,b)=>deptOrder(grp(a.dept))-deptOrder(grp(b.dept))||grp(a.dept).localeCompare(grp(b.dept))||a.name.localeCompare(b.name));
+  el.innerHTML=`<div style="margin-top:12px">${summaryHTML(ppl,S.dept==="__all")}</div>`;
+  const t=el.querySelector(".ptitle");if(t)t.textContent="Employee summary · hours & days"+(S.dept==="__all"?"":" · "+grp(S.dept));}
+function renderGrid(){renderSum();
   const slot=$("#gridSlot");if(!S.store){slot.innerHTML="";return}
   document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===S.view)));
   document.querySelectorAll("[data-color]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.color===S.colorBy)));
@@ -1239,16 +1247,17 @@ function wStep5(){
       :(dutiesBox(S.store,grp(S.dept))?`<div class="pv tprev">${dutiesBox(S.store,grp(S.dept))}</div>`:`<p class="note">No duties yet. Tap <b>Edit for ${esc(S.store)}</b> to add them.</p>`)}</div>
   <div class="row" style="margin-top:6px">${finalBtnHTML()}<button class="btn" id="wPrint">Print schedule</button><button class="btn" data-wnext-dept>Schedule another department</button><button class="btn" data-goto-tab="dash">See dashboard</button></div>`;
 }
-function wSummaryHTML(){
-  const ppl=wPeople();const dH=[0,0,0,0,0,0,0],dP=[0,0,0,0,0,0,0];let tH=0,tD=0;
-  const rows=ppl.map(p=>{const r=rowStats(p);tH+=r.h;tD+=r.days;for(let d=0;d<7;d++){const v=cellVal(p.id,d);if(v&&v.s&&!v.off){dH[d]+=hoursOf(v,S.cfg);dP[d]++}}
+function wSummaryHTML(){return summaryHTML(wPeople())}
+function summaryHTML(ppl,grouped){
+  const dH=[0,0,0,0,0,0,0],dP=[0,0,0,0,0,0,0];let tH=0,tD=0;let lastG=null;
+  const rows=ppl.map(p=>{const r=rowStats(p);const G=grp(p.dept);const head=grouped&&G!==lastG?`<tr class="sumg"><td colspan="4" style="text-align:left">${esc(G)}</td></tr>`:"";lastG=G;tH+=r.h;tD+=r.days;for(let d=0;d<7;d++){const v=cellVal(p.id,d);if(v&&v.s&&!v.off){dH[d]+=hoursOf(v,S.cfg);dP[d]++}}
     const cap=capsFor(p);const pct=Math.min(100,r.h/Math.max(cap,1)*100);const bad=r.flags.some(f=>f[1]==="bad");
-    return `<tr><td class="wname" style="text-align:left"><b>${esc(p.name)}</b> <span class="pill ${p.type==="FT"?"ft":""}">${p.type||"PT"}</span>${p.sched==="fixed"?` <span class="pill setp">Set</span>`:""}</td>
+    return head+`<tr><td class="wname" style="text-align:left"><b>${esc(p.name)}</b> <span class="pill ${p.type==="FT"?"ft":""}">${p.type||"PT"}</span>${p.sched==="fixed"?` <span class="pill setp">Set</span>`:""}${(p.also||[]).length?` <span class="note">+ ${esc(p.also.join(", "))}</span>`:""}</td>
       <td><b>${r.days}</b><span class="note"> / ${S.cfg.maxDays||5}</span></td>
       <td style="min-width:150px"><div class="hmeter ${bad?"bad":p.type==="FT"&&r.h<30?"low":""}"><i style="width:${pct.toFixed(0)}%"></i></div><b>${fmtH(r.h)}</b><span class="note"> / ${fmtH(cap)} max</span></td>
       <td style="text-align:left">${r.flags.map(([t,c])=>`<span class="flag ${c}">${t}</span>`).join(" ")||`<span class="okpill">OK</span>`}</td></tr>`}).join("");
   return `<div class="tcard"><div class="ptitle">Hours &amp; days summary</div>
-  <div class="wtablewrap"><table class="wtable wsum"><thead><tr><th style="text-align:left">Name</th><th>Days</th><th>Hours</th><th style="text-align:left">Check</th></tr></thead><tbody>${rows||`<tr><td colspan="4" class="note">No one in this department yet.</td></tr>`}</tbody>
+  <div class="wtablewrap"><table class="wtable wsum"><thead><tr><th style="text-align:left">Name</th><th>Days</th><th>Hours</th><th style="text-align:left">Check</th></tr></thead><tbody>${rows||`<tr><td colspan="4" class="note">No one here yet.</td></tr>`}</tbody>
   <tfoot><tr><td style="text-align:left">Total · ${ppl.length} people</td><td>${tD} shifts</td><td><b>${fmtH(tH)}</b> hrs</td><td></td></tr></tfoot></table></div>
   <div class="wdays">${DAYS.map((dn,d)=>`<div><span>${dn}</span><b>${fmtH(dH[d])}</b><small>${dP[d]} ${dP[d]===1?"person":"people"}</small></div>`).join("")}</div></div>`;
 }
