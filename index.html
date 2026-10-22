@@ -1383,10 +1383,15 @@ function genScope(){
   const withG=depts.filter(d=>guideFor(S.store,d)),noG=depts.filter(d=>!guideFor(S.store,d));
   return{all,depts:withG,noG};
 }
+let FIXED_N=0;
 function baseShifts(scope,mode){
-  const sh=JSON.parse(JSON.stringify((S.sched&&S.sched.shifts)||{}));
-  if(mode==="rebuild")for(const st of scope.all){if(!scope.depts.includes(grp(st.dept)))continue;const r=sh[st.id]||{};
-    for(let d=0;d<7;d++){if(r[d]&&!r[d].off)r[d]=null;const t=st.sched==="fixed"&&st.fixed&&st.fixed[d];if(t&&!(r[d]&&r[d].off))r[d]=t.off?{off:true}:{s:t.s,e:t.e}}sh[st.id]=r}
+  const sh=JSON.parse(JSON.stringify((S.sched&&S.sched.shifts)||{}));FIXED_N=0;
+  for(const st of scope.all){const inG=scope.depts.includes(grp(st.dept));const fx=st.sched==="fixed"&&st.fixed;
+    if(!(mode==="rebuild"&&inG)&&!fx)continue;const r=sh[st.id]||{};
+    for(let d=0;d<7;d++){const wipe=mode==="rebuild"&&inG;if(wipe&&r[d]&&!r[d].off)r[d]=null;
+      const t=fx&&fx[d];if(!t)continue;if(r[d]&&(r[d].off||!wipe))continue;
+      r[d]=t.off?{off:true}:{s:t.s,e:t.e};FIXED_N++}
+    sh[st.id]=r}
   return sh;
 }
 const cv=(sh,id,d)=>sh[id]&&sh[id][d]||null;
@@ -1464,7 +1469,7 @@ function previewHTML(scope,res){
   for(const st of scope.all.filter(s=>scope.depts.includes(grp(s.dept)))){const s=stats(res.sh,st.id);const fl=[];
     if(st.type==="FT"&&s.h<30)fl.push(["FT under 30",""]);if(st.type==="PT"&&s.h>29.99)fl.push(["PT over 29.99","bad"]);if(+st.maxHrs>0&&s.h>+st.maxHrs+1e-9)fl.push(["Over "+fmtH(+st.maxHrs)+" cap","bad"]);if(s.h>40)fl.push(["Over 40","bad"]);
     rows.push(`<tr><td style="text-align:left">${dot(st.id)}${esc(st.name)} <span class="pill ${st.type==="FT"?"ft":""}">${st.type||"PT"}</span></td><td style="text-align:left">${esc(st.dept)}</td><td>${s.days}</td><td><b>${fmtH(s.h)}</b></td><td>${fl.map(([t,c])=>`<span class="flag ${c}">${t}</span>`).join(" ")}</td></tr>`)}
-  return `<div class="gstats"><div><b>${res.added.length}</b><span>shifts added</span></div><div><b>${filled}</b><span>guide spots filled</span></div><div class="${open?"short":""}"><b>${open}</b><span>spots still open</span></div></div>
+  return `<div class="gstats">${FIXED_N?`<div><b>${FIXED_N}</b><span>set-schedule days placed</span></div>`:""}<div><b>${res.added.length}</b><span>shifts added</span></div><div><b>${filled}</b><span>guide spots filled</span></div><div class="${open?"short":""}"><b>${open}</b><span>spots still open</span></div></div>
     ${open?`<div class="note">${open} spot${open===1?"":"s"} couldn't be filled: nobody else is available on those days within their hour and day limits. Place someone by hand (red means outside availability) or add people in step 2.</div>`:""}
     ${res.notes.length?`<div class="card" style="gap:4px">${res.notes.map(n=>`<div class="note">• ${esc(n)}</div>`).join("")}</div>`:""}
     <div style="overflow:auto;max-height:40vh;border:1px solid var(--line);border-radius:10px"><table class="gtable" style="min-width:520px"><thead><tr><th>Employee</th><th style="text-align:left">Dept</th><th>Days</th><th>Hours</th><th></th></tr></thead><tbody>${rows.join("")}</tbody></table></div>`;
@@ -1473,12 +1478,14 @@ function openGenerator(){
   if(S.readOnly)return;
   const scope=genScope();
   if(!scope.all.length){toast("Add staff first.");return}
-  const ai=!!sampleFn;const where=`${esc(S.store)} · ${S.dept==="__all"?"all departments":esc(grp(S.dept))} · Week ${weekNo(S.week,S.cfg.wkOffset)}`;
-  if(!scope.depts.length){openModal(`<h3>Fill the schedule automatically</h3><div class="ctx">${where}</div><div class="banner info">This department doesn't have a staffing guide yet, so there's no list of shifts and headcount to fill. Ask corporate to set one up in Staffing guide.</div><div class="row"><div class="spacer"></div>${S.canEdit?`<button class="btn" data-act="toGuide">Set up a staffing guide</button>`:""}<button class="btn primary" data-close>OK</button></div>`);return}
+  const hasFixed=scope.all.some(s=>s.sched==="fixed"&&s.fixed&&Object.keys(s.fixed).length);
+  const ai=!!sampleFn&&scope.depts.length>0;const where=`${esc(S.store)} · ${S.dept==="__all"?"all departments":esc(grp(S.dept))} · Week ${weekNo(S.week,S.cfg.wkOffset)}`;
+  if(!scope.depts.length&&!hasFixed){openModal(`<h3>Fill the schedule automatically</h3><div class="ctx">${where}</div><div class="banner info">This department doesn't have a staffing guide yet, so there's no list of shifts and headcount to fill. Ask corporate to set one up in Staffing guide.</div><div class="row"><div class="spacer"></div>${S.canEdit?`<button class="btn" data-act="toGuide">Set up a staffing guide</button>`:""}<button class="btn primary" data-close>OK</button></div>`);return}
   const opt=(name,val,title,desc,checked,tag)=>`<label class="gopt"><input type="radio" name="${name}" value="${val}" ${checked?"checked":""}><span><b>${title}${tag?` <em>${tag}</em>`:""}</b><small>${desc}</small></span></label>`;
   openModal(`<div><h3>Fill the schedule automatically</h3><div class="ctx">${where}</div></div>
     <p class="note" style="margin:0">It fills open shifts from the staffing guide using each person's availability, days off, preferred shift and hour limits (part-time 29.99, overtime 40, personal caps). You'll see a preview first. Nothing saves until you tap <b>Apply</b>.</p>
-    ${scope.noG.length?`<div class="banner info">Skipping ${esc(scope.noG.join(", "))}: no staffing guide yet.</div>`:""}
+    ${scope.noG.length?`<div class="banner info">${hasFixed?"Set schedules are placed for everyone. ":""}No open-shift filling for ${esc(scope.noG.join(", "))}: no staffing guide yet.</div>`:""}
+    ${hasFixed?`<p class="note" style="margin:0">People marked <b>Set schedule</b> in Staff &amp; availability get their usual shifts first. Days already on the schedule are left alone.</p>`:""}
     <div class="gq"><div class="wq">1. What should happen to shifts already on the schedule?</div>
       ${opt("gmode","fill","Keep them, fill only the empty spots","Anything you already placed stays exactly as it is.",true,"Recommended")}
       ${opt("gmode","rebuild","Clear them and start fresh","Removes this week's shifts and rebuilds the week. Days off and set schedules stay.",false)}</div>
@@ -1502,7 +1509,7 @@ function openGenerator(){
     catch(e){const c=e&&e.code;$("#gStatus").textContent=c==="aborted"||(e&&e.name==="AbortError")?"Stopped.":c==="not_granted"?"The schedule assistant isn't allowed on this page for you. Use Fast fill instead.":c==="rate_limited"?"Too many requests right now. Wait a minute or use Fast fill.":"The schedule assistant couldn't finish. Try again, or use Fast fill."}
     finally{ctl=null;const b=$("#gGo");if(b&&b.textContent==="Stop")b.textContent=result?"Try again":"Show preview"}
   };
-  $("#gApply").onclick=()=>{if(!result)return;backend.setSched(key(),{...meta(),shifts:result.sh}).then(()=>toast(result.added.length+" shifts added")).catch(showErr);closeModal()};
+  $("#gApply").onclick=()=>{if(!result)return;const fxn=FIXED_N;backend.setSched(key(),{...meta(),shifts:result.sh}).then(()=>toast((fxn?fxn+" set-schedule days + ":"")+result.added.length+" shifts added")).catch(showErr);closeModal()};
 }
 /* ---------- chat assistant ---------- */
 const CH={open:false,msgs:[],staged:[],busy:false,ctl:null};
@@ -1638,7 +1645,7 @@ function renderStaff(){
   $("#selReset").disabled=$("#selDel").disabled=!SEL.ids.size;
   if(!list.length&&S.q){$("#staffSlot").innerHTML=`<div class="card"><div class="empty"><h2>No one named “${esc(S.q)}” at any store</h2><button class="btn" data-act="clearq">Clear search</button></div></div>`;return}
   if(!list.length){$("#staffSlot").innerHTML=`<div class="card"><div class="empty"><h2>No employees here yet</h2><p>Use <b>Add employee</b> for one person, or <b>Paste a roster</b> to add a whole department at once and fill in availability after.</p></div></div>`;return}
-  $("#staffSlot").innerHTML=`<div class="stafflist">`+list.map(st=>`<div class="scard${SEL.on&&SEL.ids.has(st.id)?" picked":""}"${SEL.on?` data-pick-emp="${st.id}"`:""}><div class="top">${SEL.on?`<input type="checkbox" class="pickbox" data-pick-emp="${st.id}" ${SEL.ids.has(st.id)?"checked":""} aria-label="Select ${esc(st.name)}">`:""}<div style="flex:1;min-width:0"><div class="nm">${hl(st.name)}</div><div class="note">${S.q?esc(st.store)+" · ":""}${esc(st.dept)} · ${st.type==="FT"?"Full-time":"Part-time"}${+st.maxHrs>0?" · <b>max "+fmtH(+st.maxHrs)+" h/wk</b>":""}${st.notes?" · "+esc(st.notes):""}</div></div>${S.readOnly||SEL.on?"":`<button class="btn sm" data-edit="${st.id}">Edit</button>`}</div>
+  $("#staffSlot").innerHTML=`<div class="stafflist">`+list.map(st=>`<div class="scard${SEL.on&&SEL.ids.has(st.id)?" picked":""}"${SEL.on?` data-pick-emp="${st.id}"`:""}><div class="top">${SEL.on?`<input type="checkbox" class="pickbox" data-pick-emp="${st.id}" ${SEL.ids.has(st.id)?"checked":""} aria-label="Select ${esc(st.name)}">`:""}<div style="flex:1;min-width:0"><div class="nm">${hl(st.name)}</div><div class="note">${S.q?esc(st.store)+" · ":""}${esc(st.dept)} · ${st.type==="FT"?"Full-time":"Part-time"}${+st.maxHrs>0?" · <b>max "+fmtH(+st.maxHrs)+" h/wk</b>":""}${st.notes?" · "+esc(st.notes):""}</div>${st.sched==="fixed"&&st.fixed&&Object.keys(st.fixed).length?`<div class="note"><span class="pill setp">Set schedule</span> ${DAYS.map((dn,d)=>{const v=st.fixed[d];return v?dn+" "+(v.off?"off":fmtRange(v.s,v.e)):""}).filter(Boolean).join(" · ")}</div>`:""}</div>${S.readOnly||SEL.on?"":`<button class="btn sm" data-edit="${st.id}">Edit</button>`}</div>
     <div class="avrow">${DAYS.map((dn,d)=>{const a=availOf(st,d);return `<div class="avd ${a.mode==="no"?"no":a.mode==="times"?"part":""}"><b>${dn}</b>${a.mode==="any"?"Any":a.mode==="no"?"—":fmtT(a.from)+"<br>"+fmtT(a.to)}</div>`}).join("")}</div></div>`).join("")+`</div>`;
 }
 const TEMPLATE=[{label:"AM",start:"06:00",end:"14:00"},{label:"Mid",start:"10:00",end:"18:00"},{label:"PM",start:"14:00",end:"22:00"},{label:"After 5",start:"17:00",end:"22:00"}];
@@ -1842,6 +1849,11 @@ function shiftPicker(sid,d){
 function staffEditor(id){
   const isNew=!id;const st=isNew?{name:"",store:S.store,dept:S.dept!=="__all"?S.dept:S.cfg.depts[0],type:"PT",avail:anyAvail(),notes:""}:{...S.staff[id],avail:JSON.parse(JSON.stringify(S.staff[id].avail||anyAvail()))};
   const avRows=DAYS_LONG.map((dn,d)=>{const a=st.avail[d]||{mode:"any"};return `<div class="dn">${dn}</div><div class="ctrl"><select id="am${d}"><option value="any" ${a.mode==="any"?"selected":""}>Any time</option><option value="times" ${a.mode==="times"?"selected":""}>Between</option><option value="no" ${a.mode==="no"?"selected":""}>Not available</option></select><input type="time" id="af${d}" value="${a.from||"06:00"}" ${a.mode!=="times"?"hidden":""}><input type="time" id="at${d}" value="${a.to||"14:00"}" ${a.mode!=="times"?"hidden":""}></div>`}).join("");
+  const fxOpts=(()=>{const seen=new Set(),o=[];const add=(s,e,l)=>{const k=s+"-"+e;if(seen.has(k))return;seen.add(k);o.push({k,l:(l?l+" ":"")+fmtRange(s,e)})};
+    const g=guideFor(st.store||S.store,grp(st.dept));if(g)g.slots.forEach(sl=>add(sl.start,sl.end,sl.label));(S.cfg.presets||[]).forEach(p=>add(p.start,p.end,p.label));
+    Object.values(st.fixed||{}).forEach(v=>{if(v&&v.s)add(v.s,v.e,"")});return o})();
+  const fxRows=DAYS_LONG.map((dn,d)=>{const v=(st.fixed||{})[d];const cur=v?(v.off?"off":v.s+"-"+v.e):"";
+    return `<div class="dn">${dn}</div><div class="ctrl"><select id="fx${d}"><option value="" ${!cur?"selected":""}>Not set</option><option value="off" ${cur==="off"?"selected":""}>Off</option>${fxOpts.map(o=>`<option value="${o.k}" ${o.k===cur?"selected":""}>${esc(o.l)}</option>`).join("")}<option value="custom">Custom time…</option></select><input type="time" id="fs${d}" value="08:00" hidden><input type="time" id="fe${d}" value="16:00" hidden></div>`}).join("");
   openModal(`<h3>${isNew?"Add employee":"Edit "+esc(st.name)}</h3>
     <div class="formgrid">
       <label class="field"><span>Name</span><input type="text" id="eName" value="${esc(st.name)}"></label>
@@ -1853,17 +1865,29 @@ function staffEditor(id){
       <label class="field"><span>Max hours / week (optional)</span><input type="number" id="eMax" min="1" max="60" step="0.5" value="${+st.maxHrs>0?+st.maxHrs:""}" placeholder="e.g. 20"></label>
       <label class="field" style="grid-column:span 2"><span>Note (optional)</span><input type="text" id="eNotes" value="${esc(st.notes||"")}" placeholder="e.g. Opener, school until 3pm"></label>
     </div>
+    <div class="field"><span>Schedule type</span>
+      <div class="seg sm" id="eSchedSeg">${[["rotate","Rotates week to week"],["fixed","Set schedule (same every week)"]].map(([k,l])=>`<button type="button" class="${(st.sched||"rotate")===k?"on":""}" data-esched="${k}">${l}</button>`).join("")}</div>
+      <div id="eFixedBox" ${st.sched==="fixed"?"":"hidden"} style="margin-top:6px">
+        <div class="note">Auto fill places these shifts every week before filling anything else. Leave a day as <b>Not set</b> to let auto fill decide.</div>
+        <div class="row" style="margin-top:4px"><button type="button" class="btn sm" id="fxCopyMon">Copy Monday to weekdays</button></div>
+        <div class="avgrid" style="margin-top:6px">${fxRows}</div></div></div>
     <div class="field"><span>Weekly availability</span>
       <div class="row"><button class="btn sm" id="allAny">All days any time</button><button class="btn sm" id="copyMon">Copy Monday to all</button></div>
       <div class="avgrid" style="margin-top:6px">${avRows}</div></div>
     <div class="row">${isNew?"":`<button class="btn danger" id="eDel">Remove employee</button>`}<div class="spacer"></div><button class="btn" data-close>Cancel</button><button class="btn primary" id="eSave">Save</button></div>`);
+  let eSched=st.sched==="fixed"?"fixed":"rotate";
+  document.querySelectorAll("[data-esched]").forEach(b=>b.onclick=()=>{eSched=b.dataset.esched;document.querySelectorAll("[data-esched]").forEach(x=>x.classList.toggle("on",x===b));$("#eFixedBox").hidden=eSched!=="fixed"});
+  for(let d=0;d<7;d++)$("#fx"+d).onchange=()=>{const c=$("#fx"+d).value==="custom";$("#fs"+d).hidden=!c;$("#fe"+d).hidden=!c};
+  $("#fxCopyMon").onclick=()=>{for(let d=2;d<=5;d++){$("#fx"+d).value=$("#fx1").value;$("#fs"+d).value=$("#fs1").value;$("#fe"+d).value=$("#fe1").value;$("#fx"+d).onchange()}};
   for(let d=0;d<7;d++)$("#am"+d).onchange=()=>{const t=$("#am"+d).value!=="times";$("#af"+d).hidden=t;$("#at"+d).hidden=t};
   $("#allAny").onclick=()=>{for(let d=0;d<7;d++){$("#am"+d).value="any";$("#am"+d).onchange()}};
   $("#copyMon").onclick=()=>{for(let d=0;d<7;d++){if(d===1)continue;$("#am"+d).value=$("#am1").value;$("#af"+d).value=$("#af1").value;$("#at"+d).value=$("#at1").value;$("#am"+d).onchange()}};
   $("#eSave").onclick=()=>{
     const name=$("#eName").value.trim();if(!name){toast("Enter a name.");$("#eName").focus();return}
     const avail={};for(let d=0;d<7;d++){const m=$("#am"+d).value;avail[d]=m==="times"?{mode:"times",from:$("#af"+d).value,to:$("#at"+d).value}:{mode:m}}
-    const o={name,store:$("#eStore").value,dept:$("#eDept").value,type:$("#eType").value,notes:$("#eNotes").value.trim(),avail};const mx=parseFloat($("#eMax").value);if(mx>0)o.maxHrs=Math.round(mx*2)/2;
+    const fixed={};for(let d=0;d<7;d++){const v=$("#fx"+d).value;if(!v)continue;if(v==="off")fixed[d]={off:true};else if(v==="custom"){const a=$("#fs"+d).value,b=$("#fe"+d).value;if(!a||!b||a===b){toast("Enter a start and end time for "+DAYS_LONG[d]+".");return}fixed[d]={s:a,e:b}}else{const[a,b]=v.split("-");fixed[d]={s:a,e:b}}}
+    if(eSched==="fixed"&&!Object.keys(fixed).length){toast("Pick at least one day for the set schedule, or choose Rotates.");return}
+    const o={...(id&&S.staff[id]||{}),name,store:$("#eStore").value,dept:$("#eDept").value,type:$("#eType").value,notes:$("#eNotes").value.trim(),avail,sched:eSched,fixed};delete o._pending;delete o.maxHrs;const mx=parseFloat($("#eMax").value);if(mx>0)o.maxHrs=Math.round(mx*2)/2;
     backend.saveStaff(id||uid(),o).then(()=>toast(isNew?"Employee added":"Saved")).catch(showErr);closeModal();
   };
   const del=$("#eDel");if(del)del.onclick=()=>{
