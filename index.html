@@ -23,7 +23,7 @@
 .hchip.sub{background:#FEC938;color:#3d2e00}.hchip.ok{background:#e3f4e4;color:#1f5e23}.hchip.rev{background:#fde3df;color:#9b2c1f}.hchip.late{background:#c0392b;color:#fff}
 .hometiles{margin-bottom:18px}.gtogs{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:6px}.gtog{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface);cursor:pointer;font-weight:700;font-size:15px}
 .gtog .sw2{position:relative;width:46px;height:26px;border-radius:99px;background:#cfcabf;flex:none;transition:background .15s}.gtog .sw2::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
-.gtog.on .sw2{background:var(--brand)}.gtog.on .sw2::after{left:23px}.gtog>span:first-child{text-align:left}.gtog small{display:block;font-weight:600;color:var(--muted);font-size:12px}.gtogall{grid-column:1/-1;display:flex;gap:8px}#bannerSlot:empty,#lockSlot:empty,#budgetSlot:empty,#issuesSlot:empty,#sumSlot:empty,#notesSlot:empty{display:none}
+.gtog.on .sw2{background:var(--brand)}.gtog.on .sw2::after{left:23px}.gtog>span:first-child{text-align:left}.fgrp{grid-column:1/-1;font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:8px}.gtog small{display:block;font-weight:600;color:var(--muted);font-size:12px}.gtogall{grid-column:1/-1;display:flex;gap:8px}#bannerSlot:empty,#lockSlot:empty,#budgetSlot:empty,#issuesSlot:empty,#sumSlot:empty,#notesSlot:empty{display:none}
 .shero{display:flex;flex-wrap:wrap;align-items:center;gap:14px 26px;background:linear-gradient(135deg,#2E7D32,#1f5e23);color:#fff;border-radius:18px;padding:16px 22px;border-bottom:5px solid #FEC938;box-shadow:0 6px 18px rgba(46,125,50,.18)}
 .sh-l{display:flex;flex-direction:column;gap:4px;min-width:170px}.sh-k,.sh-pick span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:#FEC938}
 .sh-name{margin:0;font-family:var(--f-display);font-size:30px;color:#fff;line-height:1.05}.sh-pick{display:flex;flex-direction:column;gap:3px}
@@ -220,6 +220,7 @@ tr.cov td.who{font-size:12px;color:var(--muted);font-weight:600;text-transform:u
 .cv.short{background:var(--bad-bg);color:var(--bad-fg)}
 .cv.over{background:var(--warn-bg);color:var(--warn-fg)}
 .cv.none{color:var(--muted)}
+body.nf-home_totals [data-feat~="home_totals"],body.nf-card_stats [data-feat~="card_stats"],body.nf-home_summary [data-feat~="home_summary"],body.nf-store_stats [data-feat~="store_stats"],body.nf-emp_totals [data-feat~="emp_totals"],body.nf-issues [data-feat~="issues"],body.nf-sum_tab [data-feat~="sum_tab"],body.nf-sum_tiles [data-feat~="sum_tiles"],body.nf-sum_dept [data-feat~="sum_dept"],body.nf-sum_day [data-feat~="sum_day"],body.nf-sum_shift [data-feat~="sum_shift"],body.nf-sum_emp [data-feat~="sum_emp"]{display:none!important}
 details.exact{margin-top:10px}details.exact>summary{cursor:pointer;font-weight:700;color:var(--muted);padding:6px 0}.stab.part4 td.dn{text-align:left;font-weight:800;vertical-align:top;border-right:1px solid var(--line);background:var(--surface);width:150px}.stab.part4 tr.first td{border-top:2px solid var(--line)}
 .stab.part4 td.pl{text-align:left;width:70px}.stab.part4 .pt{display:inline-block;min-width:54px;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:800;text-align:center}
 .pt.k0{background:#fff1c2;color:#6b4d00}.pt.k1{background:#e3f4e4;color:#1f5e23}.pt.k2{background:#dcebf7;color:#0d4a75}.pt.k3{background:#ece3f5;color:#4b2a73}
@@ -601,7 +602,7 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
       <button role="tab" id="tab-schedule" aria-selected="true" data-tab="schedule" class="navbig"><span class="ni" aria-hidden="true">📅</span>See full schedule</button>
       <button role="tab" id="tab-build" aria-selected="false" data-tab="build" class="navbig"><span class="ni" aria-hidden="true">✏️</span>Build schedule</button>
       <button role="tab" id="tab-staff" aria-selected="false" data-tab="staff" class="navbig"><span class="ni" aria-hidden="true">👥</span>Staff &amp; availability</button>
-      <button role="tab" id="tab-sum" aria-selected="false" data-tab="sum" class="navbig"><span class="ni" aria-hidden="true">📊</span>Summary</button>
+      <button role="tab" id="tab-sum" aria-selected="false" data-tab="sum" class="navbig" data-feat="sum_tab"><span class="ni" aria-hidden="true">📊</span>Summary</button>
       <span class="navsp"></span>
       <button role="tab" id="tab-dash" aria-selected="false" data-tab="dash" class="navsm">Dashboard</button>
       <button role="tab" id="tab-guide" aria-selected="false" data-tab="guide" class="navsm">Staffing guide</button>
@@ -655,7 +656,7 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
       <div class="tabs vtog" role="group" aria-label="Schedule view"><button data-view="person" aria-pressed="true">By employee</button><button data-view="shift" aria-pressed="false">By shift</button></div>
     </div>
     <div id="budgetSlot"></div>
-    <div id="issuesSlot"></div>
+    <div id="issuesSlot" data-feat="issues"></div>
     <div id="gridSlot"></div>
     <div id="sumSlot"></div>
     <div id="notesSlot" style="display:flex;flex-direction:column;gap:10px;margin-top:6px"></div>
@@ -683,7 +684,7 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
 
   <section id="view-dash" class="panel" hidden>
     <div id="subSlot"></div>
-    <div id="dashSlot"></div>
+    <div id="dashSlot" data-feat="home_summary"></div>
   </section>
 
   <section id="view-guide" class="panel" hidden>
@@ -716,6 +717,11 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
       <h2 class="sec">Backup</h2>
       <div class="note">Downloads a copy of everything (staff, availability, schedules, guides, approvals) as one file. Save it somewhere safe. Doing this once a week is a good habit.</div>
       <div class="row"><button class="btn primary" id="bakBtn">Download backup</button><span class="note" id="bakState"></span></div>
+    </div>
+    <div class="card" id="featCard">
+      <h2 class="sec">Features on / off</h2>
+      <div class="note">Start simple and turn on more as your managers get comfortable. Turning something off only hides it; nothing is deleted. <b>Simple setup</b> keeps the schedule, store cards with hours, the days · hours row, and the Summary tab with By department and By shift.</div>
+      <div id="featToggles" class="gtogs"></div>
     </div>
     <div class="card" id="ftptCard">
       <h2 class="sec">Full-time / part-time rules</h2>
@@ -921,7 +927,7 @@ function subsHTML(){const due=dueOf(S.week),now=new Date();const pill={draft:["N
   const hero=`<div class="homehero"><div class="hh-l"><div class="hh-wk"><button class="hwb" data-hwk="prevWk" aria-label="Previous week">‹</button><span class="hh-k">Week ${weekNo(S.week,S.cfg.wkOffset)}</span><button class="hwb" data-hwk="nextWk" aria-label="Next week">›</button><button class="hwb t" data-hwk="dueWk">Week to submit</button><button class="hwb t" data-hwk="thisWk">This week</button></div><h2>${rangeLabel(S.week)}</h2><div class="note">Schedules due ${dueTxt}</div>
     <div class="hchips">${chip(C.submitted,"waiting for you","sub")}${chip(C.revise,"changes requested","rev")}${chip(C.approved,"approved","ok")}${chip(C.draft,C.late?"not submitted (late)":"not submitted",C.late?"late":"draft")}</div></div>
     <div class="hh-r"><button class="btn" data-xls="__all">⬇ All stores (Excel)</button><button class="btn" data-subsref>↻ Refresh</button></div></div>`;
-  const tiles=`<div class="dtiles hometiles">
+  const tiles=`<div class="dtiles hometiles" data-feat="home_totals">
     <div class="dtile"><span>Total hours</span><b>${haveDash?Math.round(T.hrs).toLocaleString():"…"}</b><small>all ${info.length} stores</small></div>
     <div class="dtile"><span>People working</span><b>${haveDash?T.ppl:"…"}</b><small>${info.filter(x=>x.r&&x.r.ppl).length} stores have a schedule</small></div>
     <div class="dtile ${T.fl?"warn":""}"><span>Hour problems</span><b>${haveDash?T.fl:"…"}</b><small>${FTPT()?"overtime, PT over 29.99, over cap":"overtime, over cap, too many days"}</small></div>
@@ -932,13 +938,13 @@ function subsHTML(){const due=dueOf(S.week),now=new Date();const pill={draft:["N
     return `<div class="hcard st-${s2} ${late?"st-late":""}">
       <div class="hc-top"><h3>${esc(st)}</h3><span class="spill ${c} ${late?"sp-late":""}">${late?"Late":t}</span></div>
       <div class="hc-when note">${when}</div>
-      <div class="hc-num">${r?`<b>${Math.round(r.hrs).toLocaleString()}</b><span>hours</span>`:`<span class="note">${haveDash?"No schedule yet":"Loading…"}</span>`}</div>
-      <div class="hc-bar"><i style="width:${r?(r.hrs/maxH*100).toFixed(1):0}%"></i></div>
-      <div class="hc-meta note">${r?`<b>${r.ppl}</b> of ${roster} working${bd>=0?` · busiest ${DAYS[bd]}`:""}`:`${roster} on the roster`}</div>
-      <div class="hc-flags">${r?(fl?`<span class="flag bad">${fl} hour problem${fl>1?"s":""}</span>`:`<span class="okpill">Hours OK</span>`)+(r.need?(r.open?` <span class="flag">${r.open} open</span>`:` <span class="okpill">Covered</span>`):""):""}</div>
+      <div class="hc-num" data-feat="card_stats">${r?`<b>${Math.round(r.hrs).toLocaleString()}</b><span>hours</span>`:`<span class="note">${haveDash?"No schedule yet":"Loading…"}</span>`}</div>
+      <div class="hc-bar" data-feat="card_stats"><i style="width:${r?(r.hrs/maxH*100).toFixed(1):0}%"></i></div>
+      <div class="hc-meta note" data-feat="card_stats">${r?`<b>${r.ppl}</b> of ${roster} working${bd>=0?` · busiest ${DAYS[bd]}`:""}`:`${roster} on the roster`}</div>
+      <div class="hc-flags" data-feat="card_stats">${r?(fl?`<span class="flag bad">${fl} hour problem${fl>1?"s":""}</span>`:`<span class="okpill">Hours OK</span>`)+(r.need?(r.open?` <span class="flag">${r.open} open</span>`:` <span class="okpill">Covered</span>`):""):""}</div>
       ${note}
       <div class="hc-acts"><button class="btn ${s2==="submitted"?"primary":""}" data-goschedule="${esc(st)}">${s2==="submitted"?"Review →":"Open →"}</button><button class="btn sm" data-dsum="${esc(st)}" title="Staffing summary">📊</button><button class="btn sm" data-xls="${esc(st)}" title="Download Excel">⬇ Excel</button></div></div>`}).join("");
-  return hero+tiles+`<div class="hsec">Stores</div><div class="hcards">${cards}</div><div class="hsec" id="sumHead">Staffing summary</div>`}
+  return hero+tiles+`<div class="hsec">Stores</div><div class="hcards">${cards}</div><div class="hsec" id="sumHead" data-feat="home_summary">Staffing summary</div>`}
 document.addEventListener("click",e=>{if(e.target.closest("[data-subsref]")){loadSubs(true);if(typeof loadDash==="function")loadDash(true)}
   const w=e.target.closest("[data-hwk]");if(w){const t=document.getElementById(w.dataset.hwk);if(t)t.click();return}
   const s=e.target.closest("[data-dsum]");if(s){DASH.store=s.dataset.dsum;renderDash();const h=document.getElementById("sumHead");if(h)h.scrollIntoView({behavior:"smooth"})}});
@@ -1053,7 +1059,7 @@ function storeHeroHTML(){if(!S.store)return"";const adm=isAdm();const st=stState
   const dueTxt=due.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"short",month:"numeric",day:"numeric"});
   return `<div class="shero"><div class="sh-l">${adm?`<label class="sh-pick"><span>Store</span><select id="svStore">${S.cfg.stores.map(x=>`<option ${x===S.store?"selected":""}>${esc(x)}</option>`).join("")}</select></label>`:`<div class="sh-k">Store</div><h2 class="sh-name">${esc(S.store)}</h2>`}
     <div class="sh-wk"><b>Week ${weekNo(S.week,S.cfg.wkOffset)}</b> · ${rangeLabel(S.week)}</div></div>
-    <div class="sh-stats"><div><b>${roster.length}</b><span>employees</span></div><div><b>${working}</b><span>working</span></div><div><b>${fmtH(Math.round(hrs*10)/10)}</b><span>hours</span></div><div><b class="sh-due">${dueTxt}</b><span>due</span></div></div>
+    <div class="sh-stats" data-feat="store_stats"><div><b>${roster.length}</b><span>employees</span></div><div><b>${working}</b><span>working</span></div><div><b>${fmtH(Math.round(hrs*10)/10)}</b><span>hours</span></div><div><b class="sh-due">${dueTxt}</b><span>due</span></div></div>
     <div class="sh-st"><button class="btn sh-link" data-final="link">📲 Employee link</button><span class="spill ${lab[1]} ${late?"sp-late":""}">${lab[0]}</span></div></div>`}
 function renderHero(){const el=$("#storeHero");if(!el)return;const show=["schedule","build","staff","sum"].includes(S.tab)&&!!S.store;el.hidden=!show;if(!show)return;
   if(el.contains(document.activeElement))return;el.innerHTML=storeHeroHTML();const sv=$("#svStore");if(sv)sv.onchange=()=>{S.store=sv.value;S.dept="__all";savePrefs();renderAll();resub()}}
@@ -1073,6 +1079,13 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-gtog]");if
   const a=e.target.closest("[data-gall]");if(a){const off={};if(a.dataset.gall==="off")S.cfg.stores.forEach(st=>off[st]=true);saveGuideOff(off)}});
 
 document.addEventListener("click",async e=>{if(!e.target.closest("#ftptTog"))return;try{await backend.saveCfg({...S.cfg,ftpt:!FTPT()});toast(FTPT()?"FT/PT rules on":"FT/PT rules off")}catch(x){showErr(x)}});
+
+/* ---------- feature switches ---------- */
+function renderFeatToggles(){const el=$("#featToggles");if(!el)return;const ed=S.canEdit&&!LOCK;
+  el.innerHTML=`<div class="gtogall"><button class="btn sm" data-fall="simple">Simple setup</button><button class="btn sm" data-fall="on">Turn everything on</button></div>`+FEATS.map(([g,list])=>`<div class="fgrp">${esc(g)}</div>`+list.map(([k,l])=>{const on=featOn(k);return `<button class="gtog ${on?"on":""}" data-feat-tog="${k}" ${ed?"":"disabled"} aria-pressed="${on}"><span>${esc(l)}<small>${on?"On":"Off"}</small></span><span class="sw2"></span></button>`}).join("")).join("")}
+async function saveFeatOff(off){try{await backend.saveCfg({...S.cfg,featOff:off});toast("Saved")}catch(x){showErr(x)}}
+document.addEventListener("click",e=>{const t=e.target.closest("[data-feat-tog]");if(t){const off={...(S.cfg.featOff||{})};const k=t.dataset.featTog;if(off[k])delete off[k];else off[k]=true;saveFeatOff(off);return}
+  const a=e.target.closest("[data-fall]");if(a){if(a.dataset.fall==="on")saveFeatOff({});else saveFeatOff({home_totals:true,home_summary:true,store_stats:true,issues:true,sum_tiles:true,sum_day:true,sum_emp:true})}});
 
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAYS_ES=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
@@ -1197,6 +1210,11 @@ const deptOrder=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i
 let CTXG=null;
 const deptMatch=s=>S.dept==="__all"||s.dept===S.dept||(s.also||[]).includes(S.dept)||(S.dept===FE&&inGrp(s,FE));
 const grpMatch=s=>S.dept==="__all"||inGrp(s,grp(S.dept));
+const FEATS=[["Home page (admin)",[["home_totals","Totals: hours, people, hour problems, open spots"],["card_stats","Hours, people and problems on each store card"],["home_summary","Staffing summary section"]]],
+  ["Store pages",[["store_stats","Numbers in the store banner (employees, working, hours)"],["emp_totals","Days · hours row under each department"],["issues","Issues to review list (admin)"]]],
+  ["Summary tab",[["sum_tab","Show the Summary tab"],["sum_tiles","Totals at the top"],["sum_dept","By department"],["sum_day","By day"],["sum_shift","By shift (AM / Mid / PM / After 5)"],["sum_emp","By employee"]]]];
+const featOn=k=>!((S.cfg&&S.cfg.featOff)||{})[k];
+function applyFeats(){for(const[,list]of FEATS)for(const[k]of list)document.body.classList.toggle("nf-"+k,!featOn(k));if(!featOn("sum_tab")&&S.tab==="sum")S.tab="schedule"}
 const FTPT=()=>!!(S.cfg&&S.cfg.ftpt);
 const isFT=x=>FTPT()&&!!x&&x.type==="FT";const isPT=x=>FTPT()&&!!x&&(x.type||"PT")==="PT";
 const ftPill=x=>FTPT()?`<span class="pill ${isFT(x)?"ft":""}">${x.type||"PT"}</span>`:"";
@@ -1266,7 +1284,7 @@ function renderBanner(){
   $("#bannerSlot").innerHTML=h;
   const x=$("#exitSample");if(x)x.onclick=()=>{S.mode=S._prevMode||"shared";S.canEdit=S._realCanEdit;S.gDraft=null;attach(realBackend);renderAll()};
 }
-function renderControls(){
+function renderControls(){applyFeats();
   const ss=$("#storeSel");ss.innerHTML=S.cfg.stores.map(s=>`<option ${s===S.store?"selected":""}>${esc(s)}</option>`).join("");
   const ds=$("#deptSel");ds.innerHTML=`<option value="__all">All departments</option><option value="${FE}" ${S.dept===FE?"selected":""}>Front End (all cashier, office &amp; pricing roles)</option>`+S.cfg.depts.map(d=>`<option ${d===S.dept?"selected":""}>${esc(d)}</option>`).join("");
   if(S.dept!=="__all"&&S.dept!==FE&&!S.cfg.depts.includes(S.dept))S.dept="__all";ds.value=S.dept;
@@ -1540,7 +1558,7 @@ function dashAll(){
       <span class="sbar"><i style="width:${(r.hrs/maxH*100).toFixed(1)}%"></i><em>${doc?Math.round(r.hrs).toLocaleString()+" hrs":"No schedule this week"}</em></span>
       <span class="smeta">${doc?`<b>${r.ppl}</b> working · busiest ${r.hrs?DAYS[bd]:"—"}`:""}${goalFor(st)?`<br>Goal ${Math.round(goalFor(st)).toLocaleString()} hrs ${doc?goalPill(r.hrs,goalFor(st)):""}`:""}</span>
       <span class="sflags">${doc?(fl?`<span class="flag bad">${fl} hour problem${fl>1?"s":""}</span>`:`<span class="okpill">Hours OK</span>`)+(r.need?(r.open?` <span class="flag">${r.open} open</span>`:` <span class="okpill">Covered</span>`):""):""}</span></button>`}).join("")}</div></div>
-  <details class="card"><summary><b>Hours by department, every store</b> <span class="note">— darker = more hours</span></summary>
+  <details class="card" open><summary><b>Hours by department, every store</b> <span class="note">— darker = more hours</span></summary>
   <div style="overflow-x:auto;margin-top:8px"><table class="dtable heat"><thead><tr><th style="text-align:left">Department</th>${stores.map(x=>`<th>${esc(x.st)}</th>`).join("")}<th>Total</th></tr></thead><tbody>
   ${groups.map(G=>{const row=stores.map(x=>x.r.dept[G]||0);const tot=row.reduce((a,b)=>a+b,0);if(!tot)return"";
     return `<tr><td style="text-align:left"><b>${esc(G)}</b></td>${row.map((v,i)=>`<td class="hc" data-dstore="${esc(stores[i].st)}" style="--a:${(v/maxCell).toFixed(3)}">${v?fmtH(v):"—"}</td>`).join("")}<td><b>${fmtH(tot)}</b></td></tr>`}).join("")}
@@ -1576,7 +1594,7 @@ function dashStore(st){
   <tfoot><tr><td style="text-align:left">Total</td><td>${B.T.ppl.size}</td><td>${fmtH(B.T.hrs)}</td><td>${goalFor(st)?fmtH(goalFor(st)):"—"}</td>${B.T.part.map((x,k)=>`<td class="p${k}">${x.p.size}</td>`).join("")}<td>${r.need?r.open:"—"}</td></tr></tfoot></table></div>
   <div class="note">AM / Mid / PM = how many different people work at least one shift starting in that part of the day.</div></div>
   ${TRAF.docs[st]?trafficHTML():""}
-  <details class="card"><summary><b>Show details</b> <span class="note">— hours and people per department per day, and by time of day</span></summary>${(DASH.store=st,breakdownHTML()).replace(/<div class="card" style="gap:10px">/,'<div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">').replace(/<label class="field"><span>Store<\/span>[\s\S]*?<\/label>/,'')}</details>`;
+  <details class="card" open><summary><b>Show details</b> <span class="note">— hours and people per department per day, and by time of day</span></summary>${(DASH.store=st,breakdownHTML()).replace(/<div class="card" style="gap:10px">/,'<div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">').replace(/<label class="field"><span>Store<\/span>[\s\S]*?<\/label>/,'')}</details>`;
 }
 /* ---------- guided "Build schedule" flow ---------- */
 const PREF=[["am","Morning","starts before 10a"],["mid","Mid","starts 10a–2p"],["pm","Closing","starts 2p or later"],["any","Any shift","no preference"]];
@@ -1791,7 +1809,7 @@ function renderPinState(){const el=$("#pinState");if(!el)return;const p=S.cfg.pi
   const box=$("#pinStores");if(box&&!box.contains(document.activeElement))box.innerHTML=S.cfg.stores.map(s=>`<label class="field"><span>${esc(s)} PIN</span><input type="password" autocomplete="new-password" data-pinstore="${esc(s)}" placeholder="${st[s]?"set · type to change":"not set"}"></label>`).join("");
   const missing=S.cfg.stores.filter(s=>!st[s]);
   el.textContent=p.admin?`PINs are on. ${missing.length?"No PIN yet for: "+missing.join(", ")+" (those stores can't sign in).":"Every store has a PIN."}`:"PINs are off: anyone with the link sees every store."}
-function renderGoals(){renderPinState();renderPayCfg();renderGuideToggles();{const t=$("#ftptTog");if(t){const on=FTPT();t.classList.toggle("on",on);t.setAttribute("aria-pressed",String(on));$("#ftptLbl").textContent=on?"On":"Off";t.disabled=!(S.canEdit&&!LOCK)}}
+function renderGoals(){renderPinState();renderPayCfg();renderGuideToggles();renderFeatToggles();{const t=$("#ftptTog");if(t){const on=FTPT();t.classList.toggle("on",on);t.setAttribute("aria-pressed",String(on));$("#ftptLbl").textContent=on?"On":"Off";t.disabled=!(S.canEdit&&!LOCK)}}
   const slot=$("#goalsSlot");if(!slot||slot.contains(document.activeElement))return;const groups=wGroups();const G=S.cfg.goals||{};
   slot.innerHTML=`<div style="overflow-x:auto"><table class="gtable" style="min-width:${180+S.cfg.stores.length*92}px"><thead><tr><th>Weekly hours goal</th>${S.cfg.stores.map(s=>`<th>${esc(s)}</th>`).join("")}</tr></thead><tbody>
   <tr><td style="text-align:left"><b>Whole store</b></td>${S.cfg.stores.map(s=>`<td><input type="number" min="0" step="0.5" style="width:80px" data-goal="${esc(s)}" data-g="" value="${(G[s]&&G[s].total)||""}" placeholder="—" ${S.canEdit?"":"disabled"}></td>`).join("")}</tr>
@@ -1835,7 +1853,7 @@ function shiftGridHTML(noCov){
     });
     h+=`<tr class="cov"><td class="who"><div class="nm">Off</div><div class="meta">Drag a name up onto a shift</div></td>${offs.map((o,d)=>{const free=people.filter(st=>!cellVal(st.id,d)&&availOf(st,d).mode!=="no"&&matchQ(st.name)).sort((a,b)=>a.name.localeCompare(b.name));
       return `<td class="scell offcell" data-drop="off" data-dept="${esc(dept)}" data-d="${d}"><div class="slist">${o.filter(st=>matchQ(st.name)).map(st=>`<button class="nchip unsched" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":`draggable="true" data-drag="req"`} title="Day off">${dot(st.id)}${hl(st.name)}<span class="ct2">Off</span></button>`).join("")}${free.map(st=>`<button class="nchip unsched" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":`draggable="true" data-drag="off"`} title="Off (no shift yet). Drag onto a shift, or tap to pick one.">${dot(st.id)}${hl(st.name)}<span class="ct2">Off</span></button>`).join("")}</div></td>`}).join("")}</tr>`;
-    h+=`<tr class="empsum"><td class="who"><div class="nm">Days · hours</div><div class="meta">This week, per person</div></td><td colspan="7"><div class="esum">${people.filter(st=>matchQ(st.name)).map(st=>{const r=rowStats(st);const lm=limitMsgs(st,r.h,r.days);const low=isFT(st)&&r.h<30;
+    h+=`<tr class="empsum" data-feat="emp_totals"><td class="who"><div class="nm">Days · hours</div><div class="meta">This week, per person</div></td><td colspan="7"><div class="esum">${people.filter(st=>matchQ(st.name)).map(st=>{const r=rowStats(st);const lm=limitMsgs(st,r.h,r.days);const low=isFT(st)&&r.h<30;
       return `<span class="echip ${lm.length?"bad":low?"low":""}" title="${esc(lm.length?lm.join(" · "):low?"Full-time under 30 hours":"")}">${dot(st.id)}<b>${esc(st.name)}</b><span>${r.days}d</span><span>${fmtH(r.h)}h</span></span>`}).join("")}</div></td></tr>`;
   }
   if(!depts.length)h+=`<tr><td colspan="8" style="padding:24px;color:var(--muted)">No staff in this view.</td></tr>`;
@@ -2584,15 +2602,15 @@ function renderSumTab(){const el=$("#sumTabSlot");if(!el)return;if(S.tab!=="sum"
   const allPc=PART4.map((x,k)=>DAYS.map((y,d)=>order.reduce((a,G)=>a+D[G].pc[k][d],0)));
   const part4Blocks=order.length?(order.length>1?blk("All departments",allPc,"allg"):"")+order.map(G=>blk(esc(G),D[G].pc)).join(""):"";
   el.innerHTML=`<div class="sumhead"><h2 class="sec">Summary · ${esc(S.store)}${F?" · "+esc(F):""}</h2><div class="note">Week ${weekNo(S.week,S.cfg.wkOffset)} · ${rangeLabel(S.week)}${S.cfg.mealDeduct?" · hours exclude a 30-min meal on 6h+ shifts":""}</div></div>
-  <div class="dtiles"><div class="dtile"><span>Total hours</span><b>${r1(T.h)}</b></div><div class="dtile"><span>Employees working</span><b>${T.ids.size}</b><small>of ${ppl.length} on the team</small></div><div class="dtile"><span>Shifts</span><b>${T.n}</b></div><div class="dtile"><span>Avg hours per person</span><b>${T.ids.size?r1(T.h/T.ids.size):0}</b></div></div>
-  <div class="card"><h3 class="sec">By department</h3><div class="sx"><table class="stab"><thead><tr><th class="l">Department</th><th>Employees</th><th>Shifts</th><th>Hours</th>${dh}</tr></thead><tbody>${deptRows||`<tr><td colspan="11" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody>
+  <div class="dtiles" data-feat="sum_tiles"><div class="dtile"><span>Total hours</span><b>${r1(T.h)}</b></div><div class="dtile"><span>Employees working</span><b>${T.ids.size}</b><small>of ${ppl.length} on the team</small></div><div class="dtile"><span>Shifts</span><b>${T.n}</b></div><div class="dtile"><span>Avg hours per person</span><b>${T.ids.size?r1(T.h/T.ids.size):0}</b></div></div>
+  <div class="card" data-feat="sum_dept"><h3 class="sec">By department</h3><div class="sx"><table class="stab"><thead><tr><th class="l">Department</th><th>Employees</th><th>Shifts</th><th>Hours</th>${dh}</tr></thead><tbody>${deptRows||`<tr><td colspan="11" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody>
   <tfoot><tr><td class="l">All departments</td><td>${T.ids.size}</td><td>${T.n}</td><td>${r1(T.h)}</td>${T.day.map(x=>`<td>${cell(x.h,x.ids.size)}</td>`).join("")}</tr></tfoot></table></div></div>
-  <div class="card"><h3 class="sec">By day</h3><div class="sx"><table class="stab"><thead><tr><th class="l">Day</th><th>Employees</th><th>Hours</th>${PART4.map(([n,t])=>`<th>${n}<small>${t.replace("starts ","")}</small></th>`).join("")}</tr></thead><tbody>
+  <div class="card" data-feat="sum_day"><h3 class="sec">By day</h3><div class="sx"><table class="stab"><thead><tr><th class="l">Day</th><th>Employees</th><th>Hours</th>${PART4.map(([n,t])=>`<th>${n}<small>${t.replace("starts ","")}</small></th>`).join("")}</tr></thead><tbody>
   ${T.day.map((x,d)=>{const dt=addDays(S.week,d);return `<tr><td class="l"><b>${DAYS_LONG[d]}</b> <span class="note">${dt.getMonth()+1}/${dt.getDate()}</span></td><td>${x.ids.size}</td><td><b>${r1(x.h)}</b></td>${x.part.map(n=>`<td>${n||"—"}</td>`).join("")}</tr>`}).join("")}</tbody>
   <tfoot><tr><td class="l">Week</td><td>${T.ids.size}</td><td>${r1(T.h)}</td>${[0,1,2,3].map(k=>`<td>${T.day.reduce((a,x)=>a+x.part[k],0)}</td>`).join("")}</tr></tfoot></table></div></div>
-  <div class="card"><h3 class="sec">By shift <span class="note" style="font-weight:500">people starting in each part of the day · AM before 10a · Mid 10a–2p · PM 2p–5p · After 5 = 5p or later</span></h3><div class="sx"><table class="stab part4"><thead><tr><th class="l">Department</th><th class="l">Shift</th>${dh}<th>Week</th></tr></thead><tbody>${part4Blocks||`<tr><td colspan="10" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody></table></div>
-  <details class="exact"><summary>${guideOn(S.store)?"Compared to the staffing guide (short / over)":"Exact shift times"}</summary><div class="sx"><table class="stab shifts"><thead><tr><th class="l">Shift</th>${dh}</tr></thead><tbody>${shiftBlocks||`<tr><td colspan="8" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody></table></div></details></div>
-  <div class="card"><h3 class="sec">By employee</h3>${summaryHTML([...ppl].sort((a,b)=>deptOrder(grp(a.dept))-deptOrder(grp(b.dept))||grp(a.dept).localeCompare(grp(b.dept))||a.name.localeCompare(b.name)),!F)}</div>`}
+  <div class="card" data-feat="sum_shift"><h3 class="sec">By shift <span class="note" style="font-weight:500">people starting in each part of the day · AM before 10a · Mid 10a–2p · PM 2p–5p · After 5 = 5p or later</span></h3><div class="sx"><table class="stab part4"><thead><tr><th class="l">Department</th><th class="l">Shift</th>${dh}<th>Week</th></tr></thead><tbody>${part4Blocks||`<tr><td colspan="10" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody></table></div>
+  <details class="exact" open><summary>${guideOn(S.store)?"Compared to the staffing guide (short / over)":"Exact shift times"}</summary><div class="sx"><table class="stab shifts"><thead><tr><th class="l">Shift</th>${dh}</tr></thead><tbody>${shiftBlocks||`<tr><td colspan="8" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody></table></div></details></div>
+  <div class="card" data-feat="sum_emp"><h3 class="sec">By employee</h3>${summaryHTML([...ppl].sort((a,b)=>deptOrder(grp(a.dept))-deptOrder(grp(b.dept))||grp(a.dept).localeCompare(grp(b.dept))||a.name.localeCompare(b.name)),!F)}</div>`}
 /* ---------- English / Español ---------- */
 let LANG=(()=>{try{return localStorage.getItem("vsb-lang")==="es"?"es":"en"}catch(e){return"en"}})();
 const DAY_ES={Sun:"Dom",Mon:"Lun",Tue:"Mar",Wed:"Mié",Thu:"Jue",Fri:"Vie",Sat:"Sáb",SUN:"DOM",MON:"LUN",TUE:"MAR",WED:"MIÉ",THU:"JUE",FRI:"VIE",SAT:"SÁB"};
