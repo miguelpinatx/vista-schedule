@@ -14,8 +14,37 @@
 .fixlist{margin:6px 0 2px;display:flex;flex-direction:column;gap:4px}.fixrow{background:#fff;border:1px solid var(--bad-line);border-left:4px solid var(--bad-fg);border-radius:8px;padding:6px 10px;font-size:15px}
 .revdepts{display:flex;flex-direction:column;gap:6px;max-height:44vh;overflow:auto}.revd{border:1px solid var(--line);border-radius:10px;padding:8px 10px}.revchk{display:flex;gap:8px;align-items:center;font-weight:700;font-size:15px;cursor:pointer}.revchk input{width:20px;height:20px}
 .revd textarea{width:100%;box-sizing:border-box;margin-top:6px;min-height:52px;font-family:var(--f-body);font-size:15px}
-#storeNav.subnav{margin-top:-4px;padding-top:8px;border-top:1px dashed var(--line)}#storeNav.subnav .navbig{font-size:15px;min-height:42px;padding:8px 14px}
+#storeNav.subnav .navbig{font-size:15px;min-height:42px;padding:8px 14px}
 .svpick{display:flex;flex-direction:column;gap:2px;margin-right:8px;font-weight:700}.svpick span{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}.svpick select{font-size:17px;font-weight:700;padding:8px 10px;border-radius:10px;border:2px solid var(--brand);min-height:44px}
+.homehero{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#2E7D32,#1f5e23);color:#fff;border-radius:18px;padding:20px 24px;margin:0 0 14px;box-shadow:0 6px 18px rgba(46,125,50,.18);border-bottom:5px solid #FEC938}
+.homehero h2{margin:2px 0 2px;font-size:28px;font-family:var(--f-display);color:#fff}.homehero .note{color:#e3f1e4}.hh-k{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:#FEC938}
+.hh-r{display:flex;gap:8px;flex-wrap:wrap}.hh-r .btn{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.35)}.hh-r .btn:hover{background:rgba(255,255,255,.22)}
+.hchips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.hchip{border-radius:99px;padding:5px 12px;font-size:13px;background:rgba(255,255,255,.14);color:#fff}.hchip b{font-size:15px}
+.hchip.sub{background:#FEC938;color:#3d2e00}.hchip.ok{background:#e3f4e4;color:#1f5e23}.hchip.rev{background:#fde3df;color:#9b2c1f}.hchip.late{background:#c0392b;color:#fff}
+.hometiles{margin-bottom:18px}#bannerSlot:empty,#lockSlot:empty,#budgetSlot:empty,#issuesSlot:empty,#sumSlot:empty,#notesSlot:empty{display:none}
+.shero{display:flex;flex-wrap:wrap;align-items:center;gap:14px 26px;background:linear-gradient(135deg,#2E7D32,#1f5e23);color:#fff;border-radius:18px;padding:16px 22px;border-bottom:5px solid #FEC938;box-shadow:0 6px 18px rgba(46,125,50,.18)}
+.sh-l{display:flex;flex-direction:column;gap:4px;min-width:170px}.sh-k,.sh-pick span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:#FEC938}
+.sh-name{margin:0;font-family:var(--f-display);font-size:30px;color:#fff;line-height:1.05}.sh-pick{display:flex;flex-direction:column;gap:3px}
+.sh-pick select{font-family:var(--f-display);font-size:24px;font-weight:800;color:#1f5e23;background:#fff;border:0;border-radius:10px;padding:5px 10px;min-height:44px;cursor:pointer}
+.sh-wk{font-size:14px;color:#e3f1e4}.sh-stats{display:flex;gap:10px;flex-wrap:wrap;flex:1}.sh-stats>div{background:rgba(255,255,255,.12);border-radius:12px;padding:8px 14px;display:flex;flex-direction:column;min-width:82px}
+.sh-stats b{font-family:var(--f-display);font-size:24px;line-height:1.1}.sh-stats b.sh-due{font-size:17px;padding-top:4px}.sh-stats span{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#cfe6d1;font-weight:700}
+.sh-st .spill{font-size:14px;padding:6px 14px}
+#storeNav{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px;gap:6px;flex-wrap:wrap}#storeNav .navbig{border:0;box-shadow:none;background:transparent;min-height:46px;font-size:16px}#storeNav .navbig[aria-selected="true"]{background:var(--brand);color:#fff}#storeNav .navbig:not([aria-selected="true"]):hover{background:var(--surface2)}
+#storeNav .navsp{flex:1}
+#mainBar #schedActions{flex-basis:100%;border-top:1px solid var(--line);padding-top:10px;margin-top:2px}
+@media (max-width:640px){.sh-stats{display:grid;grid-template-columns:repeat(4,1fr);width:100%;flex:none}.sh-stats>div{min-width:0;padding:6px 8px}.sh-stats span{font-size:9.5px}.sh-stats b.sh-due{font-size:13px}.sh-stats b{font-size:19px}.sh-name{font-size:24px}#storeNav .navbig{font-size:14px;padding:8px 10px}}
+.hh-wk{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.hwb{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:8px;min-width:30px;height:30px;font-size:18px;font-weight:700;cursor:pointer;padding:0 8px}.hwb.t{font-size:12.5px;font-weight:600}.hwb:hover{background:rgba(255,255,255,.26)}
+.hcard .spill{white-space:nowrap}@media (max-width:640px){.hometiles{grid-template-columns:1fr 1fr}.hometiles .dtile b{font-size:26px}.homehero{padding:16px}.homehero h2{font-size:23px}}
+.hsec{font-family:var(--f-display);font-size:20px;font-weight:800;margin:4px 0 10px;display:flex;align-items:center;gap:10px}.hsec::after{content:"";flex:1;height:2px;background:var(--line);border-radius:2px}
+.hcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-bottom:22px}
+.hcard{background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.hcard.st-submitted{border-top-color:#FEC938;background:#fffcef}.hcard.st-approved{border-top-color:#2E7D32}.hcard.st-revise{border-top-color:#e0806f}.hcard.st-late{border-top-color:#c0392b}
+.hc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.hc-top h3{margin:0;font-size:21px;font-family:var(--f-display)}
+.hc-when{margin:0;font-size:12.5px}.hc-num{display:flex;align-items:baseline;gap:6px;margin-top:4px;min-height:38px}.hc-num b{font-family:var(--f-display);font-size:32px;line-height:1}.hc-num span{color:var(--muted);font-size:13px}
+.hc-bar{height:7px;background:var(--surface2);border-radius:99px;overflow:hidden}.hc-bar i{display:block;height:100%;background:#7fb685;border-radius:99px}
+.hc-meta{margin:0;font-size:13px}.hc-flags{min-height:20px}.hcnote{font-size:13px;background:var(--surface2);border-radius:8px;padding:6px 8px}.hcnote.rev{background:#fdf1ef}
+.hc-acts{display:flex;gap:6px;margin-top:auto;padding-top:6px}.hc-acts .btn:first-child{flex:1;justify-content:center}
+#view-dash .dhead h2.sec{display:none}
 .stcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin:0 0 14px}.stcard{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;cursor:pointer;text-align:left;font:inherit;color:inherit}.stcard:hover{border-color:var(--brand)}.stcard h3{margin:0;font-size:20px}.stcard .note{margin:0}.stcard.sub{border-color:#e0a800;background:#fffbea}
 .homehead{display:flex;align-items:flex-end;gap:12px;margin:0 0 10px}.homehead h2{margin:0}
 details.dsumwrap{margin-top:6px}details.dsumwrap>summary{cursor:pointer;font-weight:700;font-size:16px;padding:10px 0;list-style:revert}
@@ -561,6 +590,7 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
       <button role="tab" data-atab="guide" class="navbig"><span class="ni" aria-hidden="true">📐</span>Staffing guide</button>
       <button role="tab" data-atab="settings" class="navbig"><span class="ni" aria-hidden="true">⚙️</span>Settings</button>
   </nav>
+  <div id="storeHero" hidden></div>
   <nav class="tabs mainnav" id="storeNav" role="tablist">
       <button role="tab" id="tab-schedule" aria-selected="true" data-tab="schedule" class="navbig"><span class="ni" aria-hidden="true">📅</span>See full schedule</button>
       <button role="tab" id="tab-build" aria-selected="false" data-tab="build" class="navbig"><span class="ni" aria-hidden="true">✏️</span>Build schedule</button>
@@ -647,7 +677,7 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
 
   <section id="view-dash" class="panel" hidden>
     <div id="subSlot"></div>
-    <details class="dsumwrap"><summary>Staffing summary · all stores (hours, open spots)</summary><div id="dashSlot"></div></details>
+    <div id="dashSlot"></div>
   </section>
 
   <section id="view-guide" class="panel" hidden>
@@ -864,18 +894,45 @@ async function loadSubs(force){const el=$("#subSlot");if(!el)return;if(!isAdm()|
   try{const out={};await Promise.all(S.cfg.stores.map(async st=>{out[st]=await backend.getLock(st.replace(/[^A-Za-z0-9_-]/g,"_")+"_"+wk).catch(()=>null)}));SUBS.docs=out;SUBS.week=wk;SUBS.at=Date.now()}finally{SUBS.loading=false}
   const e2=$("#subSlot");if(e2)e2.innerHTML=subsHTML()}
 function subsHTML(){const due=dueOf(S.week),now=new Date();const pill={draft:["Not submitted","sp-draft"],submitted:["Waiting for you","sp-sub"],revise:["Changes requested","sp-rev"],approved:["Approved & locked","sp-ok"]};
-  const rows=S.cfg.stores.map(st=>{const d=SUBS.docs[st];const s=d?(d.state||"approved"):"draft";const late=s==="draft"&&now>due;const[t,c]=pill[s];
-    return `<tr><td class="l"><b>${esc(st)}</b></td><td><span class="spill ${c} ${late?"sp-late":""}">${late?"Late · ":""}${t}</span></td><td>${d&&d.submittedAt?fdt(d.submittedAt):"—"}</td><td class="l">${d&&d.state==="revise"?`<span class="note">Asked: ${(d.fixes||[]).map(f=>esc(f.dept)).join(", ")}${d.note?` “${esc(d.note)}”`:""}</span>`:d&&d.state==="submitted"&&d.storeNote?`<span class="note"><b>Store:</b> “${esc(d.storeNote)}”</span>`:d&&d.approvedAt?"Approved "+fdt(d.approvedAt):""}</td><td style="white-space:nowrap"><button class="btn sm ${s==="submitted"?"primary":""}" data-goschedule="${esc(st)}">${s==="submitted"?"Review":"Open"}</button> <button class="btn sm" data-xls="${esc(st)}" title="Download ${esc(st)} as Excel">⬇ Excel</button></td></tr>`}).join("");
-  const n=S.cfg.stores.filter(st=>SUBS.docs[st]&&SUBS.docs[st].state==="submitted").length;
-  const cnt=st=>Object.values(S.staff).filter(p=>p&&!p._pending&&p.store===st).length;
-  const cards=S.cfg.stores.map(st=>{const d=SUBS.docs[st];const s2=d?(d.state||"approved"):"draft";const late=s2==="draft"&&now>due;const[t,c]=pill[s2];
-    return `<button class="stcard ${s2==="submitted"?"sub":""}" data-goschedule="${esc(st)}"><h3>${esc(st)}</h3><span><span class="spill ${c} ${late?"sp-late":""}">${late?"Late · ":""}${t}</span></span><span class="note">${cnt(st)} employees</span><span class="btn sm ${s2==="submitted"?"primary":""}" style="align-self:flex-start">${s2==="submitted"?"Review schedule →":"Open store →"}</span></button>`}).join("");
-  return `<div class="homehead"><div><h2 class="sec">Home</h2><div class="note">Week ${weekNo(S.week,S.cfg.wkOffset)} · ${rangeLabel(S.week)}${n?` · <b>${n} waiting for your approval</b>`:""}</div></div></div>
-  <div class="stcards">${cards}</div>
-  <div class="card subs"><div class="row"><div><h2 class="sec" style="margin:0">Schedule submissions · Week ${weekNo(S.week,S.cfg.wkOffset)}</h2><div class="note">${rangeLabel(S.week)} · due ${due.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"long",month:"numeric",day:"numeric"})}${n?` · <b>${n} waiting for your approval</b>`:""}</div></div><div class="spacer"></div><button class="btn sm" data-xls="__all">⬇ All stores (Excel)</button><button class="btn sm" data-subsref>Refresh</button></div>
-  <div class="sx"><table class="stab" style="min-width:640px"><thead><tr><th class="l">Store</th><th>Status</th><th>Submitted</th><th class="l">Notes</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`}
-document.addEventListener("click",e=>{if(e.target.closest("[data-subsref]"))loadSubs(true)});
-
+  const dueTxt=due.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"long",month:"numeric",day:"numeric"});
+  const haveDash=DASH.week===ymd(S.week)&&!DASH.loading&&Object.keys(DASH.docs).length>0;
+  const info=S.cfg.stores.map(st=>{const d=SUBS.docs[st];const s2=d?(d.state||"approved"):"draft";const late=s2==="draft"&&now>due;
+    const doc=haveDash?DASH.docs[st]:null;const r=doc?storeStats(st,doc):null;const roster=Object.values(S.staff).filter(p=>p&&!p._pending&&p.store===st).length;return{st,d,s2,late,doc,r,roster}});
+  const C={submitted:0,approved:0,revise:0,draft:0,late:0};info.forEach(x=>{C[x.s2]++;if(x.late)C.late++});
+  const T={hrs:0,ppl:0,fl:0,open:0};info.forEach(({r})=>{if(!r)return;T.hrs+=r.hrs;T.ppl+=r.ppl;T.fl+=r.ptOver.length+r.ot.length+r.capOver.length;T.open+=r.open});
+  const maxH=Math.max(1,...info.map(x=>x.r?x.r.hrs:0));
+  const chip=(n,t,c)=>n?`<span class="hchip ${c}"><b>${n}</b> ${t}</span>`:"";
+  const hero=`<div class="homehero"><div class="hh-l"><div class="hh-wk"><button class="hwb" data-hwk="prevWk" aria-label="Previous week">‹</button><span class="hh-k">Week ${weekNo(S.week,S.cfg.wkOffset)}</span><button class="hwb" data-hwk="nextWk" aria-label="Next week">›</button><button class="hwb t" data-hwk="dueWk">Week to submit</button><button class="hwb t" data-hwk="thisWk">This week</button></div><h2>${rangeLabel(S.week)}</h2><div class="note">Schedules due ${dueTxt}</div>
+    <div class="hchips">${chip(C.submitted,"waiting for you","sub")}${chip(C.revise,"changes requested","rev")}${chip(C.approved,"approved","ok")}${chip(C.draft,C.late?"not submitted (late)":"not submitted",C.late?"late":"draft")}</div></div>
+    <div class="hh-r"><button class="btn" data-xls="__all">⬇ All stores (Excel)</button><button class="btn" data-subsref>↻ Refresh</button></div></div>`;
+  const tiles=`<div class="dtiles hometiles">
+    <div class="dtile"><span>Total hours</span><b>${haveDash?Math.round(T.hrs).toLocaleString():"…"}</b><small>all ${info.length} stores</small></div>
+    <div class="dtile"><span>People working</span><b>${haveDash?T.ppl:"…"}</b><small>${info.filter(x=>x.r&&x.r.ppl).length} stores have a schedule</small></div>
+    <div class="dtile ${T.fl?"warn":""}"><span>Hour problems</span><b>${haveDash?T.fl:"…"}</b><small>overtime, PT over 29.99, over cap</small></div>
+    <div class="dtile ${T.open?"warn":""}"><span>Open spots</span><b>${haveDash?T.open:"…"}</b><small>below the staffing guide</small></div></div>`;
+  const cards=info.map(({st,d,s2,late,doc,r,roster})=>{const[t,c]=pill[s2];const fl=r?r.ptOver.length+r.ot.length+r.capOver.length:0;const bd=r&&r.hrs?r.day.indexOf(Math.max(...r.day)):-1;
+    const note=d&&s2==="submitted"&&d.storeNote?`<div class="hcnote"><b>Store:</b> <span translate="no">“${esc(d.storeNote)}”</span></div>`:d&&s2==="revise"?`<div class="hcnote rev"><b>You asked:</b> ${(d.fixes||[]).map(f=>esc(f.dept)).join(", ")}${d.note?` <span translate="no">“${esc(d.note)}”</span>`:""}</div>`:"";
+    const when=d&&s2==="approved"&&d.approvedAt?"Approved "+fdt(d.approvedAt):d&&d.submittedAt&&s2!=="draft"?"Submitted "+fdt(d.submittedAt):late?"Was due "+fdt(due):"Due "+fdt(due);
+    return `<div class="hcard st-${s2} ${late?"st-late":""}">
+      <div class="hc-top"><h3>${esc(st)}</h3><span class="spill ${c} ${late?"sp-late":""}">${late?"Late":t}</span></div>
+      <div class="hc-when note">${when}</div>
+      <div class="hc-num">${r?`<b>${Math.round(r.hrs).toLocaleString()}</b><span>hours</span>`:`<span class="note">${haveDash?"No schedule yet":"Loading…"}</span>`}</div>
+      <div class="hc-bar"><i style="width:${r?(r.hrs/maxH*100).toFixed(1):0}%"></i></div>
+      <div class="hc-meta note">${r?`<b>${r.ppl}</b> of ${roster} working${bd>=0?` · busiest ${DAYS[bd]}`:""}`:`${roster} on the roster`}</div>
+      <div class="hc-flags">${r?(fl?`<span class="flag bad">${fl} hour problem${fl>1?"s":""}</span>`:`<span class="okpill">Hours OK</span>`)+(r.need?(r.open?` <span class="flag">${r.open} open</span>`:` <span class="okpill">Covered</span>`):""):""}</div>
+      ${note}
+      <div class="hc-acts"><button class="btn ${s2==="submitted"?"primary":""}" data-goschedule="${esc(st)}">${s2==="submitted"?"Review →":"Open →"}</button><button class="btn sm" data-dsum="${esc(st)}" title="Staffing summary">📊</button><button class="btn sm" data-xls="${esc(st)}" title="Download Excel">⬇ Excel</button></div></div>`}).join("");
+  return hero+tiles+`<div class="hsec">Stores</div><div class="hcards">${cards}</div><div class="hsec" id="sumHead">Staffing summary</div>`}
+document.addEventListener("click",e=>{if(e.target.closest("[data-subsref]")){loadSubs(true);if(typeof loadDash==="function")loadDash(true)}
+  const w=e.target.closest("[data-hwk]");if(w){const t=document.getElementById(w.dataset.hwk);if(t)t.click();return}
+  const s=e.target.closest("[data-dsum]");if(s){DASH.store=s.dataset.dsum;renderDash();const h=document.getElementById("sumHead");if(h)h.scrollIntoView({behavior:"smooth"})}});
+function homeAllHTML(){const stores=S.cfg.stores.map(st=>({st,r:storeStats(st,DASH.docs[st])}));const groups=[...new Set(S.cfg.depts.map(grp))];const maxCell=Math.max(1,...stores.flatMap(x=>groups.map(G=>x.r.dept[G]||0)));
+  return `<div class="card"><div class="ptitle">Hours by department, every store <span class="note">· darker = more hours · click a number for that store</span></div>
+  <div style="overflow-x:auto;margin-top:4px"><table class="dtable heat"><thead><tr><th style="text-align:left">Department</th>${stores.map(x=>`<th>${esc(x.st)}</th>`).join("")}<th>Total</th></tr></thead><tbody>
+  ${groups.map(G=>{const row=stores.map(x=>x.r.dept[G]||0);const tot=row.reduce((a,b)=>a+b,0);if(!tot)return"";
+    return `<tr><td style="text-align:left"><b>${esc(G)}</b></td>${row.map((v,i)=>`<td class="hc" data-dstore="${esc(stores[i].st)}" style="--a:${(v/maxCell).toFixed(3)}">${v?fmtH(v):"—"}</td>`).join("")}<td><b>${fmtH(tot)}</b></td></tr>`}).join("")}
+  <tr class="tot"><td style="text-align:left"><b>All departments</b></td>${stores.map(x=>`<td><b>${fmtH(x.r.hrs)}</b></td>`).join("")}<td><b>${fmtH(stores.reduce((a,x)=>a+x.r.hrs,0))}</b></td></tr>
+  </tbody></table></div></div>`}
 /* ---------- Payroll budget + issues (GitHub version) ---------- */
 const money=n=>"$"+Math.round(n).toLocaleString();
 const PAYROLL_ON=false;// payroll budget is a future add-on
@@ -915,7 +972,7 @@ function issuesHTML(){const L=issuesList();if(!S.store)return"";
   if(!L.length)return `<div class="card issues ok"><b>✓ No issues.</b> <span class="note">Staffing guide covered, hours within the rules${payCfg()?" and on budget":""}.</span></div>`;
   return `<details class="card issues" ${ISS_OPEN?"open":""}><summary><b>Issues to review</b> <span class="note">(admin only)</span> <span class="flag ${bad?"bad":""}">${L.length}</span> <span class="note">${bad} need attention${S.dept==="__all"?"":" · "+esc(grp(S.dept))+" only"}</span></summary>
   ${sec("budget","Budget")}${sec("staff","Staffing")}${sec("hours","Hours & rules")}<div class="note">Tap a department or person to show only that department.</div></details>`}
-let ISS_OPEN=true;
+let ISS_OPEN=false;
 function renderPay(){const b=$("#budgetSlot"),i=$("#issuesSlot");if(!b||!i)return;if(!S.store||S.tab!=="schedule"){b.innerHTML="";i.innerHTML="";return}
   const ae=document.activeElement;const foc=ae&&ae.dataset&&ae.dataset.sales;if(!(foc!=null&&b.contains(ae)))b.innerHTML=budgetHTML();else{const t=document.createElement("div");t.innerHTML=budgetHTML();const nb=t.querySelector(".bhead"),ob=b.querySelector(".bhead");if(nb&&ob)ob.innerHTML=nb.innerHTML;const nt=t.querySelectorAll(".btab tbody tr"),ot=b.querySelectorAll(".btab tbody tr");for(let r=1;r<nt.length;r++)if(ot[r])ot[r].innerHTML=nt[r].innerHTML;const w=t.querySelector(".btab tbody tr td:last-child"),ow=b.querySelector(".btab tbody tr td:last-child");if(w&&ow)ow.innerHTML=w.innerHTML}
   const d=i.querySelector("details");if(d)ISS_OPEN=d.open;i.innerHTML=(LOCK||!S.canEdit)?"":issuesHTML()}
@@ -971,6 +1028,19 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-xls]");if(
 
 /* ---------- admin top tabs ---------- */
 document.addEventListener("click",e=>{const b=e.target.closest("[data-atab]");if(!b)return;const t=b.dataset.atab;S.tab=t==="store"?(S._lastStoreTab||"schedule"):t;savePrefs();renderAll();window.scrollTo({top:0})});
+
+/* ---------- store header (hero) ---------- */
+function storeHeroHTML(){if(!S.store)return"";const adm=isAdm();const st=stState();const due=dueOf(S.week),late=st==="draft"&&new Date()>due;
+  const lab={draft:[late?"Late · not submitted":"Not submitted yet","sp-draft"],submitted:[adm?"Waiting for you":"Submitted · waiting","sp-sub"],revise:["Changes requested","sp-rev"],approved:["Approved & locked","sp-ok"]}[st];
+  const roster=Object.values(S.staff).filter(p=>p&&!p._pending&&p.store===S.store);const H=storeDayHours();const hrs=H.reduce((a,b)=>a+b,0);
+  let working=0;for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;for(let d=0;d<7;d++){const v=cellVal(id,d);if(v&&v.s&&!v.off){working++;break}}}
+  const dueTxt=due.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"short",month:"numeric",day:"numeric"});
+  return `<div class="shero"><div class="sh-l">${adm?`<label class="sh-pick"><span>Store</span><select id="svStore">${S.cfg.stores.map(x=>`<option ${x===S.store?"selected":""}>${esc(x)}</option>`).join("")}</select></label>`:`<div class="sh-k">Store</div><h2 class="sh-name">${esc(S.store)}</h2>`}
+    <div class="sh-wk"><b>Week ${weekNo(S.week,S.cfg.wkOffset)}</b> · ${rangeLabel(S.week)}</div></div>
+    <div class="sh-stats"><div><b>${roster.length}</b><span>employees</span></div><div><b>${working}</b><span>working</span></div><div><b>${fmtH(Math.round(hrs*10)/10)}</b><span>hours</span></div><div><b class="sh-due">${dueTxt}</b><span>due</span></div></div>
+    <div class="sh-st"><span class="spill ${lab[1]} ${late?"sp-late":""}">${lab[0]}</span></div></div>`}
+function renderHero(){const el=$("#storeHero");if(!el)return;const show=["schedule","build","staff","sum"].includes(S.tab)&&!!S.store;el.hidden=!show;if(!show)return;
+  if(el.contains(document.activeElement))return;el.innerHTML=storeHeroHTML();const sv=$("#svStore");if(sv)sv.onchange=()=>{S.store=sv.value;S.dept="__all";savePrefs();renderAll();resub()}}
 
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAYS_ES=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
@@ -1165,9 +1235,8 @@ function renderControls(){
   document.querySelector('#storeSel').closest('.field').hidden=S.tab==="dash";document.querySelector('#deptSel').closest('.field').hidden=S.tab==="dash";
   $("#searchField").hidden=!(S.tab==="schedule"||S.tab==="staff");
   {const adm=isAdm(),inStore=["schedule","build","staff","sum"].includes(S.tab);$("#admNav").hidden=!adm;if(inStore)S._lastStoreTab=S.tab;document.body.classList.toggle("adm",adm);
-   $("#storeNav").hidden=adm&&!inStore;$("#storeNav").classList.toggle("subnav",adm);
-   let sv=$("#svStore");if(adm&&!sv){const w=document.createElement("label");w.className="svpick";w.innerHTML=`<span>Store</span><select id="svStore"></select>`;$("#storeNav").prepend(w);sv=$("#svStore");sv.onchange=()=>{S.store=sv.value;S.dept="__all";savePrefs();renderAll();resub()}}
-   if(sv){sv.closest(".svpick").hidden=!adm;sv.innerHTML=S.cfg.stores.map(x=>`<option ${x===S.store?"selected":""}>${esc(x)}</option>`).join("")}
+   $("#storeNav").hidden=adm&&!inStore;if(adm&&S.tab==="dash")$("#mainBar").hidden=true;$("#storeNav").classList.toggle("subnav",adm);
+   renderHero();if((adm&&inStore)||LOCK){document.querySelector('#storeSel').closest('.field').hidden=true}
    ["tab-dash","tab-guide","tab-settings"].forEach(id=>{if(adm)$("#"+id).hidden=true});
    document.querySelectorAll("[data-atab]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.atab===(inStore?"store":S.tab))))}
   $("#weekField").hidden=S.tab!=="schedule"&&S.tab!=="dash"&&S.tab!=="sum";$("#schedActions").hidden=S.tab!=="schedule";
@@ -1213,7 +1282,7 @@ function renderSum(){const el=$("#sumSlot");if(!el)return;el.innerHTML="";return
     .sort((a,b)=>deptOrder(grp(a.dept))-deptOrder(grp(b.dept))||grp(a.dept).localeCompare(grp(b.dept))||a.name.localeCompare(b.name));
   el.innerHTML=`<div style="margin-top:12px">${summaryHTML(ppl,S.dept==="__all")}</div>`;
   const t=el.querySelector(".ptitle");if(t)t.textContent="Employee summary · hours & days"+(S.dept==="__all"?"":" · "+grp(S.dept));}
-function renderGrid(){renderSum();renderPay();renderLock();
+function renderGrid(){renderSum();renderPay();renderLock();renderHero();
   const slot=$("#gridSlot");if(!S.store){slot.innerHTML="";return}
   document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===S.view)));
   document.querySelectorAll("[data-color]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.color===S.colorBy)));
@@ -1390,7 +1459,7 @@ function trafficHTML(){
   </div>`;
 }
 const fmtD=iso=>{const d=parseYmd(iso);return MON[d.getMonth()]+" "+d.getDate()};
-function renderDash(){
+function renderDash(){{const e=$("#subSlot");if(e&&S.tab==="dash"&&isAdm()&&SUBS.week===ymd(S.week))e.innerHTML=subsHTML()}
   const slot=$("#dashSlot");if(!slot||S.tab!=="dash")return;
   const wkLbl=`Week ${weekNo(S.week,S.cfg.wkOffset)} · ${rangeLabel(S.week)}`;
   if(DASH.loading&&!Object.keys(DASH.docs).length){slot.innerHTML=`<div class="card"><div class="empty"><h2>Loading all stores…</h2><p>${wkLbl}</p></div></div>`;return}
@@ -1398,7 +1467,7 @@ function renderDash(){
   const head=`<div class="dhead"><div><h2 class="sec">${sel==="__all"?"All stores":esc(sel)} · staffing summary</h2><div class="note">${wkLbl}${S.cfg.mealDeduct?" · hours exclude a 30-min meal on 6h+ shifts":""}</div></div>
     <div class="row"><label class="field"><span>Store</span><select id="dashStore"><option value="__all">All stores</option>${S.cfg.stores.map(s=>`<option ${s===sel?"selected":""}>${esc(s)}</option>`).join("")}</select></label>
     <button class="btn sm" id="dashRefresh">${DASH.loading?"Refreshing…":"Refresh"}</button></div></div>${DASH.err?`<div class="banner info">${esc(DASH.err)}</div>`:""}`;
-  slot.innerHTML=head+(sel==="__all"?dashAll():dashStore(sel));
+  slot.innerHTML=head+(sel==="__all"?(isAdm()?homeAllHTML():dashAll()):dashStore(sel));
   $("#dashRefresh").onclick=()=>loadDash(true);
   $("#dashStore").onchange=e=>{DASH.store=e.target.value;if(e.target.value!=="__all")TRAF.store=e.target.value;renderDash()};
   {const b=$("#trShow");if(b)b.onchange=e=>{TRAF.show=e.target.value;renderDash()};const c=$("#trCap");if(c)c.onchange=e=>{TRAF.cap=Math.max(5,Math.min(80,+e.target.value||25));renderDash()}}
