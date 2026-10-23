@@ -32,7 +32,7 @@
 .sh-stats b{font-family:var(--f-display);font-size:24px;line-height:1.1}.sh-stats b.sh-due{font-size:17px;padding-top:4px}.sh-stats span{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#cfe6d1;font-weight:700}
 .sh-st .spill{font-size:14px;padding:6px 14px}.sh-st{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.sh-link{background:#FEC938;color:#3d2e00;border-color:#FEC938;font-weight:700}.sh-link:hover{background:#ffd75e}
 #storeNav{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px;gap:6px;flex-wrap:wrap}#storeNav .navbig{border:0;box-shadow:none;background:transparent;min-height:46px;font-size:16px}#storeNav .navbig[aria-selected="true"]{background:var(--brand);color:#fff}#storeNav .navbig:not([aria-selected="true"]):hover{background:var(--surface2)}
-#storeNav .navsp{flex:1}
+#storeNav .navsp{flex:1}body.adm #storeNav #tab-sum{order:-1}
 #mainBar #schedActions{flex-basis:100%;border-top:1px solid var(--line);padding-top:10px;margin-top:2px}
 @media (max-width:640px){.sh-stats{display:grid;grid-template-columns:repeat(4,1fr);width:100%;flex:none}.sh-stats>div{min-width:0;padding:6px 8px}.sh-stats span{font-size:9.5px}.sh-stats b.sh-due{font-size:13px}.sh-stats b{font-size:19px}.sh-name{font-size:24px}#storeNav .navbig{font-size:14px;padding:8px 10px}}
 .hh-wk{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.hwb{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:8px;min-width:30px;height:30px;font-size:18px;font-weight:700;cursor:pointer;padding:0 8px}.hwb.t{font-size:12.5px;font-weight:600}.hwb:hover{background:rgba(255,255,255,.26)}
@@ -943,7 +943,7 @@ function subsHTML(){const due=dueOf(S.week),now=new Date();const pill={draft:["N
       <div class="hc-meta note" data-feat="card_stats">${r?`<b>${r.ppl}</b> of ${roster} working${bd>=0?` · busiest ${DAYS[bd]}`:""}`:`${roster} on the roster`}</div>
       <div class="hc-flags" data-feat="card_stats">${r?(fl?`<span class="flag bad">${fl} hour problem${fl>1?"s":""}</span>`:`<span class="okpill">Hours OK</span>`)+(r.need?(r.open?` <span class="flag">${r.open} open</span>`:` <span class="okpill">Covered</span>`):""):""}</div>
       ${note}
-      <div class="hc-acts"><button class="btn ${s2==="submitted"?"primary":""}" data-goschedule="${esc(st)}">${s2==="submitted"?"Review →":"Open →"}</button><button class="btn sm" data-dsum="${esc(st)}" title="Staffing summary">📊</button><button class="btn sm" data-xls="${esc(st)}" title="Download Excel">⬇ Excel</button></div></div>`}).join("");
+      <div class="hc-acts"><button class="btn ${s2==="submitted"?"primary":""}" data-gosum="${esc(st)}">${s2==="submitted"?"Review →":"Open →"}</button><button class="btn sm" data-dsum="${esc(st)}" title="Staffing summary">📊</button><button class="btn sm" data-xls="${esc(st)}" title="Download Excel">⬇ Excel</button></div></div>`}).join("");
   return hero+tiles+`<div class="hsec">Stores</div><div class="hcards">${cards}</div><div class="hsec" id="sumHead" data-feat="home_summary">Staffing summary</div>`}
 document.addEventListener("click",e=>{if(e.target.closest("[data-subsref]")){loadSubs(true);if(typeof loadDash==="function")loadDash(true)}
   const w=e.target.closest("[data-hwk]");if(w){const t=document.getElementById(w.dataset.hwk);if(t)t.click();return}
@@ -1049,7 +1049,7 @@ async function exportExcel(stores){try{toast("Preparing Excel…");const X=await
 document.addEventListener("click",e=>{const b=e.target.closest("[data-xls]");if(!b)return;const v=b.dataset.xls;exportExcel(v==="__all"?S.cfg.stores:[v||S.store])});
 
 /* ---------- admin top tabs ---------- */
-document.addEventListener("click",e=>{const b=e.target.closest("[data-atab]");if(!b)return;const t=b.dataset.atab;S.tab=t==="store"?(S._lastStoreTab||"schedule"):t;savePrefs();renderAll();window.scrollTo({top:0})});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-atab]");if(!b)return;const t=b.dataset.atab;S.tab=t==="store"?(S._lastStoreTab||(featOn("sum_tab")?"sum":"schedule")):t;savePrefs();renderAll();window.scrollTo({top:0})});
 
 /* ---------- store header (hero) ---------- */
 function storeHeroHTML(){if(!S.store)return"";const adm=isAdm();const st=stState();const due=dueOf(S.week),late=st==="draft"&&new Date()>due;
@@ -1086,6 +1086,8 @@ function renderFeatToggles(){const el=$("#featToggles");if(!el)return;const ed=S
 async function saveFeatOff(off){try{await backend.saveCfg({...S.cfg,featOff:off});toast("Saved")}catch(x){showErr(x)}}
 document.addEventListener("click",e=>{const t=e.target.closest("[data-feat-tog]");if(t){const off={...(S.cfg.featOff||{})};const k=t.dataset.featTog;if(off[k])delete off[k];else off[k]=true;saveFeatOff(off);return}
   const a=e.target.closest("[data-fall]");if(a){if(a.dataset.fall==="on")saveFeatOff({});else saveFeatOff({home_totals:true,home_summary:true,store_stats:true,issues:true,sum_tiles:true,sum_day:true,sum_emp:true})}});
+
+document.addEventListener("click",e=>{const b=e.target.closest("[data-gosum]");if(!b)return;e.stopPropagation();S.store=b.dataset.gosum;S.dept="__all";S.tab=featOn("sum_tab")?"sum":"schedule";savePrefs();renderAll();resub();window.scrollTo({top:0})},true);
 
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAYS_ES=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
@@ -1345,7 +1347,7 @@ function renderSum(){const el=$("#sumSlot");if(!el)return;el.innerHTML="";return
     .sort((a,b)=>deptOrder(grp(a.dept))-deptOrder(grp(b.dept))||grp(a.dept).localeCompare(grp(b.dept))||a.name.localeCompare(b.name));
   el.innerHTML=`<div style="margin-top:12px">${summaryHTML(ppl,S.dept==="__all")}</div>`;
   const t=el.querySelector(".ptitle");if(t)t.textContent="Employee summary · hours & days"+(S.dept==="__all"?"":" · "+grp(S.dept));}
-function renderGrid(){renderSum();renderPay();renderLock();renderHero();
+function renderGrid(){renderSum();renderPay();renderLock();renderHero();if(S.tab==="sum")renderSumTab();
   const slot=$("#gridSlot");if(!S.store){slot.innerHTML="";return}
   document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===S.view)));
   document.querySelectorAll("[data-color]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.color===S.colorBy)));
@@ -2603,13 +2605,13 @@ function renderSumTab(){const el=$("#sumTabSlot");if(!el)return;if(S.tab!=="sum"
   const part4Blocks=order.length?(order.length>1?blk("All departments",allPc,"allg"):"")+order.map(G=>blk(esc(G),D[G].pc)).join(""):"";
   el.innerHTML=`<div class="sumhead"><h2 class="sec">Summary · ${esc(S.store)}${F?" · "+esc(F):""}</h2><div class="note">Week ${weekNo(S.week,S.cfg.wkOffset)} · ${rangeLabel(S.week)}${S.cfg.mealDeduct?" · hours exclude a 30-min meal on 6h+ shifts":""}</div></div>
   <div class="dtiles" data-feat="sum_tiles"><div class="dtile"><span>Total hours</span><b>${r1(T.h)}</b></div><div class="dtile"><span>Employees working</span><b>${T.ids.size}</b><small>of ${ppl.length} on the team</small></div><div class="dtile"><span>Shifts</span><b>${T.n}</b></div><div class="dtile"><span>Avg hours per person</span><b>${T.ids.size?r1(T.h/T.ids.size):0}</b></div></div>
+  <div class="card" data-feat="sum_shift"><h3 class="sec">By shift <span class="note" style="font-weight:500">people starting in each part of the day · AM before 10a · Mid 10a–2p · PM 2p–5p · After 5 = 5p or later</span></h3><div class="sx"><table class="stab part4"><thead><tr><th class="l">Department</th><th class="l">Shift</th>${dh}<th>Week</th></tr></thead><tbody>${part4Blocks||`<tr><td colspan="10" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody></table></div>
+  <details class="exact" open><summary>${guideOn(S.store)?"Compared to the staffing guide (short / over)":"Exact shift times"}</summary><div class="sx"><table class="stab shifts"><thead><tr><th class="l">Shift</th>${dh}</tr></thead><tbody>${shiftBlocks||`<tr><td colspan="8" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody></table></div></details></div>
   <div class="card" data-feat="sum_dept"><h3 class="sec">By department</h3><div class="sx"><table class="stab"><thead><tr><th class="l">Department</th><th>Employees</th><th>Shifts</th><th>Hours</th>${dh}</tr></thead><tbody>${deptRows||`<tr><td colspan="11" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody>
   <tfoot><tr><td class="l">All departments</td><td>${T.ids.size}</td><td>${T.n}</td><td>${r1(T.h)}</td>${T.day.map(x=>`<td>${cell(x.h,x.ids.size)}</td>`).join("")}</tr></tfoot></table></div></div>
   <div class="card" data-feat="sum_day"><h3 class="sec">By day</h3><div class="sx"><table class="stab"><thead><tr><th class="l">Day</th><th>Employees</th><th>Hours</th>${PART4.map(([n,t])=>`<th>${n}<small>${t.replace("starts ","")}</small></th>`).join("")}</tr></thead><tbody>
   ${T.day.map((x,d)=>{const dt=addDays(S.week,d);return `<tr><td class="l"><b>${DAYS_LONG[d]}</b> <span class="note">${dt.getMonth()+1}/${dt.getDate()}</span></td><td>${x.ids.size}</td><td><b>${r1(x.h)}</b></td>${x.part.map(n=>`<td>${n||"—"}</td>`).join("")}</tr>`}).join("")}</tbody>
   <tfoot><tr><td class="l">Week</td><td>${T.ids.size}</td><td>${r1(T.h)}</td>${[0,1,2,3].map(k=>`<td>${T.day.reduce((a,x)=>a+x.part[k],0)}</td>`).join("")}</tr></tfoot></table></div></div>
-  <div class="card" data-feat="sum_shift"><h3 class="sec">By shift <span class="note" style="font-weight:500">people starting in each part of the day · AM before 10a · Mid 10a–2p · PM 2p–5p · After 5 = 5p or later</span></h3><div class="sx"><table class="stab part4"><thead><tr><th class="l">Department</th><th class="l">Shift</th>${dh}<th>Week</th></tr></thead><tbody>${part4Blocks||`<tr><td colspan="10" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody></table></div>
-  <details class="exact" open><summary>${guideOn(S.store)?"Compared to the staffing guide (short / over)":"Exact shift times"}</summary><div class="sx"><table class="stab shifts"><thead><tr><th class="l">Shift</th>${dh}</tr></thead><tbody>${shiftBlocks||`<tr><td colspan="8" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody></table></div></details></div>
   <div class="card" data-feat="sum_emp"><h3 class="sec">By employee</h3>${summaryHTML([...ppl].sort((a,b)=>deptOrder(grp(a.dept))-deptOrder(grp(b.dept))||grp(a.dept).localeCompare(grp(b.dept))||a.name.localeCompare(b.name)),!F)}</div>`}
 /* ---------- English / Español ---------- */
 let LANG=(()=>{try{return localStorage.getItem("vsb-lang")==="es"?"es":"en"}catch(e){return"en"}})();
