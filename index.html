@@ -21,7 +21,9 @@
 .hh-r{display:flex;gap:8px;flex-wrap:wrap}.hh-r .btn{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.35)}.hh-r .btn:hover{background:rgba(255,255,255,.22)}
 .hchips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.hchip{border-radius:99px;padding:5px 12px;font-size:13px;background:rgba(255,255,255,.14);color:#fff}.hchip b{font-size:15px}
 .hchip.sub{background:#FEC938;color:#3d2e00}.hchip.ok{background:#e3f4e4;color:#1f5e23}.hchip.rev{background:#fde3df;color:#9b2c1f}.hchip.late{background:#c0392b;color:#fff}
-.hometiles{margin-bottom:18px}#bannerSlot:empty,#lockSlot:empty,#budgetSlot:empty,#issuesSlot:empty,#sumSlot:empty,#notesSlot:empty{display:none}
+.hometiles{margin-bottom:18px}.gtogs{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:6px}.gtog{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface);cursor:pointer;font-weight:700;font-size:15px}
+.gtog .sw2{position:relative;width:46px;height:26px;border-radius:99px;background:#cfcabf;flex:none;transition:background .15s}.gtog .sw2::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
+.gtog.on .sw2{background:var(--brand)}.gtog.on .sw2::after{left:23px}.gtog>span:first-child{text-align:left}.gtog small{display:block;font-weight:600;color:var(--muted);font-size:12px}.gtogall{grid-column:1/-1;display:flex;gap:8px}#bannerSlot:empty,#lockSlot:empty,#budgetSlot:empty,#issuesSlot:empty,#sumSlot:empty,#notesSlot:empty{display:none}
 .shero{display:flex;flex-wrap:wrap;align-items:center;gap:14px 26px;background:linear-gradient(135deg,#2E7D32,#1f5e23);color:#fff;border-radius:18px;padding:16px 22px;border-bottom:5px solid #FEC938;box-shadow:0 6px 18px rgba(46,125,50,.18)}
 .sh-l{display:flex;flex-direction:column;gap:4px;min-width:170px}.sh-k,.sh-pick span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:#FEC938}
 .sh-name{margin:0;font-family:var(--f-display);font-size:30px;color:#fff;line-height:1.05}.sh-pick{display:flex;flex-direction:column;gap:3px}
@@ -711,6 +713,11 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
       <div class="note">Downloads a copy of everything (staff, availability, schedules, guides, approvals) as one file. Save it somewhere safe. Doing this once a week is a good habit.</div>
       <div class="row"><button class="btn primary" id="bakBtn">Download backup</button><span class="note" id="bakState"></span></div>
     </div>
+    <div class="card" id="guideCard">
+      <h2 class="sec">Staffing guide on / off</h2>
+      <div class="note">When it's <b>on</b>, schedules are checked against the staffing guide: short / over staffed per department, open spots, and warnings before submitting. Turn it <b>off</b> for a store to hide those checks. Fill automatically still uses the guide's shifts, and you can keep editing the guide.</div>
+      <div id="guideToggles" class="gtogs"></div>
+    </div>
     <div class="card" id="payCard" hidden>
       <h2 class="sec">Payroll goals</h2>
       <div class="note">Payroll budget = each day's sales goal × the store's payroll %. Hour budget = payroll budget ÷ blended hourly rate. Store managers enter their sales goals on the Full schedule tab. Leave a store blank to turn the budget off there.</div>
@@ -1048,6 +1055,14 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-fina
   if(a==="copy"){const l=staffLink(S.store);try{await navigator.clipboard.writeText(l);toast("Link copied")}catch(x){const i=$("#shareLink");if(i){i.select();document.execCommand("copy");toast("Link copied")}}return}
   if(a==="unpub"){if(!confirm("Take this week off the employee page?"))return;try{await backend.delPub(key());S.pub=null;closeModal();toast("Taken down. Employees won't see this week.")}catch(x){showErr(x)}return}});
 
+/* ---------- staffing guide on/off per store ---------- */
+function renderGuideToggles(){const el=$("#guideToggles");if(!el)return;const off=S.cfg.guideOff||{};
+  el.innerHTML=`<div class="gtogall"><button class="btn sm" data-gall="on">Turn on for all stores</button><button class="btn sm" data-gall="off">Turn off for all stores</button></div>`+
+  S.cfg.stores.map(st=>{const on=!off[st];return `<button class="gtog ${on?"on":""}" data-gtog="${esc(st)}" ${S.canEdit&&!LOCK?"":"disabled"} aria-pressed="${on}"><span>${esc(st)}<small>${on?"Guide on":"Guide off"}</small></span><span class="sw2"></span></button>`}).join("")}
+async function saveGuideOff(off){try{await backend.saveCfg({...S.cfg,guideOff:off});toast("Saved")}catch(x){showErr(x)}}
+document.addEventListener("click",e=>{const t=e.target.closest("[data-gtog]");if(t){const off={...(S.cfg.guideOff||{})};const st=t.dataset.gtog;if(off[st])delete off[st];else off[st]=true;saveGuideOff(off);return}
+  const a=e.target.closest("[data-gall]");if(a){const off={};if(a.dataset.gall==="off")S.cfg.stores.forEach(st=>off[st]=true);saveGuideOff(off)}});
+
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAYS_ES=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
 const DAYS_LONG=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -1171,7 +1186,9 @@ const deptOrder=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i
 let CTXG=null;
 const deptMatch=s=>S.dept==="__all"||s.dept===S.dept||(s.also||[]).includes(S.dept)||(S.dept===FE&&inGrp(s,FE));
 const grpMatch=s=>S.dept==="__all"||inGrp(s,grp(S.dept));
-const guideFor=(store,dept)=>{const ok=g=>g&&g.slots&&g.slots.length?g:null;const k=grp(dept);return ok(S.guides[guideId(store,k)])||(k===FE?ok(S.guides[guideId(store,"Cashiers")]):null)};
+const guideOn=store=>!((S.cfg.guideOff||{})[store]);
+const guideFor=(store,dept)=>guideOn(store)?guideRaw(store,dept):null;
+const guideRaw=(store,dept)=>{const ok=g=>g&&g.slots&&g.slots.length?g:null;const k=grp(dept);return ok(S.guides[guideId(store,k)])||(k===FE?ok(S.guides[guideId(store,"Cashiers")]):null)};
 const roleTag=st=>grp(st.dept)!==st.dept?`<span class="rt">${esc(st.dept)}</span>`:"";
 const norm=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
 const matchQ=n=>!S.q||norm(n).includes(norm(S.q));
@@ -1653,7 +1670,7 @@ function pickEmpModal(){const list=Object.entries(S.staff).filter(([id,s])=>!s._
     <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button></div>`,true);
   $("#peQ").oninput=e=>{const q=norm(e.target.value);document.querySelectorAll("#peList .prow").forEach(b=>{b.hidden=q&&!norm(b.textContent).includes(q)})};setTimeout(()=>$("#peQ").focus(),0)}
 function wStep4(){
-  const g=guideFor(S.store,grp(S.dept));
+  const g=guideRaw(S.store,grp(S.dept));
   return `<h2 class="wh">Place people on shifts</h2><p class="wsub"><b>Drag a name</b> from the Off row onto a shift. Drag it to another shift to move it, or back to Off to remove it. While you drag, <span class="wk ok">green</span> = they're available, <span class="wk no">red</span> = they're not. You can also click an empty spot to pick from a list.</p>
   <div class="wauto"><button class="btn primary" id="wFill">Fill the rest automatically</button><span class="note">${g?"Fills the open shifts for you. You choose how, see a preview, and approve before anything saves.":"No staffing guide for this department yet, so auto-fill can't run. Ask corporate to set one up, or place shifts by hand."}</span></div>
   ${wAlertsHTML(wPeople())}<div id="wBoard">${shiftGridHTML(true)}</div>`;
@@ -1752,7 +1769,7 @@ function renderPinState(){const el=$("#pinState");if(!el)return;const p=S.cfg.pi
   const box=$("#pinStores");if(box&&!box.contains(document.activeElement))box.innerHTML=S.cfg.stores.map(s=>`<label class="field"><span>${esc(s)} PIN</span><input type="password" autocomplete="new-password" data-pinstore="${esc(s)}" placeholder="${st[s]?"set · type to change":"not set"}"></label>`).join("");
   const missing=S.cfg.stores.filter(s=>!st[s]);
   el.textContent=p.admin?`PINs are on. ${missing.length?"No PIN yet for: "+missing.join(", ")+" (those stores can't sign in).":"Every store has a PIN."}`:"PINs are off: anyone with the link sees every store."}
-function renderGoals(){renderPinState();renderPayCfg();
+function renderGoals(){renderPinState();renderPayCfg();renderGuideToggles();
   const slot=$("#goalsSlot");if(!slot||slot.contains(document.activeElement))return;const groups=wGroups();const G=S.cfg.goals||{};
   slot.innerHTML=`<div style="overflow-x:auto"><table class="gtable" style="min-width:${180+S.cfg.stores.length*92}px"><thead><tr><th>Weekly hours goal</th>${S.cfg.stores.map(s=>`<th>${esc(s)}</th>`).join("")}</tr></thead><tbody>
   <tr><td style="text-align:left"><b>Whole store</b></td>${S.cfg.stores.map(s=>`<td><input type="number" min="0" step="0.5" style="width:80px" data-goal="${esc(s)}" data-g="" value="${(G[s]&&G[s].total)||""}" placeholder="—" ${S.canEdit?"":"disabled"}></td>`).join("")}</tr>
@@ -1838,7 +1855,7 @@ function capsFor(st){const base=st.type==="FT"?40:29.99;const m=+st.maxHrs;retur
 function genScope(){
   const all=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&grpMatch(s));
   const depts=[...new Set(all.flatMap(s=>S.dept==="__all"?gsetOf(s):[grp(S.dept)]))];
-  const withG=depts.filter(d=>guideFor(S.store,d)),noG=depts.filter(d=>!guideFor(S.store,d));
+  const withG=depts.filter(d=>guideRaw(S.store,d)),noG=depts.filter(d=>!guideRaw(S.store,d));
   return{all,depts:withG,noG};
 }
 let FIXED_N=0;
@@ -1864,7 +1881,7 @@ function canTake(sh,st,d,sl){
 function quickFill(scope,mode){
   const sh=baseShifts(scope,mode);const added=[];
   for(let d=0;d<7;d++)for(const dept of scope.depts){
-    const g=guideFor(S.store,dept);const people=scope.all.filter(s=>inGrp(s,dept));
+    const g=guideRaw(S.store,dept);const people=scope.all.filter(s=>inGrp(s,dept));
     g.slots.forEach((sl,i)=>{
       let have=people.filter(p=>{const v=cv(sh,p.id,d);return v&&v.s&&!v.off&&shG(p,v)===dept&&slotOf(g,v)===i}).length;
       const need=+(sl.need&&sl.need[d])||0;
@@ -1882,7 +1899,7 @@ async function aiFill(scope,mode,extra,signal,onStatus){
   const sh=baseShifts(scope,mode);
   const ids={},rev={};scope.all.filter(s=>gsetOf(s).some(G=>scope.depts.includes(G))).forEach((s,i)=>{ids[s.id]="p"+i;rev["p"+i]=s});
   const avs=(st,d)=>{const a=availOf(st,d);return a.mode==="any"?"any":a.mode==="no"?"no":a.from+"-"+a.to};
-  const depts=scope.depts.map(dept=>{const g=guideFor(S.store,dept);return{dept,shifts:g.slots.map((sl,i)=>({slot:i,label:sl.label,time:sl.start+"-"+sl.end,hours:slotHrs(sl),need:DAYS.map((x,d)=>+(sl.need&&sl.need[d])||0)})),
+  const depts=scope.depts.map(dept=>{const g=guideRaw(S.store,dept);return{dept,shifts:g.slots.map((sl,i)=>({slot:i,label:sl.label,time:sl.start+"-"+sl.end,hours:slotHrs(sl),need:DAYS.map((x,d)=>+(sl.need&&sl.need[d])||0)})),
     people:scope.all.filter(s=>inGrp(s,dept)).map(st=>({id:ids[st.id],name:st.name,role:st.dept,status:st.type||"PT",max_hours:capsFor(st),prefers:st.pref&&st.pref!=="any"?({am:"morning (starts before 10am)",mid:"mid (starts 10am-2pm)",pm:"afternoon/close (starts 2pm or later)"})[st.pref]:undefined,note:st.notes||undefined,availability:DAYS.map((x,d)=>avs(st,d)),locked:DAYS.map((x,d)=>{const v=cv(sh,st.id,d);return v?(v.off?"OFF":v.s+"-"+v.e):null})}))}});
   const prompt=`You are building a weekly grocery store work schedule for Vista Markets, ${S.store} store, week of ${rangeLabel(S.week)}. Days are indexed 0=Sunday through 6=Saturday.
 
@@ -1912,7 +1929,7 @@ Each "a" entry is [person id, day 0-6, slot index within that department's shift
   for(const row of out.a){
     if(!Array.isArray(row))continue;const[pid,d,si,dn]=row;const st=rev[pid];
     if(!st||!(d>=0&&d<=6)){rejected.push("an unknown person or day");continue}
-    const G=dn&&inGrp(st,grp(String(dn)))&&scope.depts.includes(grp(String(dn)))?grp(String(dn)):grp(st.dept);const g=guideFor(S.store,G);const sl=g&&g.slots[si];if(!sl){rejected.push(st.name+" on a shift that doesn't exist");continue}
+    const G=dn&&inGrp(st,grp(String(dn)))&&scope.depts.includes(grp(String(dn)))?grp(String(dn)):grp(st.dept);const g=guideRaw(S.store,G);const sl=g&&g.slots[si];if(!sl){rejected.push(st.name+" on a shift that doesn't exist");continue}
     const why=canTake(sh,st,d,sl);if(why){rejected.push(st.name+" "+DAYS[d]+" "+sl.label+" ("+why+")");continue}
     sh[st.id]=sh[st.id]||{};sh[st.id][d]=G!==grp(st.dept)?{s:sl.start,e:sl.end,dept:G}:{s:sl.start,e:sl.end};added.push([st.id,d]);
   }
@@ -1922,7 +1939,7 @@ Each "a" entry is [person id, day 0-6, slot index within that department's shift
 }
 function previewHTML(scope,res){
   let open=0,filled=0;const rows=[];
-  for(const dept of scope.depts){const g=guideFor(S.store,dept);const people=scope.all.filter(s=>inGrp(s,dept));
+  for(const dept of scope.depts){const g=guideRaw(S.store,dept);const people=scope.all.filter(s=>inGrp(s,dept));
     for(let d=0;d<7;d++)g.slots.forEach((sl,i)=>{const need=+(sl.need&&sl.need[d])||0;const have=people.filter(p=>{const v=cv(res.sh,p.id,d);return v&&v.s&&!v.off&&shG(p,v)===dept&&slotOf(g,v)===i}).length;filled+=Math.min(have,need);open+=Math.max(0,need-have)})}
   for(const st of scope.all.filter(s=>gsetOf(s).some(G=>scope.depts.includes(G)))){const s=stats(res.sh,st.id);const fl=[];
     if(st.type==="FT"&&s.h<30)fl.push(["FT under 30",""]);if(st.type==="PT"&&s.h>29.99)fl.push(["PT over 29.99","bad"]);if(+st.maxHrs>0&&s.h>+st.maxHrs+1e-9)fl.push(["Over "+fmtH(+st.maxHrs)+" cap","bad"]);if(s.h>40)fl.push(["Over 40","bad"]);
@@ -2118,11 +2135,11 @@ function renderGuide(){
   if(S.dept==="__all"){
     slot.innerHTML=`<div class="row"><h2 class="sec">${esc(S.store)} staffing guide</h2><div class="spacer"></div>${lockNote}</div>
       <div class="note">Corporate sets the shifts and recommended headcount for each department. The schedule then shows scheduled vs. recommended under each department, and the department's shifts become the first buttons in the shift picker. Pick a department to ${S.canEdit?"set it up":"see it"}.</div>
-      <div class="gsum">${[...new Set(S.cfg.depts.map(grp))].map(d=>{const g=guideFor(S.store,d);return `<button class="card" data-gdept="${esc(d)}"><span class="nm">${esc(d)}</span>${d===FE?`<span class="note">Counts everyone in: ${esc(feList().join(", "))}</span>`:""}<span class="note">${g?g.slots.length+" shifts · "+fmtH(guideHours(g))+" recommended hrs/week":"Not set up yet"}</span><span class="note">${g?g.slots.map(sl=>esc(sl.label)+" "+fmtRange(sl.start,sl.end)).join(" · "):""}</span></button>`}).join("")}</div>`;
+      <div class="gsum">${[...new Set(S.cfg.depts.map(grp))].map(d=>{const g=guideRaw(S.store,d);return `<button class="card" data-gdept="${esc(d)}"><span class="nm">${esc(d)}</span>${d===FE?`<span class="note">Counts everyone in: ${esc(feList().join(", "))}</span>`:""}<span class="note">${g?g.slots.length+" shifts · "+fmtH(guideHours(g))+" recommended hrs/week":"Not set up yet"}</span><span class="note">${g?g.slots.map(sl=>esc(sl.label)+" "+fmtRange(sl.start,sl.end)).join(" · "):""}</span></button>`}).join("")}</div>`;
     return;
   }
   const GD=grp(S.dept);const id=guideId(S.store,GD);
-  if(!S.gDraft||S.gDraft.id!==id||!S.gDraft.dirty){const g=guideFor(S.store,S.dept);S.gDraft={id,dirty:false,slots:g?JSON.parse(JSON.stringify(g.slots)):[]}}
+  if(!S.gDraft||S.gDraft.id!==id||!S.gDraft.dirty){const g=guideRaw(S.store,S.dept);S.gDraft={id,dirty:false,slots:g?JSON.parse(JSON.stringify(g.slots)):[]}}
   const D=S.gDraft;const ro=!S.canEdit;
   const dayTot=[0,0,0,0,0,0,0];D.slots.forEach(sl=>(sl.need||[]).forEach((n,d)=>dayTot[d]+=(+n||0)));
   let rows=D.slots.map((sl,i)=>`<tr>
@@ -2291,7 +2308,7 @@ function setCell(sid,d,v){if(S.readOnly){toast("This week is approved and locked
 function shiftPicker(sid,d){
   const st={id:sid,...S.staff[sid]};const cur=cellVal(sid,d);const dt=addDays(S.week,d);
   const PG=CTXG&&inGrp(st,CTXG)?CTXG:(cur&&cur.dept&&inGrp(st,cur.dept)?cur.dept:grp(st.dept));CTXG=PG;const multi=gsetOf(st).length>1;
-  const g=guideFor(st.store,PG);
+  const g=guideRaw(st.store,PG);
   const pb=(p,attr,extra)=>{const f=fit(st,d,{s:p.start,e:p.end});return `<button class="pbtn ${f}" ${attr}><span class="pl">${esc(p.label)}${extra||""}</span><span class="pt">${fmtRange(p.start,p.end)}</span><span class="why">${f==="good"?"Fits availability":"Outside availability"} · ${fmtH(hoursOf({s:p.start,e:p.end},S.cfg))} h</span></button>`};
   let pres="";
   if(g){
@@ -2314,7 +2331,7 @@ function staffEditor(id){
   const isNew=!id;const st=isNew?{name:"",store:S.store,dept:S.dept!=="__all"?S.dept:S.cfg.depts[0],type:"PT",avail:anyAvail(),notes:""}:{...S.staff[id],avail:JSON.parse(JSON.stringify(S.staff[id].avail||anyAvail()))};
   const avRows=DAYS_LONG.map((dn,d)=>{const a=st.avail[d]||{mode:"any"};return `<div class="dn">${dn}</div><div class="ctrl"><select id="am${d}"><option value="any" ${a.mode==="any"?"selected":""}>Any time</option><option value="times" ${a.mode==="times"?"selected":""}>Between</option><option value="no" ${a.mode==="no"?"selected":""}>Not available</option></select><input type="time" id="af${d}" value="${a.from||"06:00"}" ${a.mode!=="times"?"hidden":""}><input type="time" id="at${d}" value="${a.to||"14:00"}" ${a.mode!=="times"?"hidden":""}></div>`}).join("");
   const fxOpts=(()=>{const seen=new Set(),o=[];const add=(s,e,l)=>{const k=s+"-"+e;if(seen.has(k))return;seen.add(k);o.push({k,l:(l?l+" ":"")+fmtRange(s,e)})};
-    const g=guideFor(st.store||S.store,grp(st.dept));if(g)g.slots.forEach(sl=>add(sl.start,sl.end,sl.label));(S.cfg.presets||[]).forEach(p=>add(p.start,p.end,p.label));
+    const g=guideRaw(st.store||S.store,grp(st.dept));if(g)g.slots.forEach(sl=>add(sl.start,sl.end,sl.label));(S.cfg.presets||[]).forEach(p=>add(p.start,p.end,p.label));
     Object.values(st.fixed||{}).forEach(v=>{if(v&&v.s)add(v.s,v.e,"")});return o})();
   const fxRows=DAYS_LONG.map((dn,d)=>{const v=(st.fixed||{})[d];const cur=v?(v.off?"off":v.s+"-"+v.e):"";
     return `<div class="dn">${dn}</div><div class="ctrl"><select id="fx${d}"><option value="" ${!cur?"selected":""}>Not set</option><option value="off" ${cur==="off"?"selected":""}>Off</option>${fxOpts.map(o=>`<option value="${o.k}" ${o.k===cur?"selected":""}>${esc(o.l)}</option>`).join("")}<option value="custom">Custom time…</option></select><input type="time" id="fs${d}" value="08:00" hidden><input type="time" id="fe${d}" value="16:00" hidden></div>`}).join("");
