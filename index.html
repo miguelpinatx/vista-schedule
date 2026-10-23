@@ -21,7 +21,13 @@
 .hh-r{display:flex;gap:8px;flex-wrap:wrap}.hh-r .btn{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.35)}.hh-r .btn:hover{background:rgba(255,255,255,.22)}
 .hchips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.hchip{border-radius:99px;padding:5px 12px;font-size:13px;background:rgba(255,255,255,.14);color:#fff}.hchip b{font-size:15px}
 .hchip.sub{background:#FEC938;color:#3d2e00}.hchip.ok{background:#e3f4e4;color:#1f5e23}.hchip.rev{background:#fde3df;color:#9b2c1f}.hchip.late{background:#c0392b;color:#fff}
-.hometiles{margin-bottom:18px}.gtogs{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:8px;margin-top:6px}.gtog{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface);cursor:pointer;font-weight:700;font-size:15px}
+.hometiles{margin-bottom:18px}
+.hello h2{font-family:var(--f-display);font-size:30px;margin:4px 0 12px}
+.startck{gap:8px;margin-bottom:18px}.ck{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}.ck .ckt{flex:1;display:flex;flex-direction:column}.ck .ckt b{font-size:16px}
+.ckb{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-weight:900;flex:none;color:#fff}.ck.ok .ckb{background:var(--brand);border-color:var(--brand)}.ck.ok{background:#f3faf3}.ck.rev{border-color:var(--bad-line);background:#fdf1ef}.ck.rev .ckb{background:#c0392b;border-color:#c0392b}
+.stiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}.stile{display:flex;gap:14px;align-items:center;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:16px 18px;cursor:pointer;font:inherit;color:inherit;min-height:84px}
+.stile:hover{border-color:var(--brand);background:#f6fbf6}.stile.pri{border-color:var(--brand);background:#eef7ee}.stile .si{font-size:30px}.stile .stx{display:flex;flex-direction:column;gap:2px}.stile b{font-size:17px}.stile .stx span{color:var(--muted);font-size:13.5px}
+#clearWeek{color:var(--bad-fg)}.gtogs{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:8px;margin-top:6px}.gtog{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface);cursor:pointer;font-weight:700;font-size:15px}
 .gtog .sw2{position:relative;width:46px;height:26px;border-radius:99px;background:#cfcabf;flex:none;transition:background .15s}.gtog .sw2::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
 .gtog.on .sw2{background:var(--brand)}.gtog.on .sw2::after{left:23px}.gtog>span:first-child{text-align:left}.gtog small b.onl{color:var(--brand)}.gtog small b.offl{color:var(--muted)}.fgrp{grid-column:1/-1;font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:8px}.gtog small{display:block;font-weight:600;color:var(--muted);font-size:12px}.gtogall{grid-column:1/-1;display:flex;gap:8px}#bannerSlot:empty,#lockSlot:empty,#budgetSlot:empty,#issuesSlot:empty,#sumSlot:empty,#notesSlot:empty{display:none}
 .shero{display:flex;flex-wrap:wrap;align-items:center;gap:14px 26px;background:linear-gradient(135deg,#2E7D32,#1f5e23);color:#fff;border-radius:18px;padding:16px 22px;border-bottom:5px solid #FEC938;box-shadow:0 6px 18px rgba(46,125,50,.18)}
@@ -221,7 +227,7 @@ tr.cov td.who{font-size:12px;color:var(--muted);font-weight:600;text-transform:u
 .cv.over{background:var(--warn-bg);color:var(--warn-fg)}
 .cv.none{color:var(--muted)}
 body.nf-home_totals [data-feat~="home_totals"],body.nf-card_stats [data-feat~="card_stats"],body.nf-home_summary [data-feat~="home_summary"],body.nf-store_stats [data-feat~="store_stats"],body.nf-emp_totals [data-feat~="emp_totals"],body.nf-issues [data-feat~="issues"],body.nf-sum_tab [data-feat~="sum_tab"],body.nf-sum_tiles [data-feat~="sum_tiles"],body.nf-sum_dept [data-feat~="sum_dept"],body.nf-sum_day [data-feat~="sum_day"],body.nf-sum_shift [data-feat~="sum_shift"],body.nf-sum_emp [data-feat~="sum_emp"]{display:none!important}
-details.exact{margin-top:10px}details.exact>summary{cursor:pointer;font-weight:700;color:var(--muted);padding:6px 0}.stab.part4 td.dn{text-align:left;font-weight:800;vertical-align:top;border-right:1px solid var(--line);background:var(--surface);width:150px}.stab.part4 tr.first td{border-top:2px solid var(--line)}
+details.exact{margin-top:10px}details.moretimes>summary{cursor:pointer;font-weight:700;color:var(--muted);padding:4px 0;font-size:13px}details.exact>summary{cursor:pointer;font-weight:700;color:var(--muted);padding:6px 0}.stab.part4 td.dn{text-align:left;font-weight:800;vertical-align:top;border-right:1px solid var(--line);background:var(--surface);width:150px}.stab.part4 tr.first td{border-top:2px solid var(--line)}
 .stab.part4 td.pl{text-align:left;width:70px}.stab.part4 .pt{display:inline-block;min-width:54px;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:800;text-align:center}
 .pt.k0{background:#fff1c2;color:#6b4d00}.pt.k1{background:#e3f4e4;color:#1f5e23}.pt.k2{background:#dcebf7;color:#0d4a75}.pt.k3{background:#ece3f5;color:#4b2a73}
 .stab.part4 tr.allg td{background:#fbf8ec}.stab.part4 td.z{color:#c9c3b6}
@@ -599,6 +605,7 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
   </nav>
   <div id="storeHero" hidden></div>
   <nav class="tabs mainnav" id="storeNav" role="tablist">
+      <button role="tab" id="tab-start" aria-selected="false" data-tab="start" class="navbig"><span class="ni" aria-hidden="true">🏠</span>Start</button>
       <button role="tab" id="tab-schedule" aria-selected="true" data-tab="schedule" class="navbig"><span class="ni" aria-hidden="true">📅</span>See full schedule</button>
       <button role="tab" id="tab-build" aria-selected="false" data-tab="build" class="navbig"><span class="ni" aria-hidden="true">✏️</span>Build schedule</button>
       <button role="tab" id="tab-staff" aria-selected="false" data-tab="staff" class="navbig"><span class="ni" aria-hidden="true">👥</span>Staff &amp; availability</button>
@@ -680,6 +687,7 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
     <div id="staffSlot"></div>
   </section>
 
+  <section id="view-start" class="panel" hidden><div id="startSlot"></div></section>
   <section id="view-sum" class="panel" hidden><div id="sumTabSlot"></div></section>
 
   <section id="view-dash" class="panel" hidden>
@@ -829,10 +837,10 @@ function pinGate(cfg){return new Promise(res=>{
   const check=h=>{if(h===pins.admin)return{lvl:"admin"};const st=Object.keys(stores).find(k=>stores[k]===h&&(cfg.stores||[]).includes(k));return st?{lvl:"store",store:st}:null};
   let saved=null;try{saved=JSON.parse(localStorage.getItem("vsb-pin")||"null")}catch(e){}
   const r0=saved&&saved.h&&check(saved.h);if(r0)return res(r0);
-  const g=document.createElement("div");g.className="scrim";g.innerHTML=`<form class="modal" style="width:min(380px,100%)"><h3>Vista Schedule Builder</h3><div class="ctx">Enter your store PIN to continue.</div><input type="password" inputmode="numeric" id="pinIn" autocomplete="off" style="font-size:22px;letter-spacing:.3em;text-align:center"><div class="note" id="pinErr" style="color:var(--bad-fg)"></div><button class="btn primary big" type="submit">Open</button></form>`;
+  const g=document.createElement("div");g.className="scrim";g.innerHTML=`<form class="modal pinbox" style="width:min(400px,100%);text-align:center"><h3 style="font-size:24px">Welcome! · ¡Bienvenido!</h3><div class="ctx" style="font-size:16px">Type your store PIN<br><span class="note">Escribe el PIN de tu tienda</span></div><input type="password" inputmode="numeric" id="pinIn" autocomplete="off" style="font-size:22px;letter-spacing:.3em;text-align:center"><div class="note" id="pinErr" style="color:var(--bad-fg)"></div><button class="btn primary big" type="submit">Open · Entrar</button></form>`;
   document.body.appendChild(g);const inp=g.querySelector("#pinIn");setTimeout(()=>inp.focus(),0);
   g.querySelector("form").onsubmit=async e=>{e.preventDefault();const h=await sha(inp.value.trim());const r=check(h);
-    if(!r){g.querySelector("#pinErr").textContent="That PIN didn't work. Try again.";inp.select();return}
+    if(!r){g.querySelector("#pinErr").textContent="That PIN didn't work. Try again. · Ese PIN no funcionó. Intenta otra vez.";inp.select();return}
     try{localStorage.setItem("vsb-pin",JSON.stringify({h}))}catch(e){}g.remove();res(r)};
 })}
 function signOut(){try{localStorage.removeItem("vsb-pin")}catch(e){}location.reload()}
@@ -1061,7 +1069,7 @@ function storeHeroHTML(){if(!S.store)return"";const adm=isAdm();const st=stState
     <div class="sh-wk"><b>Week ${weekNo(S.week,S.cfg.wkOffset)}</b> · ${rangeLabel(S.week)}</div></div>
     <div class="sh-stats" data-feat="store_stats"><div><b>${roster.length}</b><span>employees</span></div><div><b>${working}</b><span>working</span></div><div><b>${fmtH(Math.round(hrs*10)/10)}</b><span>hours</span></div><div><b class="sh-due">${dueTxt}</b><span>due</span></div></div>
     <div class="sh-st"><button class="btn sh-link" data-final="link">📲 Employee link</button><span class="spill ${lab[1]} ${late?"sp-late":""}">${lab[0]}</span></div></div>`}
-function renderHero(){const el=$("#storeHero");if(!el)return;const show=["schedule","build","staff","sum"].includes(S.tab)&&!!S.store;el.hidden=!show;if(!show)return;
+function renderHero(){const el=$("#storeHero");if(!el)return;const show=["schedule","build","staff","sum","start"].includes(S.tab)&&!!S.store;el.hidden=!show;if(!show)return;
   if(el.contains(document.activeElement))return;el.innerHTML=storeHeroHTML();const sv=$("#svStore");if(sv)sv.onchange=()=>{S.store=sv.value;S.dept="__all";savePrefs();renderAll();resub()}}
 
 /* ---------- employee link buttons ---------- */
@@ -1088,6 +1096,37 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-feat-tog]"
   const a=e.target.closest("[data-fall]");if(a){if(a.dataset.fall==="on")saveFeatOff({});else saveFeatOff({home_totals:true,home_summary:true,store_stats:true,issues:true,sum_tiles:true,sum_day:true,sum_emp:true})}});
 
 document.addEventListener("click",e=>{const b=e.target.closest("[data-gosum]");if(!b)return;e.stopPropagation();S.store=b.dataset.gosum;S.dept="__all";S.tab=featOn("sum_tab")?"sum":"schedule";savePrefs();renderAll();resub();window.scrollTo({top:0})},true);
+
+/* ---------- Start page (store managers) ---------- */
+function shiftCount(){let n=0;for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;for(let d=0;d<7;d++){const v=cellVal(id,d);if(v&&v.s&&!v.off)n++}}return n}
+function startHTML(){if(!S.store)return"";const h=new Date().getHours();const greet=h<12?"Good morning":h<18?"Good afternoon":"Good evening";
+  const st=stState(),L=S.lock||{};const n=shiftCount();const probs=n?submitChecks().length:0;const due=dueOf(S.week);
+  const dueTxt=due.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"long",month:"numeric",day:"numeric"});
+  const item=(done,title,sub,act)=>`<div class="ck ${done?"ok":""}"><span class="ckb">${done?"✓":""}</span><div class="ckt"><b>${title}</b><span class="note">${sub}</span></div>${act||""}</div>`;
+  const sent=st==="submitted"||st==="approved";
+  const checklist=`<div class="card startck"><div class="row"><div><h3 class="sec" style="margin:0"><span>This week's checklist</span></h3><div class="note"><span>Week</span> ${weekNo(S.week,S.cfg.wkOffset)} · ${rangeLabel(S.week)} · <span>due</span> ${dueTxt}</div></div><div class="spacer"></div>
+      <button class="btn sm" data-hwk="prevWk">‹</button><button class="btn sm" data-hwk="dueWk">Week to submit</button><button class="btn sm" data-hwk="nextWk">›</button></div>
+    ${item(n>0,"Build the schedule",n?`${n} shifts placed`:"No shifts yet for this week",n?"":`<button class="btn sm primary" data-sgo="build">Begin</button>`)}
+    ${item(n>0&&probs===0,"Fix any problems",!n?"Build the schedule first":probs?`${probs} thing${probs===1?"":"s"} to check (overtime, too many days, open spots)`:"Everything looks good",n&&probs?`<button class="btn sm" data-sgo="probs">Show me</button>`:"")}
+    ${st==="revise"?`<div class="ck rev"><span class="ckb">↩</span><div class="ckt"><b>The admin asked for changes</b>${fixesHTML(L)}</div></div>`:""}
+    ${item(sent,"Submit to the admin",st==="approved"?"Approved by the admin":st==="submitted"?"Sent · waiting for the admin":st==="revise"?"Make the changes, then send it again":"Send it to the admin when it's ready",!sent&&n?`<button class="btn sm primary" data-lock="submit">${st==="revise"?"Resubmit":"Submit"}</button>`:"")}
+    ${item(st==="approved","Share with employees",st==="approved"?"Employees can see it now":"Happens automatically once the admin approves",`<button class="btn sm" data-final="link">📲 Link</button>`)}
+  </div>`;
+  const tile=(icon,title,sub,attr,primary)=>`<button class="stile ${primary?"pri":""}" ${attr}><span class="si">${icon}</span><span class="stx"><b>${title}</b><span>${sub}</span></span></button>`;
+  const locked=lockedForMe();
+  const tiles=[
+    locked?"":tile("✏️","Build or change the schedule","Step by step, one department at a time",'data-sgo="build"',!n),
+    tile("📅","See the full schedule","Every department, every day",'data-sgo="schedule"',n&&!sent),
+    tile("👥","Add or change employees","New hires, availability, days off",'data-sgo="staff"'),
+    featOn("sum_tab")?tile("📊","Check the summary","Who works AM, Mid, PM and After 5",'data-sgo="sum"'):"",
+    tile("🖨️","Print the schedule","One page per department",'data-sgo="print"'),
+    !sent&&n?tile("✅","Submit to the admin","Send it to the admin when it's ready",'data-lock="submit"'):"",
+    tile("📲","Share with employees","Get the link employees use to see it",'data-final="link"')].join("");
+  return `<div class="hello"><h2><span>${greet}</span>, ${esc(S.store)}! 👋</h2></div>${checklist}<div class="hsec"><span>What would you like to do?</span></div><div class="stiles">${tiles}</div>`}
+function renderStart(){const el=$("#startSlot");if(!el)return;if(S.tab!=="start"){el.innerHTML="";return}el.innerHTML=startHTML()}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-sgo]");if(!b)return;const g=b.dataset.sgo;
+  if(g==="build"){W.step=0;S.tab="build"}else if(g==="probs"){S.tab="schedule";S.dept="__all"}else if(g==="print"){S.tab="schedule";savePrefs();renderAll();setTimeout(()=>{const p=$("#printBtn");if(p)p.click()},50);return}else S.tab=g;
+  savePrefs();renderAll();window.scrollTo({top:0});if(g==="probs")setTimeout(()=>{const d=document.querySelector("#issuesSlot details,#gridSlot .totbad");if(d&&d.scrollIntoView)d.scrollIntoView({behavior:"smooth",block:"center"})},100)});
 
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAYS_ES=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
@@ -1251,7 +1290,7 @@ async function boot(){
   if(window.SUPABASE_URL&&window.supabase){
     const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
     let c0=null;try{const r=await sb.from("docs").select("data").eq("collection","config").eq("id","main").maybeSingle();c0=r.data&&r.data.data}catch(e){}
-    const acc=await pinGate(c0);S.canEdit=acc.lvl==="admin";S._realCanEdit=S.canEdit;S.readOnly=false;LOCK=acc.store||null;if(LOCK){S.store=LOCK;if(S.tab==="dash")S.tab="build"}else if(S.canEdit)S.tab="dash";
+    const acc=await pinGate(c0);S.canEdit=acc.lvl==="admin";S._realCanEdit=S.canEdit;S.readOnly=false;LOCK=acc.store||null;if(LOCK){S.store=LOCK;S.tab="start"}else if(S.canEdit)S.tab="dash";
     if(!acc.open){const so=document.createElement("button");so.className="btn sm";so.textContent="Sign out";so.style.marginLeft="12px";so.onclick=signOut;const br=document.querySelector(".brand");if(br)br.appendChild(so)}
     realBackend=supaBackend(sb);S.mode="shared";attach(realBackend);return;
   }
@@ -1295,11 +1334,12 @@ function renderControls(){applyFeats();
   $("#jumpDate").value=ymd(S.week);
   document.querySelectorAll(".tabs button[data-tab]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));
   if(!S.canEdit&&(S.tab==="guide"||S.tab==="settings"))S.tab="build";if(LOCK&&S.tab==="dash")S.tab="build";$("#tab-dash").hidden=!!LOCK;
-  ["build","schedule","staff","sum","dash","guide","settings"].forEach(t=>$("#view-"+t).hidden=t!==S.tab);
+  ["build","schedule","staff","sum","dash","guide","settings","start"].forEach(t=>{const v=$("#view-"+t);if(v)v.hidden=t!==S.tab});
   $("#tab-guide").hidden=!S.canEdit;$("#tab-settings").hidden=!S.canEdit;
-  $("#mainBar").hidden=S.tab==="build";
+  $("#mainBar").hidden=S.tab==="build"||S.tab==="start";
   document.querySelector('#storeSel').closest('.field').hidden=S.tab==="dash";document.querySelector('#deptSel').closest('.field').hidden=S.tab==="dash";
   $("#searchField").hidden=!(S.tab==="schedule"||S.tab==="staff");
+  $("#tab-start").hidden=!LOCK;if(!LOCK&&S.tab==="start")S.tab=isAdm()?"dash":"schedule";{const fs=$("#finalSlot");if(fs)fs.hidden=!!LOCK}renderStart();
   {const adm=isAdm(),inStore=["schedule","build","staff","sum"].includes(S.tab);$("#admNav").hidden=!adm;if(inStore)S._lastStoreTab=S.tab;document.body.classList.toggle("adm",adm);
    $("#storeNav").hidden=adm&&!inStore;if(adm&&S.tab==="dash")$("#mainBar").hidden=true;$("#storeNav").classList.toggle("subnav",adm);
    renderHero();if((adm&&inStore)||LOCK){document.querySelector('#storeSel').closest('.field').hidden=true}
@@ -1348,7 +1388,7 @@ function renderSum(){const el=$("#sumSlot");if(!el)return;el.innerHTML="";return
     .sort((a,b)=>deptOrder(grp(a.dept))-deptOrder(grp(b.dept))||grp(a.dept).localeCompare(grp(b.dept))||a.name.localeCompare(b.name));
   el.innerHTML=`<div style="margin-top:12px">${summaryHTML(ppl,S.dept==="__all")}</div>`;
   const t=el.querySelector(".ptitle");if(t)t.textContent="Employee summary · hours & days"+(S.dept==="__all"?"":" · "+grp(S.dept));}
-function renderGrid(){renderSum();renderPay();renderLock();renderHero();if(S.tab==="sum")renderSumTab();
+function renderGrid(){renderSum();renderPay();renderLock();renderHero();if(S.tab==="start")renderStart();if(S.tab==="sum")renderSumTab();
   const slot=$("#gridSlot");if(!S.store){slot.innerHTML="";return}
   document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===S.view)));
   document.querySelectorAll("[data-color]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.color===S.colorBy)));
@@ -1377,13 +1417,13 @@ function renderGrid(){renderSum();renderPay();renderLock();renderHero();if(S.tab
     h+=`<tr class="grp"><td colspan="9">${esc(dept||"No department")}<span class="ct">${rows.length} ${rows.length===1?"person":"people"}${cov?" · "+(cov.short||cov.over?[cov.short?`<b class="cshort">${cov.short} short</b>`:"",cov.over?`<b class="cover">${cov.over} over</b>`:""].filter(Boolean).join(" · ")+" vs. staffing guide":`<b class="cok">✓ matches staffing guide</b>`):""}</span></td></tr>`;
     for(const st of rows){
       const r=rowStats(st);let here=0;
-      h+=`<tr><td class="who"><div class="nm">${dot(st.id)}${hl(st.name)}${roleTag(st)}${alsoTag(st,dept)} ${ftPill(st)}</div><div class="meta">${st.notes?esc(st.notes):""}</div></td>`;
+      h+=`<tr><td class="who"><div class="nm">${dot(st.id)}${hl(st.name)}${roleTag(st)}${alsoTag(st,dept)} ${ftPill(st)}</div></td>`;
       for(let d=0;d<7;d++){
         const v=cellVal(st.id,d);const f=fit(st,d,v);const a=availOf(st,d);
         let inner,cls=f;
         if(v&&v.off){cls="offauto";inner=`<span class="t">Off</span>`}
-        else if(v&&v.s){const hh=hoursOf(v,S.cfg);const og=shG(st,v);if(og===dept){dayCount[d]++;dayHrs[d]+=hh;here+=hh}inner=`<span class="t">${fmtRange(v.s,v.e)}</span><span class="h">${og!==dept?"in "+esc(og):fmtH(hh)+" h"}${f==="bad"?" · avail "+esc(availText(st,d)):""}</span>`}
-        else{cls="offauto"+(a.mode==="no"?" na":"");inner=`<span class="t">Off</span><span class="av">${a.mode==="no"?"Can't work":"Avail "+esc(availText(st,d))}</span>`}
+        else if(v&&v.s){const hh=hoursOf(v,S.cfg);const og=shG(st,v);if(og===dept){dayCount[d]++;dayHrs[d]+=hh;here+=hh}inner=`<span class="t">${fmtRange(v.s,v.e)}</span>${og!==dept||f==="bad"?`<span class="h">${og!==dept?"in "+esc(og):""}${f==="bad"?(og!==dept?" · ":"")+"avail "+esc(availText(st,d)):""}</span>`:""}`}
+        else{cls="offauto"+(a.mode==="no"?" na":"");inner=`<span class="t">Off</span>${a.mode==="no"?`<span class="av">Can't work</span>`:""}`}
         if(v&&v.s&&!v.off)cls=cellCls(f,v)+(shG(st,v)!==dept?" oth":"");
         h+=`<td class="cell"><button class="cbtn ${cls}" data-sid="${st.id}" data-d="${d}" data-g="${esc(dept)}" ${S.readOnly?"disabled":""} aria-label="${esc(st.name)}, ${DAYS_LONG[d]}">${inner}</button></td>`;
       }
@@ -1600,8 +1640,8 @@ function dashStore(st){
   <details class="card" open data-feat="ds_details"><summary><b>Show details</b> <span class="note">— hours and people per department per day, and by time of day</span></summary>${(DASH.store=st,breakdownHTML()).replace(/<div class="card" style="gap:10px">/,'<div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">').replace(/<label class="field"><span>Store<\/span>[\s\S]*?<\/label>/,'')}</details>`;
 }
 /* ---------- guided "Build schedule" flow ---------- */
-const PREF=[["am","Morning","starts before 10a"],["mid","Mid","starts 10a–2p"],["pm","Closing","starts 2p or later"],["any","Any shift","no preference"]];
-const prefIdx={am:0,mid:1,pm:2};
+const PREF=[["am","AM","starts before 10a"],["mid","Mid","starts 10a–2p"],["pm","PM","starts 2p–5p"],["late","After 5","starts 5p or later"],["any","Any shift","no preference"]];
+const prefIdx={am:0,mid:1,pm:2,late:3};
 const W={step:0};
 const WSTEPS=["Week & department","Your team","Set or rotating","Availability this week","Place shifts","Review & print"];
 function wPeople(){return Object.entries(S.staff).map(([id,o])=>({id,...o})).filter(o=>!o._pending&&o.store===S.store&&S.dept!=="__all"&&inGrp(o,grp(S.dept))).sort((a,b)=>a.name.localeCompare(b.name))}
@@ -1621,9 +1661,9 @@ function wStep0(){
   const groups=wGroups();
   const cnt=G=>Object.values(S.staff).filter(o=>!o._pending&&o.store===S.store&&inGrp(o,G)).length;
   return `<h2 class="wh">Which week and department are you scheduling?</h2>
-  <div class="wq">1. Store</div><div class="wchoices">${S.cfg.stores.map(st=>`<button class="wchoice ${st===S.store?"on":""}" data-wstore="${esc(st)}">${esc(st)}</button>`).join("")}</div>
-  <div class="wq">2. Week</div><div class="wweek"><button class="btn" data-wweek="-1">‹ Previous</button><div><b>Week ${weekNo(S.week,S.cfg.wkOffset)}</b><span>${rangeLabel(S.week)}</span></div><button class="btn" data-wweek="1">Next ›</button></div>
-  <div class="wq">3. Department</div><div class="wchoices">${groups.map(G=>{const n=cnt(G);return `<button class="wchoice ${grp(S.dept)===G&&S.dept!=="__all"?"on":""}" data-wdept="${esc(G)}">${esc(G)}<small>${n} ${n===1?"person":"people"}</small></button>`}).join("")}</div>`;
+  ${typeof LOCK!=="undefined"&&LOCK?"":`<div class="wq">1. Store</div><div class="wchoices">${S.cfg.stores.map(st=>`<button class="wchoice ${st===S.store?"on":""}" data-wstore="${esc(st)}">${esc(st)}</button>`).join("")}</div>`}
+  <div class="wq">${typeof LOCK!=="undefined"&&LOCK?"1. Week":"2. Week"}</div><div class="wweek"><button class="btn" data-wweek="-1">‹ Previous</button><div><b>Week ${weekNo(S.week,S.cfg.wkOffset)}</b><span>${rangeLabel(S.week)}</span></div><button class="btn" data-wweek="1">Next ›</button></div>
+  <div class="wq">${typeof LOCK!=="undefined"&&LOCK?"2. Department":"3. Department"}</div><div class="wchoices">${groups.map(G=>{const n=cnt(G);return `<button class="wchoice ${grp(S.dept)===G&&S.dept!=="__all"?"on":""}" data-wdept="${esc(G)}">${esc(G)}<small>${n} ${n===1?"person":"people"}</small></button>`}).join("")}</div>`;
 }
 function wStep1(){
   const ppl=wPeople();const roles=grp(S.dept)===FE?S.cfg.depts.filter(d=>grp(d)===FE):[grp(S.dept)];
@@ -1730,7 +1770,7 @@ function wStep5(){
     ${W.editTasks?"":`<button class="btn sm" data-wtask="edit">Edit for ${esc(S.store)}</button>`}</div>
     ${W.editTasks?taskEditorHTML("store",S.store,grp(S.dept))+`<div class="row"><button class="btn primary sm" data-wtask="save">Save duties</button><button class="btn sm" data-wtask="cancel">Cancel</button>${tasksFor(S.store,grp(S.dept))._custom?`<button class="btn sm" data-wtask="reset">Use company list</button>`:""}</div>`
       :(dutiesBox(S.store,grp(S.dept))?`<div class="pv tprev">${dutiesBox(S.store,grp(S.dept))}</div>`:`<p class="note">No duties yet. Tap <b>Edit for ${esc(S.store)}</b> to add them.</p>`)}</div>
-  <div class="row" style="margin-top:6px">${finalBtnHTML()}<button class="btn" id="wPrint">Print schedule</button><button class="btn" data-wnext-dept>Schedule another department</button><button class="btn" data-goto-tab="dash">See dashboard</button></div>`;
+  <div class="row" style="margin-top:6px">${finalBtnHTML()}<button class="btn" id="wPrint">Print schedule</button><button class="btn" data-wnext-dept>Schedule another department</button>${typeof LOCK!=="undefined"&&LOCK?"":`<button class="btn" data-goto-tab="dash">See dashboard</button>`}</div>`;
 }
 function wSummaryHTML(){return summaryHTML(wPeople())}
 function summaryHTML(ppl,grouped){
@@ -1760,7 +1800,7 @@ function wireWizard(){
     const t=e.target.closest("button,[data-wav]");if(!t)return;const ds=t.dataset;
     if(ds.wstep){W.step=+ds.wstep;W.confirmDel=null;W.editTasks=false;renderWizard();scrollTo({top:0});return}
     if(ds.wgo){W.step=Math.max(0,Math.min(5,W.step+ +ds.wgo));W.confirmDel=null;W.editTasks=false;renderWizard();scrollTo({top:0});return}
-    if("wdone" in ds){W.step=0;S.dept="__all";savePrefs();toast("Schedule saved. Pick another department or check the dashboard.");renderWizard();return}
+    if("wdone" in ds){W.step=0;S.dept="__all";savePrefs();toast("Schedule saved. Pick another department, or submit when every department is done.");renderWizard();return}
     if(ds.wstore){S.store=ds.wstore;savePrefs();resub();renderWizard();return}
     if(ds.wweek){S.week=addDays(S.week,7*+ds.wweek);resub();renderWizard();return}
     if(ds.wdept){S.dept=ds.wdept;savePrefs();renderWizard();return}
@@ -1871,7 +1911,7 @@ function addPicker(dept,i,d){
   const rows=people.map(st=>{const cur=cellVal(st.id,d);const wk=weekHours(st.id,d);const after=wk.h+sh;
     const f=fit(st,d,v);const busy=cur&&cur.s&&!cur.off;const same=busy&&cur.s===sl.start&&cur.e===sl.end;
     const warn=[];if(isPT(st)&&after>29.99)warn.push("PT over 29.99");if(+st.maxHrs>0&&after>+st.maxHrs+1e-9)warn.push("Over "+fmtH(+st.maxHrs)+" cap");if(after>40)warn.push("Over 40");if(wk.days+1>(S.cfg.maxDays||5))warn.push((wk.days+1)+" days");
-    const pm=st.pref&&st.pref!=="any"?(prefIdx[st.pref]===partOf(v)?0:1):0.5;
+    const pm=st.pref&&st.pref!=="any"?(prefIdx[st.pref]===partIdx(v.s)?0:1):0.5;
     return{st,f,busy,same,cur,after,warn,pm,rank:same?9:busy?5:(f==="good"?(warn.length?2:0):(warn.length?4:3))}}).filter(r=>!r.same).sort((a,b)=>a.rank-b.rank||a.pm-b.pm||a.after-b.after||a.st.name.localeCompare(b.st.name));
   const reason=r=>{if(r.cur&&r.cur.off)return"Asked for this day off";const a=availOf(r.st,d);if(a.mode==="no")return"Can't work on "+DAYS_LONG[d]+"s";if(a.mode==="times")return"Only available "+fmtRange(a.from,a.to);return"Outside their availability"};
   const isOff=r=>!!(r.cur&&r.cur.off);
@@ -1930,7 +1970,7 @@ function quickFill(scope,mode){
       const need=+(sl.need&&sl.need[d])||0;
       while(have<need){
         const c=people.filter(p=>!canTake(sh,p,d,sl)).map(p=>({p,s:stats(sh,p.id)}))
-          .sort((a,b)=>{const k=partOf({s:sl.start});const pm=x=>x.p.pref&&x.p.pref!=="any"?(prefIdx[x.p.pref]===k?0:2):1;return pm(a)-pm(b)||(grp(a.p.dept)===dept?0:1)-(grp(b.p.dept)===dept?0:1)||((isFT(a.p)&&a.s.h<30)?0:1)-((isFT(b.p)&&b.s.h<30)?0:1)||a.s.h-b.s.h||a.p.name.localeCompare(b.p.name)});
+          .sort((a,b)=>{const k=partIdx(sl.start);const pm=x=>x.p.pref&&x.p.pref!=="any"?(prefIdx[x.p.pref]===k?0:2):1;return pm(a)-pm(b)||(grp(a.p.dept)===dept?0:1)-(grp(b.p.dept)===dept?0:1)||((isFT(a.p)&&a.s.h<30)?0:1)-((isFT(b.p)&&b.s.h<30)?0:1)||a.s.h-b.s.h||a.p.name.localeCompare(b.p.name)});
         if(!c.length)break;
         const p=c[0].p;sh[p.id]=sh[p.id]||{};sh[p.id][d]=dept!==grp(p.dept)?{s:sl.start,e:sl.end,dept}:{s:sl.start,e:sl.end};added.push([p.id,d]);have++;
       }
@@ -2163,7 +2203,7 @@ function renderStaff(){
   $("#selReset").disabled=$("#selDel").disabled=!SEL.ids.size;
   if(!list.length&&S.q){$("#staffSlot").innerHTML=`<div class="card"><div class="empty"><h2>No one named “${esc(S.q)}” at any store</h2><button class="btn" data-act="clearq">Clear search</button></div></div>`;return}
   if(!list.length){$("#staffSlot").innerHTML=`<div class="card"><div class="empty"><h2>No employees here yet</h2><p>Use <b>Add employee</b> for one person, or <b>Paste a roster</b> to add a whole department at once and fill in availability after.</p></div></div>`;return}
-  const card=st=>`<div class="scard${SEL.on&&SEL.ids.has(st.id)?" picked":""}"${SEL.on?` data-pick-emp="${st.id}"`:""}><div class="top">${SEL.on?`<input type="checkbox" class="pickbox" data-pick-emp="${st.id}" ${SEL.ids.has(st.id)?"checked":""} aria-label="Select ${esc(st.name)}">`:""}<div style="flex:1;min-width:0"><div class="nm">${hl(st.name)}</div><div class="note">${S.q?esc(st.store)+" · ":""}${esc(st.dept)} · ${isFT(st)?"Full-time":"Part-time"}${+st.maxHrs>0?" · <b>max "+fmtH(+st.maxHrs)+" h/wk</b>":""}${(st.also||[]).length?" · <b>also "+esc(st.also.join(", "))+"</b>":""}${st.notes?" · "+esc(st.notes):""}</div>${st.sched==="fixed"&&st.fixed&&Object.keys(st.fixed).length?`<div class="note"><span class="pill setp">Set schedule</span> ${DAYS.map((dn,d)=>{const v=st.fixed[d];return v?dn+" "+(v.off?"off":fmtRange(v.s,v.e)):""}).filter(Boolean).join(" · ")}</div>`:""}</div>${S.readOnly||SEL.on?"":`<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm" data-avail="${st.id}">Availability</button><button class="btn sm" data-edit="${st.id}">Edit</button></div>`}</div>
+  const card=st=>`<div class="scard${SEL.on&&SEL.ids.has(st.id)?" picked":""}"${SEL.on?` data-pick-emp="${st.id}"`:""}><div class="top">${SEL.on?`<input type="checkbox" class="pickbox" data-pick-emp="${st.id}" ${SEL.ids.has(st.id)?"checked":""} aria-label="Select ${esc(st.name)}">`:""}<div style="flex:1;min-width:0"><div class="nm">${hl(st.name)}</div><div class="note">${S.q?esc(st.store)+" · ":""}${esc(st.dept)}${FTPT()?" · "+(isFT(st)?"Full-time":"Part-time"):""}${+st.maxHrs>0?" · <b>max "+fmtH(+st.maxHrs)+" h/wk</b>":""}${(st.also||[]).length?" · <b>also "+esc(st.also.join(", "))+"</b>":""}${st.notes?" · "+esc(st.notes):""}</div>${st.sched==="fixed"&&st.fixed&&Object.keys(st.fixed).length?`<div class="note"><span class="pill setp">Set schedule</span> ${DAYS.map((dn,d)=>{const v=st.fixed[d];return v?dn+" "+(v.off?"off":fmtRange(v.s,v.e)):""}).filter(Boolean).join(" · ")}</div>`:""}</div>${S.readOnly||SEL.on?"":`<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm" data-avail="${st.id}">Availability</button><button class="btn sm" data-edit="${st.id}">Edit</button></div>`}</div>
     <div class="avrow">${DAYS.map((dn,d)=>{const a=availOf(st,d);return `<div class="avd ${a.mode==="no"?"no":a.mode==="times"?"part":"ok"}" title="${a.mode==="any"?"Any time":a.mode==="no"?"Can't work":fmtRange(a.from,a.to)}"><b>${dn}</b>${a.mode==="any"?"✓":a.mode==="no"?"✗":fmtT(a.from)+"<br>"+fmtT(a.to)}</div>`}).join("")}</div></div>`;
   const gs=[...new Set(list.map(s=>grp(s.dept)))];
   $("#staffSlot").innerHTML=`<div class="avlegend"><span class="avd ok">✓</span> <span>Available any time</span> <span class="avd part">8a<br>2p</span> <span>Only those hours</span> <span class="avd no">✗</span> <span>Can't work that day</span></div>`+gs.map(G=>{const xs=list.filter(s=>grp(s.dept)===G);return `<h3 class="sgh">${esc(G)} <span class="note">${xs.length} ${xs.length===1?"person":"people"}</span></h3><div class="stafflist">${xs.map(card).join("")}</div>`}).join("");
@@ -2355,13 +2395,14 @@ function shiftPicker(sid,d){
   let pres="";
   if(g){
     const cnt=g.slots.map(()=>0);Object.entries(S.staff).forEach(([id,o])=>{if(o.store===st.store&&inGrp(o,PG)){const v=cellVal(id,d);if(v&&v.s&&!v.off&&shG(o,v)===PG){const i=slotOf(g,v);if(i>=0)cnt[i]++}}});
-    pres=`<div class="ptitle">${esc(PG)} shifts (corporate guide)</div><div class="presets">${g.slots.map((sl,i)=>pb(sl,`data-gs="${i}"`,` <span style="font-weight:500;font-size:12px">· ${cnt[i]}/${+(sl.need&&sl.need[d])||0} filled</span>`)).join("")}</div><div class="ptitle">Other shifts</div>`;
+    pres=`<div class="ptitle">${esc(PG)} shifts</div><div class="presets">${g.slots.map((sl,i)=>pb(sl,`data-gs="${i}"`,(()=>{const need=+(sl.need&&sl.need[d])||0;return need||cnt[i]?` <span style="font-weight:500;font-size:12px">· ${cnt[i]} of ${need} needed</span>`:""})())).join("")}</div>`;
   }
-  pres+=`<div class="presets">${S.cfg.presets.map((p,i)=>pb(p,`data-pi="${i}"`)).join("")}</div>`;
+  {const used=new Set((g?g.slots:[]).map(x=>x.start+"-"+x.end));const others=S.cfg.presets.map((p,i)=>[p,i]).filter(([p])=>!used.has(p.start+"-"+p.end)&&!(g&&[...used].some(()=>false)));const seen=new Set();const list=others.filter(([p])=>{const k=p.start+"-"+p.end;if(seen.has(k))return false;seen.add(k);return true});
+   if(list.length)pres+=g?`<details class="moretimes"><summary>Other times</summary><div class="presets">${list.map(([p,i])=>pb(p,`data-pi="${i}"`)).join("")}</div></details>`:`<div class="presets">${list.map(([p,i])=>pb(p,`data-pi="${i}"`)).join("")}</div>`}
   openModal(`<div><h3>${esc(st.name)}</h3><div class="ctx">${DAYS_LONG[d]} ${dt.getMonth()+1}/${dt.getDate()} · ${esc(st.dept)} · Available: <b>${esc(availText(st,d))}</b></div></div>
     ${multi?`<div class="row"><span class="note">Working in</span><div class="seg sm">${gsetOf(st).map(G=>`<button class="${G===PG?"on":""}" data-pg="${esc(G)}">${esc(G)}</button>`).join("")}</div></div>`:""}
     ${pres}
-    <div class="row"><span class="note">Custom</span><input type="time" id="cS" value="${cur&&cur.s||"08:00"}"><span>to</span><input type="time" id="cE" value="${cur&&cur.e||"16:00"}"><button class="btn" id="cApply">Set</button></div>
+    <div class="row"><span class="note">Or type a time</span><input type="time" id="cS" value="${cur&&cur.s||"08:00"}"><span>to</span><input type="time" id="cE" value="${cur&&cur.e||"16:00"}"><button class="btn" id="cApply">Set</button></div>
     <div class="row"><button class="btn big offbtn" id="cOff">OFF</button><div class="spacer"></div><button class="btn" data-close>Cancel</button></div>`);
   document.querySelectorAll("[data-pg]").forEach(b=>b.onclick=()=>{CTXG=b.dataset.pg;shiftPicker(sid,d)});
   document.querySelectorAll("[data-pi]").forEach(b=>b.onclick=()=>{const p=S.cfg.presets[+b.dataset.pi];setCell(sid,d,{s:p.start,e:p.end});closeModal()});
@@ -2620,6 +2661,17 @@ const DAY_ES={Sun:"Dom",Mon:"Lun",Tue:"Mar",Wed:"Mié",Thu:"Jue",Fri:"Vie",Sat:"
 const DAYL_ES={Sunday:"Domingo",Monday:"Lunes",Tuesday:"Martes",Wednesday:"Miércoles",Thursday:"Jueves",Friday:"Viernes",Saturday:"Sábado",Sundays:"domingos",Mondays:"lunes",Tuesdays:"martes",Wednesdays:"miércoles",Thursdays:"jueves",Fridays:"viernes",Saturdays:"sábados"};
 const MON_ES={Jan:"ene",Feb:"feb",Mar:"mar",Apr:"abr",May:"may",Jun:"jun",Jul:"jul",Aug:"ago",Sep:"sep",Oct:"oct",Nov:"nov",Dec:"dic"};
 const ES={
+"employees":"empleados","working":"trabajando","hours":"horas","due":"entrega","Employee link":"Enlace para empleados","📲 Employee link":"📲 Enlace para empleados","Late · not submitted":"Tarde · no enviado","Not submitted yet":"Todavía no enviado","Submitted · waiting":"Enviado · esperando","Changes requested":"Piden cambios","Approved & locked":"Aprobado y bloqueado",
+"No shifts yet for this week":"Todavía no hay turnos esta semana","Build the schedule first":"Primero haz el horario","Everything looks good":"Todo se ve bien","Show me":"Muéstrame","Begin":"Empezar","Submit":"Enviar","Resubmit":"Reenviar","📲 Link":"📲 Enlace",
+"Happens automatically once the admin approves":"Pasa automáticamente cuando el administrador aprueba","Employees can see it now":"Los empleados ya lo pueden ver","Approved by the admin":"Aprobado por el administrador","Sent · waiting for the admin":"Enviado · esperando al administrador","Make the changes, then send it again":"Haz los cambios y envíalo otra vez","The admin asked for changes":"El administrador pidió cambios",
+"Store":"Tienda",
+"Good morning":"Buenos días","Good afternoon":"Buenas tardes","Good evening":"Buenas noches","What would you like to do?":"¿Qué te gustaría hacer?","Start":"Inicio","This week's checklist":"Pendientes de esta semana",
+"Build the schedule":"Hacer el horario","Fix any problems":"Corregir problemas","Submit to the admin":"Enviar al administrador","Share with employees":"Compartir con los empleados",
+"Build or change the schedule":"Hacer o cambiar el horario","Step by step, one department at a time":"Paso a paso, un departamento a la vez","See the full schedule":"Ver el horario completo","Every department, every day":"Todos los departamentos, todos los días",
+"Add or change employees":"Agregar o cambiar empleados","New hires, availability, days off":"Nuevos empleados, disponibilidad, días libres","Check the summary":"Revisar el resumen","Who works AM, Mid, PM and After 5":"Quién trabaja AM, Medio, PM y Después de 5",
+"Print the schedule":"Imprimir el horario","One page per department":"Una página por departamento","Send it to the admin when it's ready":"Envíalo al administrador cuando esté listo","Get the link employees use to see it":"Obtén el enlace que usan los empleados",
+"Done":"Listo","To do":"Pendiente","Week to submit":"Semana a entregar","Welcome!":"¡Bienvenido!","Type your store PIN":"Escribe el PIN de tu tienda","Open":"Entrar",
+"Other times":"Otros horarios","Or type a time":"O escribe una hora","1. Week":"1. Semana","2. Department":"2. Departamento","After 5":"Después de 5","starts 2p–5p":"empieza 2p–5p","starts 5p or later":"empieza 5p o después",
 "Notes for the admin (optional)":"Notas para el administrador (opcional)","The admin asked for changes in these departments:":"El administrador pidió cambios en estos departamentos:","The admin asked for changes:":"El administrador pidió cambios:","Store's note:":"Nota de la tienda:","Schedules by store":"Horarios por tienda","After 5":"Después de 5","starts 2p–5p":"empieza 2p–5p","starts 5p or later":"empieza 5p o después","2p–5p":"2p–5p","5p or later":"5p o después","Exact shift times":"Horas exactas de turno","Compared to the staffing guide (short / over)":"Comparado con la guía de personal (faltan / sobran)","Part of day":"Parte del día","Usual start":"Entrada usual","Usual end":"Salida usual","Week":"Semana","Home":"Inicio","Review schedule →":"Revisar horario →","Open store →":"Abrir tienda →","Staffing summary · all stores (hours, open spots)":"Resumen de personal · todas las tiendas (horas, lugares abiertos)","Store view":"Vista de tienda","Staffing guide":"Guía de personal","Settings":"Configuración",
 "See full schedule":"Ver horario completo","Build schedule":"Hacer horario","Staff & availability":"Personal y disponibilidad","Dashboard":"Panel","Summary":"Resumen","By department":"Por departamento","By day":"Por día","By shift":"Por turno","By employee":"Por empleado","Employees":"Empleados","Shifts":"Turnos","All departments":"Todos los departamentos","Employees working":"Empleados trabajando","Avg hours per person":"Promedio de horas por persona","Nothing scheduled this week yet.":"Todavía no hay nada programado esta semana.","Day":"Día","Morning":"Mañana","before 10a":"antes de 10a","Closing":"Cierre","2p+":"2p o después","people on each shift ·":"personas en cada turno ·","red = short":"rojo = falta","blue = over":"azul = de más","the staffing guide":"la guía de personal","Drag a name up onto a shift":"Arrastra un nombre a un turno","Off (no shift yet). Drag onto a shift, or tap to pick one.":"Libre (sin turno). Arrástralo a un turno o tócalo para elegir uno.","What should happen to shifts already on the schedule?":"¿Qué hacer con los turnos que ya están en el horario?","No, keep them off":"No, dejarlo libre","Schedule them anyway?":"¿Programarlo de todos modos?","No, keep the day off":"No, dejar el día libre","Yes, schedule them":"Sí, programarlo","Totals by day, shift and department are on the":"Los totales por día, turno y departamento están en la pestaña","tab.":".","Drag a name":"Arrastra un nombre","from the Off row onto a shift. Drag it to another shift to move it, or back to Off to remove it. While you drag,":"de la fila Libre a un turno. Arrástralo a otro turno para moverlo, o de regreso a Libre para quitarlo. Mientras arrastras,","green":"verde","= they're available,":"= está disponible,","red":"rojo","= they're not. You can also click an empty spot to pick from a list.":"= no está disponible. También puedes hacer clic en un espacio vacío para elegir de una lista.","Staffing guide":"Guía de personal","Settings":"Ajustes",
 "Store":"Tienda","Department":"Departamento","Find employee":"Buscar empleado","Week":"Semana","This week":"Esta semana","Week to submit":"Semana a entregar","The next week to schedule and submit":"La próxima semana para programar y entregar","All departments":"Todos los departamentos","Front End (all cashier, office & pricing roles)":"Front End (cajeros, oficina y precios)",
@@ -2654,6 +2706,7 @@ const ES={
 "Saved for everyone with this link":"Guardado para todos con este enlace","Loading…":"Cargando…","Search results":"Resultados","Clear search":"Borrar búsqueda","Tap a department or person to show only that department.":"Toca un departamento o persona para ver solo ese departamento."
 };
 const ES_RE=[
+[/^(\d+) shifts placed$/,"$1 turnos puestos"],[/^(\d+) things? to check \(overtime, too many days, open spots\)$/,"$1 cosas por revisar (tiempo extra, demasiados días, lugares abiertos)"],[/^due (.+)$/,"entrega $1"],
 [/^(\d+(?:\.\d+)?) hours: over 40 \(overtime\)$/,"$1 horas: más de 40 (tiempo extra)"],
 [/^(\d+(?:\.\d+)?) hours: over their (\d+(?:\.\d+)?)-hour limit$/,"$1 horas: más de su límite de $2 horas"],
 [/^(\d+(?:\.\d+)?) hours: part-time must stay at 29\.99 or less$/,"$1 horas: medio tiempo debe quedarse en 29.99 o menos"],
