@@ -949,7 +949,7 @@ document.addEventListener("click",e=>{if(e.target.closest("[data-subsref]")){loa
   const w=e.target.closest("[data-hwk]");if(w){const t=document.getElementById(w.dataset.hwk);if(t)t.click();return}
   const s=e.target.closest("[data-dsum]");if(s){DASH.store=s.dataset.dsum;renderDash();const h=document.getElementById("sumHead");if(h)h.scrollIntoView({behavior:"smooth"})}});
 function homeAllHTML(){const stores=S.cfg.stores.map(st=>({st,r:storeStats(st,DASH.docs[st])}));const groups=[...new Set(S.cfg.depts.map(grp))];const maxCell=Math.max(1,...stores.flatMap(x=>groups.map(G=>x.r.dept[G]||0)));
-  return `<div class="card"><div class="ptitle">Hours by department, every store <span class="note">· darker = more hours · click a number for that store</span></div>
+  return `<div class="card" data-feat="hs_heat"><div class="ptitle">Hours by department, every store <span class="note">· darker = more hours · click a number for that store</span></div>
   <div style="overflow-x:auto;margin-top:4px"><table class="dtable heat"><thead><tr><th style="text-align:left">Department</th>${stores.map(x=>`<th>${esc(x.st)}</th>`).join("")}<th>Total</th></tr></thead><tbody>
   ${groups.map(G=>{const row=stores.map(x=>x.r.dept[G]||0);const tot=row.reduce((a,b)=>a+b,0);if(!tot)return"";
     return `<tr><td style="text-align:left"><b>${esc(G)}</b></td>${row.map((v,i)=>`<td class="hc" data-dstore="${esc(stores[i].st)}" style="--a:${(v/maxCell).toFixed(3)}">${v?fmtH(v):"—"}</td>`).join("")}<td><b>${fmtH(tot)}</b></td></tr>`}).join("")}
@@ -1214,9 +1214,10 @@ const deptMatch=s=>S.dept==="__all"||s.dept===S.dept||(s.also||[]).includes(S.de
 const grpMatch=s=>S.dept==="__all"||inGrp(s,grp(S.dept));
 const FEATS=[["Home page (admin)",[["home_totals","Totals: hours, people, hour problems, open spots"],["card_stats","Hours, people and problems on each store card"],["home_summary","Staffing summary section"]]],
   ["Store pages",[["store_stats","Numbers in the store banner (employees, working, hours)"],["emp_totals","Days · hours row under each department"],["issues","Issues to review list (admin)"]]],
+  ["Staffing summary on Home (when you pick a store)",[["ds_text","Written summary"],["ds_tiles","Totals: hours, people, shift mix, hour problems"],["ds_daychart","People working each day (chart)"],["ds_checks","Hour checks"],["ds_dept","By department table"],["ds_traffic","Customer traffic (BRdata)"],["ds_details","Hours & people breakdown (details)"],["hs_heat","All stores: hours by department table"]]],
   ["Summary tab",[["sum_tab","Show the Summary tab"],["sum_tiles","Totals at the top"],["sum_dept","By department"],["sum_day","By day"],["sum_shift","By shift (AM / Mid / PM / After 5)"],["sum_emp","By employee"]]]];
 const featOn=k=>!((S.cfg&&S.cfg.featOff)||{})[k];
-function applyFeats(){for(const[,list]of FEATS)for(const[k]of list)document.body.classList.toggle("nf-"+k,!featOn(k));if(!featOn("sum_tab")&&S.tab==="sum")S.tab="schedule"}
+function applyFeats(){let css="";for(const[,list]of FEATS)for(const[k]of list)if(!featOn(k))css+=`[data-feat~="${k}"]{display:none!important}`;let el=document.getElementById("featCss");if(!el){el=document.createElement("style");el.id="featCss";document.head.appendChild(el)}if(el.textContent!==css)el.textContent=css;if(!featOn("sum_tab")&&S.tab==="sum")S.tab="schedule"}
 const FTPT=()=>!!(S.cfg&&S.cfg.ftpt);
 const isFT=x=>FTPT()&&!!x&&x.type==="FT";const isPT=x=>FTPT()&&!!x&&(x.type||"PT")==="PT";
 const ftPill=x=>FTPT()?`<span class="pill ${isFT(x)?"ft":""}">${x.type||"PT"}</span>`:"";
@@ -1568,7 +1569,7 @@ function dashAll(){
 }
 function dashStore(st){
   const doc=DASH.docs[st];const r=storeStats(st,doc);const B=breakdown(st);
-  if(!doc)return `<div class="card"><div class="empty"><h2>No ${esc(st)} schedule for this week</h2><p>Pick another week with the arrows, or build this week on the Schedule tab.</p><button class="btn primary" data-goschedule="${esc(st)}">Open ${esc(st)} schedule</button></div></div>`+(TRAF.docs[st]?(TRAF.store=st,trafficHTML()):"");
+  if(!doc)return `<div class="card"><div class="empty"><h2>No ${esc(st)} schedule for this week</h2><p>Pick another week with the arrows, or build this week on the Schedule tab.</p><button class="btn primary" data-goschedule="${esc(st)}">Open ${esc(st)} schedule</button></div></div>`+(TRAF.docs[st]?(TRAF.store=st,`<div data-feat="ds_traffic">${trafficHTML()}</div>`):"");
   const fl=r.ptOver.length+r.ot.length+r.capOver.length;
   const bd=r.day.indexOf(Math.max(...r.day)),ld=r.day.indexOf(Math.min(...r.day));
   const parts=B.T.part.map(x=>x.p.size);
@@ -1581,22 +1582,22 @@ function dashStore(st){
     g.slots.forEach((sl,i)=>{for(let d=0;d<7;d++)o+=Math.max(0,(+(sl.need&&sl.need[d])||0)-cnt[i][d])});openBy[G]=o}
   const deptRows=B.order.map(G=>{const R=B.rows[G];return `<tr><td style="text-align:left"><b>${esc(G)}</b></td><td>${R.ppl.size}</td><td>${fmtH(R.hrs)}</td><td>${goalFor(st,G)?fmtH(goalFor(st,G))+"<br>"+goalPill(R.hrs,goalFor(st,G)):`<span class="note">—</span>`}</td>${R.part.map((x,k)=>`<td class="p${k}">${x.p.size||"—"}</td>`).join("")}<td>${G in openBy?(openBy[G]?`<span class="flag bad">${openBy[G]}</span>`:`<span class="okpill">0</span>`):`<span class="note">no guide</span>`}</td></tr>`}).join("");
   TRAF.store=st;
-  return `<div class="card dsum"><p>${sum}</p><button class="btn sm" data-goschedule="${esc(st)}">Open schedule</button></div>
-  <div class="dtiles">
+  return `<div class="card dsum" data-feat="ds_text"><p>${sum}</p><button class="btn sm" data-goschedule="${esc(st)}">Open schedule</button></div>
+  <div class="dtiles" data-feat="ds_tiles">
     <div class="dtile ${goalFor(st)&&r.hrs-goalFor(st)>0.5?"warn":""}"><span>Hours</span><b>${Math.round(r.hrs).toLocaleString()}</b><small>${goalFor(st)?`goal ${Math.round(goalFor(st)).toLocaleString()} · ${goalPill(r.hrs,goalFor(st))}`:"scheduled this week"}</small></div>
     <div class="dtile"><span>People working</span><b>${r.ppl}</b><small>of ${r.roster} on the roster</small></div>
     <div class="dtile"><span>Shift mix</span><b class="mix"><em class="p0">${B.T.part[0].n}</em><em class="p1">${B.T.part[1].n}</em><em class="p2">${B.T.part[2].n}</em></b><small>AM · Mid · PM shifts this week</small></div>
     <div class="dtile ${fl?"warn":""}"><span>Hour problems</span><b>${fl}</b><small>${fl?"see list below":"all within limits"}</small></div>
   </div>
   <div class="dgrid2">
-    <div class="card" style="gap:6px"><div class="ptitle">People working each day</div><div class="legend" style="font-size:12px"><span><i class="sw tam"></i>AM (before 10a)</span><span><i class="sw tmid"></i>Mid (10a–2p)</span><span><i class="sw tpm"></i>PM (2p+)</span></div>${chart}</div>
-    <div class="card" style="gap:6px"><div class="ptitle">Hour checks</div>${flagList(r)}</div>
+    <div class="card" style="gap:6px" data-feat="ds_daychart"><div class="ptitle">People working each day</div><div class="legend" style="font-size:12px"><span><i class="sw tam"></i>AM (before 10a)</span><span><i class="sw tmid"></i>Mid (10a–2p)</span><span><i class="sw tpm"></i>PM (2p+)</span></div>${chart}</div>
+    <div class="card" style="gap:6px" data-feat="ds_checks"><div class="ptitle">Hour checks</div>${flagList(r)}</div>
   </div>
-  <div class="card" style="gap:6px"><div class="ptitle">By department</div><div style="overflow-x:auto"><table class="dtable dsimple"><thead><tr><th style="text-align:left">Department</th><th>People</th><th>Hours</th><th>Goal</th><th class="p0">AM</th><th class="p1">Mid</th><th class="p2">PM</th><th>Open spots</th></tr></thead><tbody>${deptRows}</tbody>
+  <div class="card" style="gap:6px" data-feat="ds_dept"><div class="ptitle">By department</div><div style="overflow-x:auto"><table class="dtable dsimple"><thead><tr><th style="text-align:left">Department</th><th>People</th><th>Hours</th><th>Goal</th><th class="p0">AM</th><th class="p1">Mid</th><th class="p2">PM</th><th>Open spots</th></tr></thead><tbody>${deptRows}</tbody>
   <tfoot><tr><td style="text-align:left">Total</td><td>${B.T.ppl.size}</td><td>${fmtH(B.T.hrs)}</td><td>${goalFor(st)?fmtH(goalFor(st)):"—"}</td>${B.T.part.map((x,k)=>`<td class="p${k}">${x.p.size}</td>`).join("")}<td>${r.need?r.open:"—"}</td></tr></tfoot></table></div>
   <div class="note">AM / Mid / PM = how many different people work at least one shift starting in that part of the day.</div></div>
-  ${TRAF.docs[st]?trafficHTML():""}
-  <details class="card" open><summary><b>Show details</b> <span class="note">— hours and people per department per day, and by time of day</span></summary>${(DASH.store=st,breakdownHTML()).replace(/<div class="card" style="gap:10px">/,'<div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">').replace(/<label class="field"><span>Store<\/span>[\s\S]*?<\/label>/,'')}</details>`;
+  ${TRAF.docs[st]?`<div data-feat="ds_traffic">${trafficHTML()}</div>`:""}
+  <details class="card" open data-feat="ds_details"><summary><b>Show details</b> <span class="note">— hours and people per department per day, and by time of day</span></summary>${(DASH.store=st,breakdownHTML()).replace(/<div class="card" style="gap:10px">/,'<div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">').replace(/<label class="field"><span>Store<\/span>[\s\S]*?<\/label>/,'')}</details>`;
 }
 /* ---------- guided "Build schedule" flow ---------- */
 const PREF=[["am","Morning","starts before 10a"],["mid","Mid","starts 10a–2p"],["pm","Closing","starts 2p or later"],["any","Any shift","no preference"]];
