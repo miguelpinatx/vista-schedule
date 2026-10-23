@@ -1,6 +1,10 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}.btn.good{background:var(--good-bg);color:var(--good-fg);border-color:var(--good-line)}.btn.warn{background:var(--warn-bg);color:var(--warn-fg);border-color:#e9c45a}#finalSlot{display:contents}
 .btn.approve{background:var(--good-fg);color:#fff;border-color:var(--good-fg)}.btn.lockd{background:#2b2536;color:#fff;border-color:#2b2536}
+.lockban.sub{border-color:#e0a800;background:#fff8e1}.lockban.rev{border-color:var(--bad-line);background:#fdf1ef}.lockban.due{border-color:var(--line);background:var(--surface)}.lockban.due.late{border-color:var(--bad-fg);background:#fdf1ef}
+.revnote{margin:4px 0;font-size:15px;font-style:italic}
+.banner.ok{background:var(--good-bg);color:var(--good-fg);border:1px solid var(--good-line)}
+.subs{margin-bottom:14px}.spill{display:inline-block;border-radius:99px;padding:3px 10px;font-weight:700;font-size:12.5px}.sp-draft{background:var(--surface2);color:var(--muted)}.sp-sub{background:#fff1c2;color:#6b4d00}.sp-rev{background:var(--bad-bg);color:var(--bad-fg)}.sp-ok{background:var(--good-bg);color:var(--good-fg)}.sp-late{background:var(--bad-fg);color:#fff}
 .lockban{display:flex;gap:12px;align-items:center;border:2px solid #2b2536;background:#f1eff5;border-radius:12px;padding:10px 14px;margin:0 0 12px}.lockban .lki{font-size:22px}
 .budget{gap:8px}.bhead{font-size:15px}.bo{color:var(--bad-fg)}.bu{color:var(--good-fg)}
 .btab{border-collapse:collapse;width:100%;min-width:640px}.btab th,.btab td{padding:6px 5px;text-align:center;border-bottom:1px solid var(--line);font-size:14px}.btab th{font-size:12px;color:var(--muted);text-transform:uppercase}.btab td:first-child{text-align:left;font-weight:600;white-space:nowrap}
@@ -619,6 +623,7 @@ span.short{color:var(--bad-fg);font-weight:700}span.over{color:#08507f;font-weig
   <section id="view-sum" class="panel" hidden><div id="sumTabSlot"></div></section>
 
   <section id="view-dash" class="panel" hidden>
+    <div id="subSlot"></div>
     <div id="dashSlot"></div>
   </section>
 
@@ -647,6 +652,11 @@ span.short{color:var(--bad-fg);font-weight:700}span.over{color:#08507f;font-weig
       <h2 class="sec">Stores</h2>
       <div class="chips" id="storeChips"></div>
       <div class="row"><input type="text" id="newStore" placeholder="New store"><button class="btn" id="addStore">Add</button></div>
+    </div>
+    <div class="card" id="bakCard">
+      <h2 class="sec">Backup</h2>
+      <div class="note">Downloads a copy of everything (staff, availability, schedules, guides, approvals) as one file. Save it somewhere safe. Doing this once a week is a good habit.</div>
+      <div class="row"><button class="btn primary" id="bakBtn">Download backup</button><span class="note" id="bakState"></span></div>
     </div>
     <div class="card" id="payCard" hidden>
       <h2 class="sec">Payroll goals</h2>
@@ -758,41 +768,74 @@ function pubSnapshot(){const rows=[];for(const[id,p]of Object.entries(S.staff)){
   rows.sort((a,b)=>a.dept.localeCompare(b.dept)||a.name.localeCompare(b.name));return rows}
 function pubState(){if(!S.pub)return"none";return JSON.stringify(S.pub.rows)===JSON.stringify(pubSnapshot())?"same":"changed"}
 function staffLink(st){return location.origin+location.pathname.replace(/[^/]*$/,"")+"staff.html?store="+encodeURIComponent(st)}
-function finalBtnHTML(){if(!backend||!backend.getPub)return"";const st=pubState();
-  if(S.lock)return S.canEdit?`<button class="btn lockd" data-lock="info">🔒 Approved &amp; locked</button>`:`<button class="btn lockd" data-final="info">🔒 Approved · shared</button>`;
-  const ap=S.canEdit&&!LOCK?`<button class="btn approve" data-lock="go">✓ Approve &amp; lock</button>`:"";
-  return ap+(st==="none"?`<button class="btn primary" data-final="go">Mark final &amp; share</button>`:st==="same"?`<button class="btn good" data-final="info">✓ Final · shared</button>`:`<button class="btn warn" data-final="go">Update final (changes not shared)</button>`)}
-let unsubLock=null;
-function watchLock(){if(unsubLock){unsubLock();unsubLock=null}if(!backend||!backend.subLock||!S.store)return;const k=key();
-  unsubLock=backend.subLock(k,d=>{if(k!==key())return;S.lock=d||null;if(d)LOCKED.add(k);else LOCKED.delete(k);S.readOnly=!!d;renderAll();updFinal()})}
-function lockBannerHTML(){if(!S.lock||!(S.tab==="schedule"||S.tab==="build"))return"";const at=new Date(S.lock.at);
-  return `<div class="lockban"><span class="lki">🔒</span><div><b>This week is approved and locked.</b><br><span class="note">Approved ${at.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{month:"short",day:"numeric"})} at ${at.toLocaleTimeString(LANG==="es"?"es-MX":"en-US",{hour:"numeric",minute:"2-digit"})}. ${S.canEdit?"Unlock it to make changes.":"Shifts can't be changed. Ask the admin if something needs to change."}</span></div>${S.canEdit?`<div class="spacer"></div><button class="btn" data-lock="unlock">Unlock</button>`:""}</div>`}
-function renderLock(){const el=$("#lockSlot");if(el)el.innerHTML=lockBannerHTML()}
-document.addEventListener("click",async e=>{const b=e.target.closest("[data-lock]");if(!b)return;const a=b.dataset.lock;
-  if(a==="go"){const rows=pubSnapshot();if(!rows.length){toast("No shifts on this week yet.");return}
-    openModal(`<h3>Approve and lock this week?</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)} (${rangeLabel(S.week)})</div>
-    <p class="note" style="margin:0">This shares the schedule with employees and locks it, so the store can't change shifts or days off. You can unlock it anytime.</p>
-    <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button><button class="btn primary" id="lockYes">Approve &amp; lock</button></div>`);
-    $("#lockYes").onclick=async()=>{const k=key();try{const doc={store:S.store,weekStart:ymd(S.week),at:new Date().toISOString(),rows:pubSnapshot()};await backend.savePub(k,doc);S.pub=doc;
-      await backend.saveLock(k,{store:S.store,weekStart:ymd(S.week),at:new Date().toISOString()});closeModal();toast("Approved, shared and locked")}catch(x){showErr(x)}};return}
-  if(a==="info"){shareModal("This week is approved and locked");return}
-  if(a==="unlock"){openModal(`<h3>Unlock this week?</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)}</div><p class="note" style="margin:0">The store will be able to change shifts again. Employees keep seeing the shared version until someone clicks <b>Update final</b> or you approve again.</p>
-    <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button><button class="btn primary" id="unlockYes">Unlock</button></div>`);
-    $("#unlockYes").onclick=async()=>{try{await backend.delLock(key());closeModal();toast("Unlocked")}catch(x){showErr(x)}};return}});
+const isAdm=()=>S.canEdit&&!LOCK;
+function stState(){const L=S.lock;if(!L)return"draft";return L.state||"approved"}
+function lockedForMe(){const st=stState();return st==="approved"||(st==="submitted"&&!isAdm())}
+function dueOf(wk){const d=addDays(wk,-3);d.setHours(23,59,59,999);return d}
+const fdt=d=>{d=new Date(d);return d.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"short",month:"numeric",day:"numeric"})+" "+d.toLocaleTimeString(LANG==="es"?"es-MX":"en-US",{hour:"numeric",minute:"2-digit"})};
+function finalBtnHTML(){if(!backend||!backend.getPub)return"";const st=stState(),adm=isAdm();
+  const xb=adm?`<button class="btn" data-xls="">⬇ Excel</button>`:"";
+  if(st==="approved")return adm?xb+`<button class="btn lockd" data-lock="info">🔒 Approved &amp; locked</button>`:`<button class="btn lockd" data-final="info">🔒 Approved · shared</button>`;
+  if(st==="submitted")return adm?xb+`<button class="btn approve" data-lock="go">✓ Approve &amp; lock</button><button class="btn warn" data-lock="revise">↩ Request changes</button>`:`<button class="btn lockd" disabled>⏳ Submitted · waiting for approval</button>`;
+  return adm?xb+`<button class="btn approve" data-lock="go">✓ Approve &amp; lock</button>`:`<button class="btn primary" data-lock="submit">${st==="revise"?"Resubmit to admin":"Submit to admin"}</button>`}
 function updFinal(){const el=$("#finalSlot");if(el)el.innerHTML=finalBtnHTML()}
 async function loadPub(){if(!backend||!backend.getPub)return;const k=key();try{const d=await backend.getPub(k);if(k===key()){S.pub=d;updFinal();if(W&&W.step===5)renderWizard()}}catch(e){}}
 function shareModal(msg){const link=staffLink(S.store);
   openModal(`<h3>${msg||"Schedule shared"}</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)} (${rangeLabel(S.week)})</div>
-  <p class="note">Employees open this link to see every week marked final for ${esc(S.store)}. No PIN needed. Edits you make later stay private until you click <b>Update final</b>.</p>
+  <p class="note">Employees open this link to see every week marked final for ${esc(S.store)}. No PIN needed. It updates each time the admin approves a week.</p>
   <div class="row"><input type="text" readonly value="${esc(link)}" id="shareLink" style="flex:1;min-width:0"><button class="btn primary" data-final="copy">Copy link</button></div>
-  <div class="row" style="margin-top:10px"><button class="btn" data-final="unpub">Take this week down</button><div class="spacer"></div><a class="btn" href="${esc(link)}" target="_blank" rel="noopener">Open employee view</a><button class="btn" data-close>Done</button></div>`)}
-document.addEventListener("click",async e=>{const b=e.target.closest("[data-final]");if(!b)return;const a=b.dataset.final;
-  if(a==="go"){const was=!!S.pub;const rows=pubSnapshot();if(!rows.length){toast("No shifts on this week yet.");return}
-    const doc={store:S.store,weekStart:ymd(S.week),at:new Date().toISOString(),rows};
-    try{await backend.savePub(key(),doc);S.pub=doc;updFinal();renderWizard();shareModal(was?"Final schedule updated":"Schedule marked final")}catch(x){showErr(x)}return}
-  if(a==="info"){shareModal("This week is final");return}
-  if(a==="copy"){const v=$("#shareLink").value;try{await navigator.clipboard.writeText(v);toast("Link copied")}catch(x){$("#shareLink").select();toast("Press Ctrl+C to copy")}return}
-  if(a==="unpub"){try{await backend.delPub(key());S.pub=null;updFinal();renderWizard();closeModal();toast("Taken down. Employees no longer see this week.")}catch(x){showErr(x)}return}});
+  <div class="row" style="margin-top:10px">${S.canEdit&&!LOCK?`<button class="btn" data-final="unpub">Take this week down</button>`:""}<div class="spacer"></div><a class="btn" href="${esc(link)}" target="_blank" rel="noopener">Open employee view</a><button class="btn" data-close>Done</button></div>`)}
+let unsubLock=null;
+function watchLock(){if(unsubLock){unsubLock();unsubLock=null}if(!backend||!backend.subLock||!S.store)return;const k=key();
+  unsubLock=backend.subLock(k,d=>{if(k!==key())return;S.lock=d||null;if(lockedForMe())LOCKED.add(k);else LOCKED.delete(k);S.readOnly=lockedForMe();renderAll();updFinal();SUBS.at=0})}
+function lockBannerHTML(){if(!S.store||!(S.tab==="schedule"||S.tab==="build"))return"";const st=stState(),adm=isAdm(),L=S.lock||{};
+  if(st==="approved")return `<div class="lockban"><span class="lki">🔒</span><div><b>This week is approved and locked.</b><br><span class="note">Approved ${fdt(L.approvedAt||L.at)}. ${adm?"Unlock it to make changes.":"Shifts can't be changed. Ask the admin if something needs to change."}</span></div>${adm?`<div class="spacer"></div><button class="btn" data-lock="unlock">Unlock</button>`:""}</div>`;
+  if(st==="submitted")return adm?`<div class="lockban sub"><span class="lki">⏳</span><div><b>${esc(S.store)} submitted this week for approval.</b><br><span class="note">Submitted ${fdt(L.submittedAt||L.at)}. Review it, then approve it or ask for changes.</span></div><div class="spacer"></div><button class="btn warn" data-lock="revise">↩ Request changes</button><button class="btn approve" data-lock="go">✓ Approve &amp; lock</button></div>`
+    :`<div class="lockban sub"><span class="lki">⏳</span><div><b>Submitted. Waiting for the admin to approve.</b><br><span class="note">Submitted ${fdt(L.submittedAt||L.at)}. You can't make changes while it's being reviewed.</span></div></div>`;
+  if(st==="revise")return `<div class="lockban rev"><span class="lki">↩</span><div><b>The admin asked for changes.</b>${L.note?`<div class="revnote">“${esc(L.note)}”</div>`:""}<span class="note">${adm?"Waiting for the store to resubmit.":"Make the changes, then click <b>Resubmit to admin</b>."}</span></div>${adm?"":`<div class="spacer"></div><button class="btn primary" data-lock="submit">Resubmit to admin</button>`}</div>`;
+  const now=new Date(),due=dueOf(S.week),end=addDays(S.week,7);if(now>=end)return"";const late=now>due;
+  return `<div class="lockban due ${late?"late":""}"><span class="lki">📅</span><div><b>${late?"Late: this schedule was due":"Due"} ${due.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"long",month:"numeric",day:"numeric"})}</b><br><span class="note">${adm?"Not submitted by the store yet.":"When it's ready, click <b>Submit to admin</b>. You can't edit it after you submit unless the admin sends it back."}</span></div>${adm?"":`<div class="spacer"></div><button class="btn primary" data-lock="submit">Submit to admin</button>`}</div>`}
+function renderLock(){const el=$("#lockSlot");if(el)el.innerHTML=lockBannerHTML();if(S.tab==="dash")loadSubs()}
+function submitChecks(){const out=[];const groups=new Set();for(const p of Object.values(S.staff))if(p&&!p._pending&&p.store===S.store)gsetOf(p).forEach(G=>groups.add(G));
+  for(const G of [...groups].sort((a,b)=>deptOrder(a)-deptOrder(b))){const o=openByDay(G);if(o){const n=o.reduce((a,b)=>a+b,0);if(n)out.push(`<b>${esc(G)}</b>: ${n} open spot${n===1?"":"s"} vs. staffing guide`)}}
+  for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;const r=rowStats({id,...p});const m=limitMsgs(p,r.h,r.days);if(m.length)out.push(`<b>${esc(p.name)}</b>: ${m.map(esc).join(", ")}`)}
+  return out}
+const statusDoc=(state,extra)=>({...(S.lock||{}),store:S.store,weekStart:ymd(S.week),state,at:new Date().toISOString(),...extra});
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-lock]");if(!b)return;const a=b.dataset.lock;const k=key();
+  if(a==="submit"){const rows=pubSnapshot();if(!rows.length){toast("No shifts on this week yet.");return}const C=submitChecks();
+    openModal(`<h3>Submit this schedule to the admin?</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)} (${rangeLabel(S.week)})</div>
+    ${C.length?`<div class="alertlist"><div class="alerthead">⚠ Check these first</div>${C.map(x=>`<div class="alertrow">${x}</div>`).join("")}</div><p class="note" style="margin:0">You can go back and fix them, or submit anyway.</p>`:`<div class="banner ok">✓ No problems found: every shift in the staffing guide is covered and hours are within the rules.</div>`}
+    <p class="note" style="margin:0">After you submit, you can't change this week unless the admin sends it back.</p>
+    <div class="row"><div class="spacer"></div><button class="btn" data-close>${C.length?"Go back and fix":"Cancel"}</button><button class="btn primary" id="subYes">${C.length?"Submit anyway":"Submit to admin"}</button></div>`);
+    $("#subYes").onclick=async()=>{try{await backend.saveLock(k,statusDoc("submitted",{submittedAt:new Date().toISOString(),note:""}));closeModal();toast("Submitted. The admin will review it.")}catch(x){showErr(x)}};return}
+  if(a==="go"){const rows=pubSnapshot();if(!rows.length){toast("No shifts on this week yet.");return}
+    openModal(`<h3>Approve and lock this week?</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)} (${rangeLabel(S.week)})</div>
+    <p class="note" style="margin:0">This shares the schedule with employees and locks it, so the store can't change shifts or days off. You can unlock it anytime.</p>
+    <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button><button class="btn primary" id="lockYes">Approve &amp; lock</button></div>`);
+    $("#lockYes").onclick=async()=>{try{const doc={store:S.store,weekStart:ymd(S.week),at:new Date().toISOString(),rows:pubSnapshot()};await backend.savePub(k,doc);S.pub=doc;
+      await backend.saveLock(k,statusDoc("approved",{approvedAt:new Date().toISOString()}));closeModal();toast("Approved, shared and locked")}catch(x){showErr(x)}};return}
+  if(a==="revise"){openModal(`<h3>Request changes</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)}</div>
+    <label class="field"><span>What should they change?</span><textarea id="revNote" style="min-height:90px;font-family:var(--f-body);font-size:15px" placeholder="e.g. Hot Deli is short Saturday PM. Maria is over 40 hours."></textarea></label>
+    <p class="note" style="margin:0">The store can edit again and will see your note at the top of the schedule.</p>
+    <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button><button class="btn primary" id="revYes">Send back to store</button></div>`,true);setTimeout(()=>$("#revNote").focus(),0);
+    $("#revYes").onclick=async()=>{const note=$("#revNote").value.trim();if(!note){toast("Write a short note so they know what to fix.");return}try{await backend.saveLock(k,statusDoc("revise",{note,revisedAt:new Date().toISOString()}));closeModal();toast("Sent back to "+S.store)}catch(x){showErr(x)}};return}
+  if(a==="info"){shareModal("This week is approved and locked");return}
+  if(a==="unlock"){openModal(`<h3>Unlock this week?</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)}</div><p class="note" style="margin:0">The store will be able to change shifts again and must resubmit. Employees keep seeing the approved version until you approve again.</p>
+    <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button><button class="btn primary" id="unlockYes">Unlock</button></div>`);
+    $("#unlockYes").onclick=async()=>{try{await backend.delLock(k);closeModal();toast("Unlocked")}catch(x){showErr(x)}};return}});
+/* ---------- admin: submissions for every store ---------- */
+const SUBS={week:null,at:0,docs:{},loading:false};
+async function loadSubs(force){const el=$("#subSlot");if(!el)return;if(!isAdm()||!backend.getLock){el.innerHTML="";return}const wk=ymd(S.week);
+  if(!force&&SUBS.week===wk&&Date.now()-SUBS.at<30000){el.innerHTML=subsHTML();return}if(SUBS.loading)return;SUBS.loading=true;
+  try{const out={};await Promise.all(S.cfg.stores.map(async st=>{out[st]=await backend.getLock(st.replace(/[^A-Za-z0-9_-]/g,"_")+"_"+wk).catch(()=>null)}));SUBS.docs=out;SUBS.week=wk;SUBS.at=Date.now()}finally{SUBS.loading=false}
+  const e2=$("#subSlot");if(e2)e2.innerHTML=subsHTML()}
+function subsHTML(){const due=dueOf(S.week),now=new Date();const pill={draft:["Not submitted","sp-draft"],submitted:["Waiting for you","sp-sub"],revise:["Changes requested","sp-rev"],approved:["Approved & locked","sp-ok"]};
+  const rows=S.cfg.stores.map(st=>{const d=SUBS.docs[st];const s=d?(d.state||"approved"):"draft";const late=s==="draft"&&now>due;const[t,c]=pill[s];
+    return `<tr><td class="l"><b>${esc(st)}</b></td><td><span class="spill ${c} ${late?"sp-late":""}">${late?"Late · ":""}${t}</span></td><td>${d&&d.submittedAt?fdt(d.submittedAt):"—"}</td><td>${d&&d.state==="revise"&&d.note?`<span class="note">“${esc(d.note)}”</span>`:d&&d.approvedAt?"Approved "+fdt(d.approvedAt):""}</td><td style="white-space:nowrap"><button class="btn sm ${s==="submitted"?"primary":""}" data-goschedule="${esc(st)}">${s==="submitted"?"Review":"Open"}</button> <button class="btn sm" data-xls="${esc(st)}" title="Download ${esc(st)} as Excel">⬇ Excel</button></td></tr>`}).join("");
+  const n=S.cfg.stores.filter(st=>SUBS.docs[st]&&SUBS.docs[st].state==="submitted").length;
+  return `<div class="card subs"><div class="row"><div><h2 class="sec" style="margin:0">Schedule submissions · Week ${weekNo(S.week,S.cfg.wkOffset)}</h2><div class="note">${rangeLabel(S.week)} · due ${due.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"long",month:"numeric",day:"numeric"})}${n?` · <b>${n} waiting for your approval</b>`:""}</div></div><div class="spacer"></div><button class="btn sm" data-xls="__all">⬇ All stores (Excel)</button><button class="btn sm" data-subsref>Refresh</button></div>
+  <div class="sx"><table class="stab" style="min-width:640px"><thead><tr><th class="l">Store</th><th>Status</th><th>Submitted</th><th class="l">Notes</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`}
+document.addEventListener("click",e=>{if(e.target.closest("[data-subsref]"))loadSubs(true)});
 
 /* ---------- Payroll budget + issues (GitHub version) ---------- */
 const money=n=>"$"+Math.round(n).toLocaleString();
@@ -848,6 +891,36 @@ document.addEventListener("click",async e=>{if(e.target.closest("[data-sales-cop
 document.addEventListener("keydown",e=>{const it=e.target.closest&&e.target.closest(".iitem[data-tdept]");if(it&&(e.key==="Enter"||e.key===" ")){e.preventDefault();it.click()}});
 function renderPayCfg(){const el=$("#payRows");if(!el||el.contains(document.activeElement))return;const pay=S.cfg.payroll||{};
   el.innerHTML=`<table class="btab" style="max-width:520px"><thead><tr><th style="text-align:left">Store</th><th>Blended rate ($/hr)</th><th>Payroll goal (% of sales)</th></tr></thead><tbody>${S.cfg.stores.map(st=>{const p=pay[st]||{};return `<tr><td style="text-align:left"><b>${esc(st)}</b></td><td><input type="number" min="0" step="0.25" data-pay-store="${esc(st)}" data-k="rate" value="${p.rate||""}" placeholder="—"></td><td><input type="number" min="0" max="100" step="0.1" data-pay-store="${esc(st)}" data-k="pct" value="${p.pct||""}" placeholder="—"></td></tr>`}).join("")}</tbody></table>`}
+
+/* ---------- admin backup download ---------- */
+document.addEventListener("click",async e=>{if(!e.target.closest("#bakBtn"))return;const st=$("#bakState");st.textContent="Preparing…";
+  try{const sb=window.supabase.createClient(window.SUPABASE_URL,window.SUPABASE_ANON_KEY);let all=[],from=0;for(;;){const{data,error}=await sb.from("docs").select("collection,id,data,updated_at").range(from,from+999);if(error)throw error;all=all.concat(data);if(data.length<1000)break;from+=1000}
+    const blob=new Blob([JSON.stringify({exported:new Date().toISOString(),rows:all})],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="vista-schedule-backup-"+ymd(new Date())+".json";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
+    st.textContent="Downloaded "+all.length+" records."}catch(x){st.textContent="";showErr(x)}});
+
+/* ---------- Excel export (admin) ---------- */
+const XLSX_URL="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+function loadXLSX(){if(window.XLSX)return Promise.resolve(window.XLSX);return new Promise((res,rej)=>{const sc=document.createElement("script");sc.src=XLSX_URL;sc.onload=()=>res(window.XLSX);sc.onerror=()=>rej(new Error("Couldn't load the Excel tool. Check your internet and try again."));document.head.appendChild(sc)})}
+const xt=t=>{const m=toMin(t);if(m==null)return"";let h=Math.floor(m/60)%24,mm=m%60;const ap=h<12?"AM":"PM";h=h%12||12;return h+":"+String(mm).padStart(2,"0")+" "+ap};
+function storeSheetRows(st,wk,shifts){const sh=shifts||{};const cv=(id,d)=>sh[id]&&sh[id][d]||null;
+  const ppl=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>s&&!s._pending&&s.store===st);
+  const groups=[...new Set(ppl.flatMap(p=>gsetOf(p)))].sort((a,b)=>deptOrder(a)-deptOrder(b));
+  const dates=DAYS.map((x,d)=>{const t=addDays(wk,d);return x+" "+(t.getMonth()+1)+"/"+t.getDate()});
+  const rows=[["Vista Markets · "+st+" · Week "+weekNo(wk,S.cfg.wkOffset)+" ("+rangeLabel(wk)+")"],[]];const merges=[];let grand=0;const dayTot=[0,0,0,0,0,0,0];
+  for(const G of groups){const ps=ppl.filter(p=>inGrp(p,G)).sort((a,b)=>a.name.localeCompare(b.name));let gT=0;const gD=[0,0,0,0,0,0,0];
+    rows.push([G]);rows.push(["Employee","Status",...dates,"Days","Hours"]);
+    for(const p of ps){let h=0,n=0;const cells=DAYS.map((x,d)=>{const v=cv(p.id,d);if(v&&v.s&&!v.off){if(shG(p,v)!==G)return "("+shG(p,v)+")";const x2=hoursOf(v,S.cfg);h+=x2;n++;gD[d]+=x2;return xt(v.s)+" - "+xt(v.e)}return"OFF"});
+      gT+=h;rows.push([p.name,p.type==="FT"?"Full-time":"Part-time",...cells,n,Math.round(h*100)/100])}
+    rows.push(["Total "+G,"",...gD.map(x=>Math.round(x*100)/100),"",Math.round(gT*100)/100]);rows.push([]);grand+=gT;gD.forEach((x,d)=>dayTot[d]+=x)}
+  rows.push(["All departments","",...dayTot.map(x=>Math.round(x*100)/100),"",Math.round(grand*100)/100]);
+  if(S.cfg.mealDeduct)rows.push(["Hours exclude a 30-minute meal on shifts over 6 hours."]);
+  return rows}
+function sheetFrom(X,rows){const ws=X.utils.aoa_to_sheet(rows);ws["!cols"]=[{wch:24},{wch:11},...DAYS.map(()=>({wch:19})),{wch:6},{wch:8}];ws["!pageSetup"]={orientation:"landscape"};return ws}
+async function getSchedFor(st,wk){const k=st.replace(/[^A-Za-z0-9_-]/g,"_")+"_"+ymd(wk);if(st===S.store&&ymd(wk)===ymd(S.week)&&S.sched)return S.sched;return await backend.getSched(k).catch(()=>null)}
+async function exportExcel(stores){try{toast("Preparing Excel…");const X=await loadXLSX();const wk=S.week;const wb=X.utils.book_new();
+    for(const st of stores){const doc=await getSchedFor(st,wk);const ws=sheetFrom(X,storeSheetRows(st,wk,doc&&doc.shifts));X.utils.book_append_sheet(wb,ws,st.slice(0,31))}
+    const name=(stores.length===1?stores[0].replace(/\s+/g,"-"):"All-stores")+"_Week"+weekNo(wk,S.cfg.wkOffset)+"_"+ymd(wk)+".xlsx";X.writeFile(wb,name);toast("Downloaded "+name)}catch(e){showErr(e)}}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-xls]");if(!b)return;const v=b.dataset.xls;exportExcel(v==="__all"?S.cfg.stores:[v||S.store])});
 
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAYS_ES=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
@@ -2350,7 +2423,7 @@ const MON_ES={Jan:"ene",Feb:"feb",Mar:"mar",Apr:"abr",May:"may",Jun:"jun",Jul:"j
 const ES={
 "See full schedule":"Ver horario completo","Build schedule":"Hacer horario","Staff & availability":"Personal y disponibilidad","Dashboard":"Panel","Summary":"Resumen","By department":"Por departamento","By day":"Por día","By shift":"Por turno","By employee":"Por empleado","Employees":"Empleados","Shifts":"Turnos","All departments":"Todos los departamentos","Employees working":"Empleados trabajando","Avg hours per person":"Promedio de horas por persona","Nothing scheduled this week yet.":"Todavía no hay nada programado esta semana.","Day":"Día","Morning":"Mañana","before 10a":"antes de 10a","Closing":"Cierre","2p+":"2p o después","people on each shift ·":"personas en cada turno ·","red = short":"rojo = falta","blue = over":"azul = de más","the staffing guide":"la guía de personal","Drag a name up onto a shift":"Arrastra un nombre a un turno","Off (no shift yet). Drag onto a shift, or tap to pick one.":"Libre (sin turno). Arrástralo a un turno o tócalo para elegir uno.","Schedule them anyway?":"¿Programarlo de todos modos?","No, keep the day off":"No, dejar el día libre","Yes, schedule them":"Sí, programarlo","Totals by day, shift and department are on the":"Los totales por día, turno y departamento están en la pestaña","tab.":".","Drag a name":"Arrastra un nombre","from the Off row onto a shift. Drag it to another shift to move it, or back to Off to remove it. While you drag,":"de la fila Libre a un turno. Arrástralo a otro turno para moverlo, o de regreso a Libre para quitarlo. Mientras arrastras,","green":"verde","= they're available,":"= está disponible,","red":"rojo","= they're not. You can also click an empty spot to pick from a list.":"= no está disponible. También puedes hacer clic en un espacio vacío para elegir de una lista.","Staffing guide":"Guía de personal","Settings":"Ajustes",
 "Store":"Tienda","Department":"Departamento","Find employee":"Buscar empleado","Week":"Semana","This week":"Esta semana","All departments":"Todos los departamentos","Front End (all cashier, office & pricing roles)":"Front End (cajeros, oficina y precios)",
-"Fill automatically":"Llenar automáticamente","Copy last week":"Copiar semana pasada","Clear week":"Borrar semana","Print schedule":"Imprimir horario","Print":"Imprimir","Mark final & share":"Marcar final y compartir","✓ Approve & lock":"✓ Aprobar y bloquear","🔒 Approved & locked":"🔒 Aprobado y bloqueado","🔒 Approved · shared":"🔒 Aprobado · compartido","This week is approved and locked.":"Esta semana está aprobada y bloqueada.","Unlock it to make changes.":"Desbloquéala para hacer cambios.","Shifts can't be changed. Ask the admin if something needs to change.":"No se pueden cambiar los turnos. Pide al administrador si algo necesita cambio.","Unlock":"Desbloquear","Approve and lock this week?":"¿Aprobar y bloquear esta semana?","This shares the schedule with employees and locks it, so the store can't change shifts or days off. You can unlock it anytime.":"Esto comparte el horario con los empleados y lo bloquea, así la tienda no puede cambiar turnos ni días libres. Puedes desbloquearlo cuando quieras.","Approve & lock":"Aprobar y bloquear","Unlock this week?":"¿Desbloquear esta semana?","Approved, shared and locked":"Aprobado, compartido y bloqueado","Unlocked":"Desbloqueado","This week is approved and locked":"Esta semana está aprobada y bloqueada","This week is approved and locked. Ask the admin to unlock it.":"Esta semana está aprobada y bloqueada. Pide al administrador que la desbloquee.","✓ Final · shared":"✓ Final · compartido","Update final (changes not shared)":"Actualizar final (cambios sin compartir)",
+"Fill automatically":"Llenar automáticamente","Copy last week":"Copiar semana pasada","Clear week":"Borrar semana","Print schedule":"Imprimir horario","Print":"Imprimir","Mark final & share":"Marcar final y compartir","✓ Approve & lock":"✓ Aprobar y bloquear","Submit to admin":"Enviar al administrador","Resubmit to admin":"Reenviar al administrador","⏳ Submitted · waiting for approval":"⏳ Enviado · esperando aprobación","↩ Request changes":"↩ Pedir cambios","Submitted. Waiting for the admin to approve.":"Enviado. Esperando la aprobación del administrador.","You can't make changes while it's being reviewed.":"No puedes hacer cambios mientras se revisa.","The admin asked for changes.":"El administrador pidió cambios.","Make the changes, then click":"Haz los cambios y luego haz clic en","When it's ready, click":"Cuando esté listo, haz clic en","You can't edit it after you submit unless the admin sends it back.":"No puedes editarlo después de enviarlo a menos que el administrador lo regrese.","Submit this schedule to the admin?":"¿Enviar este horario al administrador?","⚠ Check these first":"⚠ Revisa esto primero","You can go back and fix them, or submit anyway.":"Puedes regresar y corregirlos, o enviarlo de todos modos.","✓ No problems found: every shift in the staffing guide is covered and hours are within the rules.":"✓ Sin problemas: todos los turnos de la guía están cubiertos y las horas están dentro de las reglas.","After you submit, you can't change this week unless the admin sends it back.":"Después de enviarlo, no puedes cambiar esta semana a menos que el administrador lo regrese.","Go back and fix":"Regresar y corregir","Submit anyway":"Enviar de todos modos","Submitted. The admin will review it.":"Enviado. El administrador lo revisará.","Request changes":"Pedir cambios","What should they change?":"¿Qué deben cambiar?","Send back to store":"Regresar a la tienda","Waiting for the store to resubmit.":"Esperando que la tienda lo reenvíe.","Not submitted by the store yet.":"La tienda todavía no lo envía.","Download backup":"Descargar respaldo","Backup":"Respaldo","🔒 Approved & locked":"🔒 Aprobado y bloqueado","🔒 Approved · shared":"🔒 Aprobado · compartido","This week is approved and locked.":"Esta semana está aprobada y bloqueada.","Unlock it to make changes.":"Desbloquéala para hacer cambios.","Shifts can't be changed. Ask the admin if something needs to change.":"No se pueden cambiar los turnos. Pide al administrador si algo necesita cambio.","Unlock":"Desbloquear","Approve and lock this week?":"¿Aprobar y bloquear esta semana?","This shares the schedule with employees and locks it, so the store can't change shifts or days off. You can unlock it anytime.":"Esto comparte el horario con los empleados y lo bloquea, así la tienda no puede cambiar turnos ni días libres. Puedes desbloquearlo cuando quieras.","Approve & lock":"Aprobar y bloquear","Unlock this week?":"¿Desbloquear esta semana?","Approved, shared and locked":"Aprobado, compartido y bloqueado","Unlocked":"Desbloqueado","This week is approved and locked":"Esta semana está aprobada y bloqueada","This week is approved and locked. Ask the admin to unlock it.":"Esta semana está aprobada y bloqueada. Pide al administrador que la desbloquee.","✓ Final · shared":"✓ Final · compartido","Update final (changes not shared)":"Actualizar final (cambios sin compartir)",
 "Matches availability":"Dentro de su disponibilidad","Outside availability":"Fuera de su disponibilidad","Day off":"Día libre","Not available that day":"No disponible ese día","Color: availability":"Color: disponibilidad","Color: time of day":"Color: hora del día","By employee":"Por empleado","By shift":"Por turno",
 "Morning (before 10a)":"Mañana (antes de 10a)","Mid (10a–2p)":"Medio (10a–2p)","Afternoon / close (2p+)":"Tarde / cierre (2p+)","Red border = outside availability":"Borde rojo = fuera de su disponibilidad",
 "Click any day to set a shift. Under each department:":"Haz clic en un día para poner un turno. Debajo de cada departamento:","Under each department:":"Debajo de cada departamento:","red = short staffed":"rojo = falta personal","blue = over staffed":"azul = personal de más","vs. the staffing guide.":"según la guía de personal.","Click any day to set a shift.":"Haz clic en un día para poner un turno.","Drag names between shifts and Off.":"Arrastra nombres entre turnos y Libre.","Requested off":"Pidió libre","Click + Add to fill a shift, or a name to change it.":"Haz clic en + Agregar para llenar un turno, o en un nombre para cambiarlo.",
@@ -2405,7 +2478,7 @@ const ES_RE=[
 [/^Tap a name to put them on this shift\. Hours include this shift\.$/,"Toca un nombre para ponerlo en este turno. Las horas incluyen este turno."],
 [/^ · Tap a name to put them on this shift\. Hours include this shift\.$/," · Toca un nombre para ponerlo en este turno. Las horas incluyen este turno."],
 [/^(\d+) (people|person)$/,m=>m[1]+" "+(m[2]==="person"?"persona":"personas")],
-[/^(\d+) short$/,"faltan $1"],[/^(\d+) over$/,"$1 de más"],[/^Need (\d+) more$/,"Faltan $1"],[/^Need (\d+)$/,"Faltan $1"],[/^\+(\d+) over$/,"+$1 de más"],[/^of (\d+)$/,"de $1"],[/^Summary · (.+)$/,"Resumen · $1"],[/^Approved (.+) at (.+)\. (.+)$/,m=>"Aprobado "+m[1]+" a las "+m[2]+". "+(ES[m[3]]||m[3])],[/^of (\d+) on the team$/,"de $1 en el equipo"],[/^(.+) asked for (\w+) off$/,m=>m[1]+" pidió el "+(DAYL_ES[m[2]]||m[2])+" libre"],[/^(.+) is off (\w+)$/,m=>m[1]+" libre el "+(DAYL_ES[m[2]]||m[2])],[/^Replaced their (.+) shift that day$/,"Se reemplazó su turno de $1 ese día"],
+[/^(\d+) short$/,"faltan $1"],[/^(\d+) over$/,"$1 de más"],[/^Need (\d+) more$/,"Faltan $1"],[/^Need (\d+)$/,"Faltan $1"],[/^\+(\d+) over$/,"+$1 de más"],[/^of (\d+)$/,"de $1"],[/^Summary · (.+)$/,"Resumen · $1"],[/^Submitted (.+)\. You can't make changes while it's being reviewed\.$/,"Enviado $1. No puedes hacer cambios mientras se revisa."],[/^Late: this schedule was due (.+)$/,"Atrasado: este horario vencía el $1"],[/^Due (.+)$/,"Vence el $1"],[/^Approved (.+) at (.+)\. (.+)$/,m=>"Aprobado "+m[1]+" a las "+m[2]+". "+(ES[m[3]]||m[3])],[/^of (\d+) on the team$/,"de $1 en el equipo"],[/^(.+) asked for (\w+) off$/,m=>m[1]+" pidió el "+(DAYL_ES[m[2]]||m[2])+" libre"],[/^(.+) is off (\w+)$/,m=>m[1]+" libre el "+(DAYL_ES[m[2]]||m[2])],[/^Replaced their (.+) shift that day$/,"Se reemplazó su turno de $1 ese día"],
 [/^of (\d+) (answered|checked)$/,m=>"de "+m[1]+" "+(m[2]==="answered"?"contestados":"revisados")],
 [/^(\d+) shifts$/,"$1 turnos"],[/^Total · (\d+) people$/,"Total · $1 personas"],[/^(\d+) ppl$/,"$1 pers."],
 [/^\/ (\S+) max$/,"/ $1 máx."],
