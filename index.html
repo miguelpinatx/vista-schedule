@@ -51,7 +51,7 @@
 .hc-when{margin:0;font-size:12.5px}.hc-num{display:flex;align-items:baseline;gap:6px;margin-top:4px;min-height:38px}.hc-num b{font-family:var(--f-display);font-size:32px;line-height:1}.hc-num span{color:var(--muted);font-size:13px}
 .hc-bar{height:7px;background:var(--surface2);border-radius:99px;overflow:hidden}.hc-bar i{display:block;height:100%;background:#7fb685;border-radius:99px}
 .hc-meta{margin:0;font-size:13px}.hc-flags{min-height:20px}.hcnote{font-size:13px;background:var(--surface2);border-radius:8px;padding:6px 8px}.hcnote.rev{background:#fdf1ef}
-body.adm .lockban .btn{font-size:16px;padding:11px 18px;min-height:46px}body.adm .lockban.sub{padding:14px 18px}.hc-num .hcn{display:flex;align-items:baseline;gap:5px;margin-right:16px}.hc-acts{display:flex;gap:6px;margin-top:auto;padding-top:6px}.hc-acts .btn:first-child{flex:1;justify-content:center}
+body.adm .lockban .btn{font-size:16px;padding:11px 18px;min-height:46px}body.adm .lockban.sub{padding:14px 18px}.isec2{margin-bottom:8px}details.revissues{margin-top:6px}details.revissues>summary{cursor:pointer;font-weight:700;font-size:14px}.hc-num .hcn{display:flex;align-items:baseline;gap:5px;margin-right:16px}.hc-acts{display:flex;gap:6px;margin-top:auto;padding-top:6px}.hc-acts .btn:first-child{flex:1;justify-content:center}
 #view-dash .dhead h2.sec{display:none}
 .stcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin:0 0 14px}.stcard{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;cursor:pointer;text-align:left;font:inherit;color:inherit}.stcard:hover{border-color:var(--brand)}.stcard h3{margin:0;font-size:20px}.stcard .note{margin:0}.stcard.sub{border-color:#e0a800;background:#fffbea}
 .homehead{display:flex;align-items:flex-end;gap:12px;margin:0 0 10px}.homehead h2{margin:0}
@@ -826,7 +826,9 @@ function supaBackend(sb){
     async savePub(k,o){try{await put("published",k,o)}catch(e){err(e)}},
     async delPub(k){try{await del("published",k)}catch(e){err(e)}},
     async getSales(k){return getDoc("sales",k)},
-    async saveSales(k,o){try{await put("sales",k,o)}catch(e){err(e)}}
+    async saveSales(k,o){try{await put("sales",k,o)}catch(e){err(e)}},
+    async getRev(k){return getDoc("reviews",k)},
+    async saveRev(k,o){try{if(o)await put("reviews",k,o);else await del("reviews",k)}catch(e){err(e)}}
   };
 }
 /* ---------- PIN gate (GitHub version) ---------- */
@@ -873,12 +875,12 @@ function watchLock(){if(unsubLock){unsubLock();unsubLock=null}if(!backend||!back
   unsubLock=backend.subLock(k,d=>{if(k!==key())return;S.lock=d||null;if(lockedForMe())LOCKED.add(k);else LOCKED.delete(k);S.readOnly=lockedForMe();renderAll();updFinal();SUBS.at=0})}
 function lockBannerHTML(){if(!S.store||!(S.tab==="schedule"||S.tab==="build"||(S.tab==="sum"&&isAdm())))return"";const st=stState(),adm=isAdm(),L=S.lock||{};
   if(st==="approved")return `<div class="lockban"><span class="lki">🔒</span><div><b>This week is approved and locked.</b><br><span class="note">Approved ${fdt(L.approvedAt||L.at)}. ${adm?"Unlock it to make changes.":"Shifts can't be changed. Ask the admin if something needs to change."}</span></div>${adm?`<div class="spacer"></div><button class="btn" data-lock="unlock">Unlock</button>`:""}</div>`;
-  if(st==="submitted")return adm?`<div class="lockban sub"><span class="lki">⏳</span><div><b>${esc(S.store)} submitted this week for approval.</b><br><span class="note">Submitted ${fdt(L.submittedAt||L.at)}. Review it, then approve it or ask for changes.</span>${L.storeNote?`<div class="revnote"><b>Store's note:</b> <span translate="no">“${esc(L.storeNote)}”</span></div>`:""}${(L.fixes||[]).length?`<div class="note" style="margin-top:4px">You had asked for: ${L.fixes.map(f=>esc(f.dept)).join(", ")}</div>`:""}</div><div class="spacer"></div><button class="btn warn" data-lock="revise">↩ Request changes</button><button class="btn approve" data-lock="go">✓ Approve &amp; lock</button></div>`
+  if(st==="submitted")return adm?`<div class="lockban sub"><span class="lki">⏳</span><div><b>${esc(S.store)} submitted this week for approval.</b><br><span class="note">Submitted ${fdt(L.submittedAt||L.at)}. Review it, then approve it or ask for changes.</span>${L.storeNote?`<div class="revnote"><b>Store's note:</b> <span translate="no">“${esc(L.storeNote)}”</span></div>`:""}${(L.issues||[]).length?`<details class="revissues"><summary>${L.reviewed?`✓ Store reviewed ${L.issues.length} flagged item${L.issues.length===1?"":"s"} and says they're OK`:`⚠ Submitted with ${L.issues.length} flagged item${L.issues.length===1?"":"s"} (not reviewed)`}</summary>${L.issues.map(x=>`<div class="alertrow">${esc(x)}</div>`).join("")}</details>`:""}${(L.fixes||[]).length?`<div class="note" style="margin-top:4px">You had asked for: ${L.fixes.map(f=>esc(f.dept)).join(", ")}</div>`:""}</div><div class="spacer"></div><button class="btn warn" data-lock="revise">↩ Request changes</button><button class="btn approve" data-lock="go">✓ Approve &amp; lock</button></div>`
     :`<div class="lockban sub"><span class="lki">⏳</span><div><b>Submitted. Waiting for the admin to approve.</b><br><span class="note">Submitted ${fdt(L.submittedAt||L.at)}. You can't make changes while it's being reviewed.</span></div></div>`;
   if(st==="revise")return `<div class="lockban rev"><span class="lki">↩</span><div><b>The admin asked for changes${(L.fixes||[]).length?" in these departments":""}:</b>${fixesHTML(L)}<span class="note">${adm?"Waiting for the store to resubmit.":"Make the changes, then click <b>Resubmit to admin</b>."}</span></div>${adm?"":`<div class="spacer"></div><button class="btn primary" data-lock="submit">Resubmit to admin</button>`}</div>`;
   const now=new Date(),due=dueOf(S.week),end=addDays(S.week,7);if(now>=end)return"";const late=now>due;
   return `<div class="lockban due ${late?"late":""}"><span class="lki">📅</span><div><b>${late?"Late: this schedule was due":"Due"} ${due.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"long",month:"numeric",day:"numeric"})}</b><br><span class="note">${adm?"Not submitted by the store yet.":"When it's ready, click <b>Submit to admin</b>. You can't edit it after you submit unless the admin sends it back."}</span></div>${adm?"":`<div class="spacer"></div><button class="btn primary" data-lock="submit">Submit to admin</button>`}</div>`}
-function renderLock(){const el=$("#lockSlot");if(el)el.innerHTML=lockBannerHTML();if(S.tab==="dash")loadSubs()}
+function renderLock(){if(LOCK)loadRev();const el=$("#lockSlot");if(el)el.innerHTML=lockBannerHTML();if(S.tab==="dash")loadSubs()}
 function submitChecks(){const out=[];const groups=new Set();for(const p of Object.values(S.staff))if(p&&!p._pending&&p.store===S.store)gsetOf(p).forEach(G=>groups.add(G));
   for(const G of [...groups].sort((a,b)=>deptOrder(a)-deptOrder(b))){const o=openByDay(G);if(o){const n=o.reduce((a,b)=>a+b,0);if(n)out.push(`<b>${esc(G)}</b>: ${n} open spot${n===1?"":"s"} vs. staffing guide`)}}
   for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;const r=rowStats({id,...p});const m=limitMsgs(p,r.h,r.days);if(m.length)out.push(`<b>${esc(p.name)}</b>: ${m.map(esc).join(", ")}`)}
@@ -889,11 +891,11 @@ const statusDoc=(state,extra)=>({...(S.lock||{}),store:S.store,weekStart:ymd(S.w
 document.addEventListener("click",async e=>{const b=e.target.closest("[data-lock]");if(!b)return;const a=b.dataset.lock;const k=key();
   if(a==="submit"){const rows=pubSnapshot();if(!rows.length){toast("No shifts on this week yet.");return}const C=submitChecks();
     openModal(`<h3>Submit this schedule to the admin?</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)} (${rangeLabel(S.week)})</div>
-    ${C.length?`<div class="alertlist"><div class="alerthead">⚠ Check these first</div>${C.map(x=>`<div class="alertrow">${x}</div>`).join("")}</div><p class="note" style="margin:0">You can go back and fix them, or submit anyway.</p>`:`<div class="banner ok">✓ No problems found: every shift in the staffing guide is covered and hours are within the rules.</div>`}
+    ${C.length&&revOK()?`<div class="banner ok">✓ You reviewed the ${C.length} thing${C.length===1?"":"s"} flagged this week. The admin will see them marked as OK by you.</div>`:C.length?`<div class="alertlist"><div class="alerthead">⚠ Check these first</div>${C.map(x=>`<div class="alertrow">${x}</div>`).join("")}</div><p class="note" style="margin:0">You can go back and fix them, or submit anyway.</p>`:`<div class="banner ok">✓ No problems found: every shift in the staffing guide is covered and hours are within the rules.</div>`}
     <label class="field"><span>Notes for the admin (optional)</span><textarea id="subNote" style="min-height:70px;font-family:var(--f-body);font-size:15px" placeholder="e.g. Maria is on vacation Tue–Thu. We're short one cashier Saturday.">${esc((S.lock&&S.lock.storeNote)||"")}</textarea></label>
     <p class="note" style="margin:0">After you submit, you can't change this week unless the admin sends it back.</p>
     <div class="row"><div class="spacer"></div><button class="btn" data-close>${C.length?"Go back and fix":"Cancel"}</button><button class="btn primary" id="subYes">${C.length?"Submit anyway":"Submit to admin"}</button></div>`);
-    $("#subYes").onclick=async()=>{try{await backend.saveLock(k,statusDoc("submitted",{submittedAt:new Date().toISOString(),storeNote:$("#subNote").value.trim()}));closeModal();toast("Submitted. The admin will review it.")}catch(x){showErr(x)}};return}
+    $("#subYes").onclick=async()=>{try{await backend.saveLock(k,statusDoc("submitted",{submittedAt:new Date().toISOString(),storeNote:$("#subNote").value.trim(),issues:C.map(plain),reviewed:revOK()}));closeModal();toast("Submitted. The admin will review it.")}catch(x){showErr(x)}};return}
   if(a==="go"){const rows=pubSnapshot();if(!rows.length){toast("No shifts on this week yet.");return}
     openModal(`<h3>Approve and lock this week?</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)} (${rangeLabel(S.week)})</div>
     <p class="note" style="margin:0">This shares the schedule with employees and locks it, so the store can't change shifts or days off. You can unlock it anytime.</p>
@@ -1106,7 +1108,7 @@ function startHTML(){if(!S.store)return"";const h=new Date().getHours();const gr
   const checklist=`<div class="card startck"><div class="row"><div><h3 class="sec" style="margin:0"><span>This week's checklist</span></h3><div class="note"><span>Week</span> ${weekNo(S.week,S.cfg.wkOffset)} · ${rangeLabel(S.week)} · <span>due</span> ${dueTxt}</div></div><div class="spacer"></div>
       <button class="btn sm" data-hwk="prevWk">‹</button><button class="btn sm" data-hwk="dueWk">Week to submit</button><button class="btn sm" data-hwk="nextWk">›</button></div>
     ${item(n>0,"Build the schedule",n?`${n} shifts placed`:"No shifts yet for this week",n?"":`<button class="btn sm primary" data-sgo="build">Begin</button>`)}
-    ${item(n>0&&probs===0,"Fix any problems",!n?"Build the schedule first":probs?`${probs} thing${probs===1?"":"s"} to check (overtime, too many days, open spots)`:"Everything looks good",n&&probs?`<button class="btn sm" data-sgo="probs">Show me</button>`:"")}
+    ${(()=>{const rv=revOK();return item(n>0&&(probs===0||rv),"Fix any problems",!n?"Build the schedule first":probs?(rv?`Reviewed · ${probs} thing${probs===1?"":"s"} marked OK`:`${probs} thing${probs===1?"":"s"} to check (overtime, too many days, open spots)`):"Everything looks good",n&&probs?`<button class="btn sm ${rv?"":"primary"}" data-issues>${rv?"See list":"Show me"}</button>`:"")})()}
     ${st==="revise"?`<div class="ck rev"><span class="ckb">↩</span><div class="ckt"><b>The admin asked for changes</b>${fixesHTML(L)}</div></div>`:""}
     ${item(sent,"Submit to the admin",st==="approved"?"Approved by the admin":st==="submitted"?"Sent · waiting for the admin":st==="revise"?"Make the changes, then send it again":"Send it to the admin when it's ready",!sent&&n?`<button class="btn sm primary" data-lock="submit">${st==="revise"?"Resubmit":"Submit"}</button>`:"")}
     ${item(st==="approved","Share with employees",st==="approved"?"Employees can see it now":"Happens automatically once the admin approves",`<button class="btn sm" data-final="link">📲 Link</button>`)}
@@ -1122,7 +1124,24 @@ function startHTML(){if(!S.store)return"";const h=new Date().getHours();const gr
     !sent&&n?tile("✅","Submit to the admin","Send it to the admin when it's ready",'data-lock="submit"'):"",
     tile("📲","Share with employees","Get the link employees use to see it",'data-final="link"')].join("");
   return `<div class="hello"><h2><span>${greet}</span>, ${esc(S.store)}! 👋</h2></div>${checklist}<div class="hsec"><span>What would you like to do?</span></div><div class="stiles">${tiles}</div>`}
-function renderStart(){const el=$("#startSlot");if(!el)return;if(S.tab!=="start"){el.innerHTML="";return}el.innerHTML=startHTML()}
+function renderStart(){const el=$("#startSlot");if(!el)return;if(S.tab!=="start"){el.innerHTML="";return}loadRev();el.innerHTML=startHTML()}
+/* ---------- problems review ---------- */
+const REV={k:null,doc:null,loading:false};
+const plain=h=>{const d=document.createElement("div");d.innerHTML=h;return d.textContent};
+function issueSig(){return submitChecks().map(plain).join("|")}
+function revOK(){return !!(REV.k===key()&&REV.doc&&REV.doc.sig===issueSig())}
+async function loadRev(force){const k=key();if(!S.store||!backend||!backend.getRev||(!force&&(REV.k===k||REV.loading)))return;REV.loading=true;try{const d=await backend.getRev(k);REV.k=k;REV.doc=d}catch(e){REV.k=k;REV.doc=null}finally{REV.loading=false}if(S.tab==="start")renderStart()}
+function issuesModal(){const C=submitChecks();const rv=revOK();const staff=C.filter(x=>/open spot/.test(x)),hrs=C.filter(x=>!/open spot/.test(x));
+  const sec=(t,sub,list)=>list.length?`<div class="isec2"><div class="ptitle">${t}</div><div class="note" style="margin:-2px 0 6px">${sub}</div>${list.map(x=>`<div class="alertrow">${x}</div>`).join("")}</div>`:"";
+  openModal(`<h3>Things to check this week</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)} (${rangeLabel(S.week)})</div>
+    ${C.length?`<div class="alertlist">${sec("Hours & days","Overtime, too many days, or over someone's hour limit.",hrs)}${sec("Staffing","Fewer people than the staffing guide asks for.",staff)}</div>
+    <p class="note" style="margin:0">These aren't always mistakes. Fix what you can on the schedule. If what's left is OK (for example, approved overtime), click <b>Mark as reviewed</b>. The admin will see that you checked them.</p>
+    ${rv?`<div class="banner ok">✓ You marked these as reviewed ${REV.doc.at?fdt(REV.doc.at):""}.</div>`:""}`:`<div class="banner ok">✓ Nothing to check. Everything looks good.</div>`}
+    <div class="row"><div class="spacer"></div>${rv?`<button class="btn" id="revUndo">Undo reviewed</button>`:""}<button class="btn" id="revFix">Go fix on the schedule</button>${C.length&&!rv?`<button class="btn primary" id="revOk">✓ Mark as reviewed</button>`:""}</div>`,true);
+  const f=$("#revFix");if(f)f.onclick=()=>{closeModal();S.tab="schedule";S.dept="__all";savePrefs();renderAll();window.scrollTo({top:0})};
+  const o=$("#revOk");if(o)o.onclick=async()=>{const doc={store:S.store,weekStart:ymd(S.week),sig:issueSig(),list:C.map(plain),at:new Date().toISOString()};REV.k=key();REV.doc=doc;closeModal();toast("Marked as reviewed");renderAll();await backend.saveRev(key(),doc)};
+  const u=$("#revUndo");if(u)u.onclick=async()=>{REV.doc=null;closeModal();renderAll();await backend.saveRev(key(),null)}}
+document.addEventListener("click",e=>{if(e.target.closest("[data-issues]"))issuesModal()});
 document.addEventListener("click",e=>{const b=e.target.closest("[data-sgo]");if(!b)return;const g=b.dataset.sgo;
   if(g==="build"){W.step=0;S.tab="build"}else if(g==="probs"){S.tab="schedule";S.dept="__all"}else if(g==="print"){S.tab="schedule";savePrefs();renderAll();setTimeout(()=>{const p=$("#printBtn");if(p)p.click()},50);return}else S.tab=g;
   savePrefs();renderAll();window.scrollTo({top:0});if(g==="probs")setTimeout(()=>{const d=document.querySelector("#issuesSlot details,#gridSlot .totbad");if(d&&d.scrollIntoView)d.scrollIntoView({behavior:"smooth",block:"center"})},100)});
@@ -2660,6 +2679,7 @@ const DAY_ES={Sun:"Dom",Mon:"Lun",Tue:"Mar",Wed:"Mié",Thu:"Jue",Fri:"Vie",Sat:"
 const DAYL_ES={Sunday:"Domingo",Monday:"Lunes",Tuesday:"Martes",Wednesday:"Miércoles",Thursday:"Jueves",Friday:"Viernes",Saturday:"Sábado",Sundays:"domingos",Mondays:"lunes",Tuesdays:"martes",Wednesdays:"miércoles",Thursdays:"jueves",Fridays:"viernes",Saturdays:"sábados"};
 const MON_ES={Jan:"ene",Feb:"feb",Mar:"mar",Apr:"abr",May:"may",Jun:"jun",Jul:"jul",Aug:"ago",Sep:"sep",Oct:"oct",Nov:"nov",Dec:"dic"};
 const ES={
+"Things to check this week":"Cosas por revisar esta semana","Hours & days":"Horas y días","Overtime, too many days, or over someone's hour limit.":"Tiempo extra, demasiados días o más del límite de horas de alguien.","Staffing":"Personal","Fewer people than the staffing guide asks for.":"Menos personas de las que pide la guía de personal.","Go fix on the schedule":"Ir a corregir en el horario","✓ Mark as reviewed":"✓ Marcar como revisado","Undo reviewed":"Quitar revisado","See list":"Ver lista","✓ Nothing to check. Everything looks good.":"✓ Nada por revisar. Todo se ve bien.","Marked as reviewed":"Marcado como revisado",
 "employees":"empleados","working":"trabajando","hours":"horas","due":"entrega","Employee link":"Enlace para empleados","📲 Employee link":"📲 Enlace para empleados","Late · not submitted":"Tarde · no enviado","Not submitted yet":"Todavía no enviado","Submitted · waiting":"Enviado · esperando","Changes requested":"Piden cambios","Approved & locked":"Aprobado y bloqueado",
 "No shifts yet for this week":"Todavía no hay turnos esta semana","Build the schedule first":"Primero haz el horario","Everything looks good":"Todo se ve bien","Show me":"Muéstrame","Begin":"Empezar","Submit":"Enviar","Resubmit":"Reenviar","📲 Link":"📲 Enlace",
 "Happens automatically once the admin approves":"Pasa automáticamente cuando el administrador aprueba","Employees can see it now":"Los empleados ya lo pueden ver","Approved by the admin":"Aprobado por el administrador","Sent · waiting for the admin":"Enviado · esperando al administrador","Make the changes, then send it again":"Haz los cambios y envíalo otra vez","The admin asked for changes":"El administrador pidió cambios",
@@ -2705,6 +2725,7 @@ const ES={
 "Saved for everyone with this link":"Guardado para todos con este enlace","Loading…":"Cargando…","Search results":"Resultados","Clear search":"Borrar búsqueda","Tap a department or person to show only that department.":"Toca un departamento o persona para ver solo ese departamento."
 };
 const ES_RE=[
+[/^Reviewed · (\d+) things? marked OK$/,"Revisado · $1 marcados como OK"],
 [/^(\d+) shifts placed$/,"$1 turnos puestos"],[/^(\d+) things? to check \(overtime, too many days, open spots\)$/,"$1 cosas por revisar (tiempo extra, demasiados días, lugares abiertos)"],[/^due (.+)$/,"entrega $1"],
 [/^(\d+(?:\.\d+)?) hours: over 40 \(overtime\)$/,"$1 horas: más de 40 (tiempo extra)"],
 [/^(\d+(?:\.\d+)?) hours: over their (\d+(?:\.\d+)?)-hour limit$/,"$1 horas: más de su límite de $2 horas"],
