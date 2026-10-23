@@ -28,7 +28,7 @@
 .sh-pick select{font-family:var(--f-display);font-size:24px;font-weight:800;color:#1f5e23;background:#fff;border:0;border-radius:10px;padding:5px 10px;min-height:44px;cursor:pointer}
 .sh-wk{font-size:14px;color:#e3f1e4}.sh-stats{display:flex;gap:10px;flex-wrap:wrap;flex:1}.sh-stats>div{background:rgba(255,255,255,.12);border-radius:12px;padding:8px 14px;display:flex;flex-direction:column;min-width:82px}
 .sh-stats b{font-family:var(--f-display);font-size:24px;line-height:1.1}.sh-stats b.sh-due{font-size:17px;padding-top:4px}.sh-stats span{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#cfe6d1;font-weight:700}
-.sh-st .spill{font-size:14px;padding:6px 14px}
+.sh-st .spill{font-size:14px;padding:6px 14px}.sh-st{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.sh-link{background:#FEC938;color:#3d2e00;border-color:#FEC938;font-weight:700}.sh-link:hover{background:#ffd75e}
 #storeNav{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px;gap:6px;flex-wrap:wrap}#storeNav .navbig{border:0;box-shadow:none;background:transparent;min-height:46px;font-size:16px}#storeNav .navbig[aria-selected="true"]{background:var(--brand);color:#fff}#storeNav .navbig:not([aria-selected="true"]):hover{background:var(--surface2)}
 #storeNav .navsp{flex:1}
 #mainBar #schedActions{flex-basis:100%;border-top:1px solid var(--line);padding-top:10px;margin-top:2px}
@@ -1038,9 +1038,15 @@ function storeHeroHTML(){if(!S.store)return"";const adm=isAdm();const st=stState
   return `<div class="shero"><div class="sh-l">${adm?`<label class="sh-pick"><span>Store</span><select id="svStore">${S.cfg.stores.map(x=>`<option ${x===S.store?"selected":""}>${esc(x)}</option>`).join("")}</select></label>`:`<div class="sh-k">Store</div><h2 class="sh-name">${esc(S.store)}</h2>`}
     <div class="sh-wk"><b>Week ${weekNo(S.week,S.cfg.wkOffset)}</b> · ${rangeLabel(S.week)}</div></div>
     <div class="sh-stats"><div><b>${roster.length}</b><span>employees</span></div><div><b>${working}</b><span>working</span></div><div><b>${fmtH(Math.round(hrs*10)/10)}</b><span>hours</span></div><div><b class="sh-due">${dueTxt}</b><span>due</span></div></div>
-    <div class="sh-st"><span class="spill ${lab[1]} ${late?"sp-late":""}">${lab[0]}</span></div></div>`}
+    <div class="sh-st"><button class="btn sh-link" data-final="link">📲 Employee link</button><span class="spill ${lab[1]} ${late?"sp-late":""}">${lab[0]}</span></div></div>`}
 function renderHero(){const el=$("#storeHero");if(!el)return;const show=["schedule","build","staff","sum"].includes(S.tab)&&!!S.store;el.hidden=!show;if(!show)return;
   if(el.contains(document.activeElement))return;el.innerHTML=storeHeroHTML();const sv=$("#svStore");if(sv)sv.onchange=()=>{S.store=sv.value;S.dept="__all";savePrefs();renderAll();resub()}}
+
+/* ---------- employee link buttons ---------- */
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-final]");if(!b)return;const a=b.dataset.final;
+  if(a==="info"||a==="link"){shareModal(a==="info"?"This week is approved and shared":"Employee schedule link");return}
+  if(a==="copy"){const l=staffLink(S.store);try{await navigator.clipboard.writeText(l);toast("Link copied")}catch(x){const i=$("#shareLink");if(i){i.select();document.execCommand("copy");toast("Link copied")}}return}
+  if(a==="unpub"){if(!confirm("Take this week off the employee page?"))return;try{await backend.delPub(key());S.pub=null;closeModal();toast("Taken down. Employees won't see this week.")}catch(x){showErr(x)}return}});
 
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAYS_ES=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
