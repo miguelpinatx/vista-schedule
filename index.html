@@ -527,6 +527,12 @@ span.short{color:var(--bad-fg);font-weight:700}span.over{color:#08507f;font-weig
 .cbtn.offauto{background:#f1eff5;color:#5c566b}.cbtn.offauto .t{font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:12px}.cbtn.offauto .av{font-size:11px}.nchip.unsched:hover{border-color:var(--brand);border-style:solid}
 .nchip .ct2{display:block;font-size:10.5px;font-weight:500;opacity:.8}
 .btn.offbtn{background:#f1eff5;border-color:#d9d4e2;color:#4b4459;font-weight:800;letter-spacing:.05em;min-width:120px}
+td.tot .dys{font-size:12px;color:var(--muted);font-weight:600}td.tot .hrs small{font-size:11px;color:var(--muted)}
+td.tot.totbad{background:var(--bad-bg)}td.tot.totbad .hrs,td.tot.totbad .dys{color:var(--bad-fg)}td.tot.totlow{background:#fff6dc}
+tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
+.esum{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0}
+.echip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:99px;padding:4px 10px;font-size:13px;font-variant-numeric:tabular-nums}
+.echip span{color:var(--muted);font-weight:600}.echip.bad{background:var(--bad-bg);border-color:var(--bad-line)}.echip.bad span,.echip.bad b{color:var(--bad-fg)}.echip.low{background:#fff6dc;border-color:#ecd48a}
 .lnkbtn{border:0;background:none;color:var(--brand);font-weight:600;text-decoration:underline;cursor:pointer;padding:0 4px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -1108,7 +1114,7 @@ function renderControls(){
   if(S.dept!=="__all"&&S.dept!==FE&&!S.cfg.depts.includes(S.dept))S.dept="__all";ds.value=S.dept;
   $("#weekLbl").innerHTML=`Week ${weekNo(S.week,S.cfg.wkOffset)}<small>${rangeLabel(S.week)}</small>`;
   $("#jumpDate").value=ymd(S.week);
-  document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));
+  document.querySelectorAll(".tabs button[data-tab]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));
   if(!S.canEdit&&(S.tab==="guide"||S.tab==="settings"))S.tab="build";if(LOCK&&S.tab==="dash")S.tab="build";$("#tab-dash").hidden=!!LOCK;
   ["build","schedule","staff","sum","dash","guide","settings"].forEach(t=>$("#view-"+t).hidden=t!==S.tab);
   $("#tab-guide").hidden=!S.canEdit;$("#tab-settings").hidden=!S.canEdit;
@@ -1178,7 +1184,7 @@ function renderGrid(){renderSum();renderPay();renderLock();
   const today=ymd(new Date());
   let h=elsewhereHTML()+`<div class="gridbox"><table class="grid"><thead><tr><th class="who">Employee</th>`;
   for(let d=0;d<7;d++){const dt=addDays(S.week,d);h+=`<th class="${ymd(dt)===today?"today":""}">${DAYS[d]}<span class="d">${dt.getMonth()+1}/${dt.getDate()}</span></th>`}
-  h+=`<th>Hours</th></tr></thead><tbody>`;
+  h+=`<th>Days · Hours</th></tr></thead><tbody>`;
   const dayCount=[0,0,0,0,0,0,0],dayHrs=[0,0,0,0,0,0,0];let total=0;
   const depts=[...new Set(list.flatMap(s=>S.dept==="__all"?gsetOf(s):[grp(S.dept)]))].sort((a,b)=>deptOrder(a)-deptOrder(b));
   for(const dept of depts){
@@ -1197,7 +1203,7 @@ function renderGrid(){renderSum();renderPay();renderLock();
         if(v&&v.s&&!v.off)cls=cellCls(f,v)+(shG(st,v)!==dept?" oth":"");
         h+=`<td class="cell"><button class="cbtn ${cls}" data-sid="${st.id}" data-d="${d}" data-g="${esc(dept)}" ${S.readOnly?"disabled":""} aria-label="${esc(st.name)}, ${DAYS_LONG[d]}">${inner}</button></td>`;
       }
-      total+=here;h+=`<td class="tot"><div class="hrs">${fmtH(r.h)}</div>${gsetOf(st).length>1?`<div class="meta">${fmtH(here)} h in ${esc(dept)}</div>`:""}<div class="flags">${r.flags.map(([t,c])=>`<span class="flag ${c}">${t}</span>`).join("")}</div></td></tr>`;
+      total+=here;const lm=limitMsgs(st,r.h,r.days);h+=`<td class="tot ${lm.length?"totbad":st.type==="FT"&&r.h<30?"totlow":""}"><div class="hrs">${fmtH(r.h)}<small> h</small></div><div class="dys">${r.days} ${r.days===1?"day":"days"}</div>${gsetOf(st).length>1?`<div class="meta">${fmtH(here)} h in ${esc(dept)}</div>`:""}<div class="flags">${r.flags.filter(f=>!/ days$/.test(f[0])).map(([t,c])=>`<span class="flag ${c}">${t}</span>`).join("")}</div></td></tr>`;
     }
   }
   h+=`</tbody></table></div><p class="note" style="margin:6px 2px">Totals by day, shift and department are on the <b>Summary</b> tab.</p>`;
@@ -1666,6 +1672,8 @@ function shiftGridHTML(noCov){
     });
     h+=`<tr class="cov"><td class="who"><div class="nm">Off</div><div class="meta">Drag a name up onto a shift</div></td>${offs.map((o,d)=>{const free=people.filter(st=>!cellVal(st.id,d)&&availOf(st,d).mode!=="no"&&matchQ(st.name)).sort((a,b)=>a.name.localeCompare(b.name));
       return `<td class="scell offcell" data-drop="off" data-dept="${esc(dept)}" data-d="${d}"><div class="slist">${o.filter(st=>matchQ(st.name)).map(st=>`<button class="nchip unsched" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":`draggable="true" data-drag="req"`} title="Day off">${dot(st.id)}${hl(st.name)}<span class="ct2">Off</span></button>`).join("")}${free.map(st=>`<button class="nchip unsched" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":`draggable="true" data-drag="off"`} title="Off (no shift yet). Drag onto a shift, or tap to pick one.">${dot(st.id)}${hl(st.name)}<span class="ct2">Off</span></button>`).join("")}</div></td>`}).join("")}</tr>`;
+    h+=`<tr class="empsum"><td class="who"><div class="nm">Days · hours</div><div class="meta">This week, per person</div></td><td colspan="7"><div class="esum">${people.filter(st=>matchQ(st.name)).map(st=>{const r=rowStats(st);const lm=limitMsgs(st,r.h,r.days);const low=st.type==="FT"&&r.h<30;
+      return `<span class="echip ${lm.length?"bad":low?"low":""}" title="${esc(lm.length?lm.join(" · "):low?"Full-time under 30 hours":"")}">${dot(st.id)}<b>${esc(st.name)}</b><span>${r.days}d</span><span>${fmtH(r.h)}h</span></span>`}).join("")}</div></td></tr>`;
   }
   if(!depts.length)h+=`<tr><td colspan="8" style="padding:24px;color:var(--muted)">No staff in this view.</td></tr>`;
   h+=`</tbody></table></div>`;
@@ -2297,7 +2305,7 @@ document.addEventListener("click",e=>{
   const dd=e.target.closest("[data-deld]");if(dd){const p=[...S.cfg.depts];p.splice(+dd.dataset.deld,1);backend.saveCfg({...S.cfg,depts:p}).catch(showErr);return}
   const dsb=e.target.closest("[data-dels]");if(dsb){if(S.cfg.stores.length<2){toast("Keep at least one store.");return}const p=[...S.cfg.stores];p.splice(+dsb.dataset.dels,1);backend.saveCfg({...S.cfg,stores:p}).catch(showErr);return}
 });
-document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{S.tab=b.dataset.tab;savePrefs();renderAll()});
+document.querySelectorAll(".tabs button[data-tab]").forEach(b=>b.onclick=()=>{S.tab=b.dataset.tab;savePrefs();renderAll()});
 $("#storeSel").onchange=e=>{if(S.gDraft&&S.gDraft.dirty){S.gDraft.dirty=false;toast("Unsaved guide changes were discarded.")}S.store=e.target.value;savePrefs();renderAll();resub()};
 $("#deptSel").onchange=e=>{if(S.gDraft&&S.gDraft.dirty){S.gDraft.dirty=false;toast("Unsaved guide changes were discarded.")}S.dept=e.target.value;savePrefs();renderAll()};
 $("#searchIn").addEventListener("input",e=>{S.q=e.target.value.trim();renderGrid();renderStaff()});
@@ -2428,7 +2436,7 @@ const ES={
 "Matches availability":"Dentro de su disponibilidad","Outside availability":"Fuera de su disponibilidad","Day off":"Día libre","Not available that day":"No disponible ese día","Color: availability":"Color: disponibilidad","Color: time of day":"Color: hora del día","By employee":"Por empleado","By shift":"Por turno",
 "Morning (before 10a)":"Mañana (antes de 10a)","Mid (10a–2p)":"Medio (10a–2p)","Afternoon / close (2p+)":"Tarde / cierre (2p+)","Red border = outside availability":"Borde rojo = fuera de su disponibilidad",
 "Click any day to set a shift. Under each department:":"Haz clic en un día para poner un turno. Debajo de cada departamento:","Under each department:":"Debajo de cada departamento:","red = short staffed":"rojo = falta personal","blue = over staffed":"azul = personal de más","vs. the staffing guide.":"según la guía de personal.","Click any day to set a shift.":"Haz clic en un día para poner un turno.","Drag names between shifts and Off.":"Arrastra nombres entre turnos y Libre.","Requested off":"Pidió libre","Click + Add to fill a shift, or a name to change it.":"Haz clic en + Agregar para llenar un turno, o en un nombre para cambiarlo.",
-"Employee":"Empleado","Hours":"Horas","Shift":"Turno","Name":"Nombre","Days":"Días","Check":"Revisión","OK":"OK","Any time":"Cualquier hora","Unavailable":"No disponible","Can't work":"No puede","Can't":"No puede","Certain hours":"Ciertas horas","Day off this week":"Día libre esta semana","OFF":"LIBRE","Off":"Libre",
+"Employee":"Empleado","Hours":"Horas","Shift":"Turno","Name":"Nombre","Days":"Días","Days · Hours":"Días · Horas","Days · hours":"Días · horas","This week, per person":"Esta semana, por persona","day":"día","days":"días","Full-time under 30 hours":"Tiempo completo con menos de 30 horas","Check":"Revisión","OK":"OK","Any time":"Cualquier hora","Unavailable":"No disponible","Can't work":"No puede","Can't":"No puede","Certain hours":"Ciertas horas","Day off this week":"Día libre esta semana","OFF":"LIBRE","Off":"Libre",
 "Staffed vs. guide":"Personal vs. guía","vs. staffing guide":"según la guía","✓ matches staffing guide":"✓ cumple con la guía","Total hours":"Total de horas","+ Add":"+ Agregar","Covered":"Cubierto","person":"persona","people":"personas",
 "Week & department":"Semana y departamento","Your team":"Tu equipo","Set or rotating":"Fijo o rotativo","Availability this week":"Disponibilidad esta semana","Place shifts":"Asignar turnos","Review & print":"Revisar e imprimir","← Back":"← Atrás","Finish":"Terminar",
 "Which week and department are you scheduling?":"¿Qué semana y departamento vas a programar?","1. Store":"1. Tienda","2. Week":"2. Semana","3. Department":"3. Departamento","‹ Previous":"‹ Anterior","Next ›":"Siguiente ›",
@@ -2479,7 +2487,7 @@ const ES_RE=[
 [/^Tap a name to put them on this shift\. Hours include this shift\.$/,"Toca un nombre para ponerlo en este turno. Las horas incluyen este turno."],
 [/^ · Tap a name to put them on this shift\. Hours include this shift\.$/," · Toca un nombre para ponerlo en este turno. Las horas incluyen este turno."],
 [/^(\d+) (people|person)$/,m=>m[1]+" "+(m[2]==="person"?"persona":"personas")],
-[/^(\d+) short$/,"faltan $1"],[/^(\d+) over$/,"$1 de más"],[/^Need (\d+) more$/,"Faltan $1"],[/^Need (\d+)$/,"Faltan $1"],[/^\+(\d+) over$/,"+$1 de más"],[/^of (\d+)$/,"de $1"],[/^Summary · (.+)$/,"Resumen · $1"],[/^(.+) is marked OFF on (\w+)$/,m=>m[1]+" está LIBRE el "+(DAYL_ES[m[2]]||m[2])],[/^Submitted (.+)\. You can't make changes while it's being reviewed\.$/,"Enviado $1. No puedes hacer cambios mientras se revisa."],[/^Late: this schedule was due (.+)$/,"Atrasado: este horario vencía el $1"],[/^Due (.+)$/,"Vence el $1"],[/^Approved (.+) at (.+)\. (.+)$/,m=>"Aprobado "+m[1]+" a las "+m[2]+". "+(ES[m[3]]||m[3])],[/^of (\d+) on the team$/,"de $1 en el equipo"],[/^(.+) asked for (\w+) off$/,m=>m[1]+" pidió el "+(DAYL_ES[m[2]]||m[2])+" libre"],[/^(.+) is off (\w+)$/,m=>m[1]+" libre el "+(DAYL_ES[m[2]]||m[2])],[/^Replaced their (.+) shift that day$/,"Se reemplazó su turno de $1 ese día"],
+[/^(\d+) short$/,"faltan $1"],[/^(\d+) over$/,"$1 de más"],[/^Need (\d+) more$/,"Faltan $1"],[/^Need (\d+)$/,"Faltan $1"],[/^\+(\d+) over$/,"+$1 de más"],[/^of (\d+)$/,"de $1"],[/^Summary · (.+)$/,"Resumen · $1"],[/^(\d+) days?$/,m=>m[1]+(m[1]==="1"?" día":" días")],[/^(.+) is marked OFF on (\w+)$/,m=>m[1]+" está LIBRE el "+(DAYL_ES[m[2]]||m[2])],[/^Submitted (.+)\. You can't make changes while it's being reviewed\.$/,"Enviado $1. No puedes hacer cambios mientras se revisa."],[/^Late: this schedule was due (.+)$/,"Atrasado: este horario vencía el $1"],[/^Due (.+)$/,"Vence el $1"],[/^Approved (.+) at (.+)\. (.+)$/,m=>"Aprobado "+m[1]+" a las "+m[2]+". "+(ES[m[3]]||m[3])],[/^of (\d+) on the team$/,"de $1 en el equipo"],[/^(.+) asked for (\w+) off$/,m=>m[1]+" pidió el "+(DAYL_ES[m[2]]||m[2])+" libre"],[/^(.+) is off (\w+)$/,m=>m[1]+" libre el "+(DAYL_ES[m[2]]||m[2])],[/^Replaced their (.+) shift that day$/,"Se reemplazó su turno de $1 ese día"],
 [/^of (\d+) (answered|checked)$/,m=>"de "+m[1]+" "+(m[2]==="answered"?"contestados":"revisados")],
 [/^(\d+) shifts$/,"$1 turnos"],[/^Total · (\d+) people$/,"Total · $1 personas"],[/^(\d+) ppl$/,"$1 pers."],
 [/^\/ (\S+) max$/,"/ $1 máx."],
