@@ -10,7 +10,16 @@
 .btab{border-collapse:collapse;width:100%;min-width:640px}.btab th,.btab td{padding:6px 5px;text-align:center;border-bottom:1px solid var(--line);font-size:14px}.btab th{font-size:12px;color:var(--muted);text-transform:uppercase}.btab td:first-child{text-align:left;font-weight:600;white-space:nowrap}
 .btab input{width:100%;min-width:70px;max-width:110px;text-align:right}
 .issues summary{cursor:pointer;list-style:revert}.issues .isec{margin-top:8px}.iitem{padding:6px 8px;border-left:3px solid var(--warn-fg);background:var(--surface2);border-radius:6px;margin-top:4px;cursor:default}.iitem.bad{border-left-color:var(--bad-fg)}.iitem[data-tdept]{cursor:pointer}.issues.ok{border-color:var(--good-line);background:var(--good-bg)}
-#budgetSlot,#issuesSlot{margin-bottom:10px}@media print{#budgetSlot,#issuesSlot{display:none}}</style>
+#budgetSlot,#issuesSlot{margin-bottom:10px}@media print{#budgetSlot,#issuesSlot{display:none}}
+.fixlist{margin:6px 0 2px;display:flex;flex-direction:column;gap:4px}.fixrow{background:#fff;border:1px solid var(--bad-line);border-left:4px solid var(--bad-fg);border-radius:8px;padding:6px 10px;font-size:15px}
+.revdepts{display:flex;flex-direction:column;gap:6px;max-height:44vh;overflow:auto}.revd{border:1px solid var(--line);border-radius:10px;padding:8px 10px}.revchk{display:flex;gap:8px;align-items:center;font-weight:700;font-size:15px;cursor:pointer}.revchk input{width:20px;height:20px}
+.revd textarea{width:100%;box-sizing:border-box;margin-top:6px;min-height:52px;font-family:var(--f-body);font-size:15px}
+#storeNav.subnav{margin-top:-4px;padding-top:8px;border-top:1px dashed var(--line)}#storeNav.subnav .navbig{font-size:15px;min-height:42px;padding:8px 14px}
+.svpick{display:flex;flex-direction:column;gap:2px;margin-right:8px;font-weight:700}.svpick span{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}.svpick select{font-size:17px;font-weight:700;padding:8px 10px;border-radius:10px;border:2px solid var(--brand);min-height:44px}
+.stcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin:0 0 14px}.stcard{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;cursor:pointer;text-align:left;font:inherit;color:inherit}.stcard:hover{border-color:var(--brand)}.stcard h3{margin:0;font-size:20px}.stcard .note{margin:0}.stcard.sub{border-color:#e0a800;background:#fffbea}
+.homehead{display:flex;align-items:flex-end;gap:12px;margin:0 0 10px}.homehead h2{margin:0}
+details.dsumwrap{margin-top:6px}details.dsumwrap>summary{cursor:pointer;font-weight:700;font-size:16px;padding:10px 0;list-style:revert}
+</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
 <script>const SUPABASE_URL="https://httiqzrqpwfqpgctlmey.supabase.co";const SUPABASE_ANON_KEY="sb_publishable_hk5V9IDwfCfQPSJKJqaBeg_Bq_QX7vi";
 window.SUPABASE_URL=SUPABASE_URL;window.SUPABASE_ANON_KEY=SUPABASE_ANON_KEY;</script>
@@ -414,26 +423,27 @@ tr.sumg td{background:var(--surface2);font-weight:700;font-size:13px;text-transf
 /* Print layout (also used for the saved printable file) */
 #printArea{display:none}
 .pv{background:#fff;color:#000;font-family:var(--f-body);padding:8px}
-.pv h1{font-family:var(--f-display);font-size:24px;margin:0}
-.pv .ph{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #000;padding-bottom:6px;margin-bottom:8px}
-.pv table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px;page-break-inside:auto}
-.pv th,.pv td{border:1px solid #000;padding:4px 5px;text-align:center}
+.pv h1{font-family:var(--f-display);font-size:32px;margin:0}
+.pv .ph{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #000;padding-bottom:6px;margin-bottom:10px;font-size:16px}
+.pv table{width:100%;border-collapse:collapse;font-size:16px;margin-bottom:10px;page-break-inside:auto}
+.pv th,.pv td{border:1.5px solid #000;padding:7px 8px;text-align:center}
+.pv th{font-size:16px}
 .pv th{background:#e6e6e6}
 .pv td.n{text-align:left;font-weight:600}
 .pv td.o{background:#000;color:#fff;font-weight:700}
 .pv,.pv *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .pv td.e{background:#e6e6e6 repeating-linear-gradient(135deg,transparent 0 6px,#b5b5b5 6px 7px)}
-.pv td.names{text-align:left;vertical-align:top;font-size:12px;line-height:1.35}
-.pv td.names .ct{font-size:10.5px;color:#333}
+.pv td.names{text-align:left;vertical-align:top;font-size:16px;line-height:1.45}
+.pv td.names .ct{font-size:13px;color:#333}
 .pv table.ps td.n{vertical-align:top;white-space:nowrap}
-.pv tr.g td{background:#d0d0d0;text-align:left;font-weight:800;font-family:var(--f-display);font-size:14px}
-.pv .sig{display:flex;gap:40px;margin-top:14px;font-size:12px}
+.pv tr.g td{background:#d0d0d0;text-align:left;font-weight:800;font-family:var(--f-display);font-size:18px}
+.pv .sig{display:flex;gap:40px;margin-top:22px;font-size:15px}
 .pv .pg{page-break-after:always;break-after:page;padding-bottom:18px}
 .pv .pg:last-child{page-break-after:auto;break-after:auto}
-.pv .ph h1{font-size:26px}
+.pv .ph h1{font-size:34px}
 .pv .duties{border:1.5px solid #000;border-radius:4px;padding:6px 10px;margin-top:8px;page-break-inside:avoid;break-inside:avoid}
-.pv .duties .dh{font-family:var(--f-display);font-weight:800;font-size:14px;border-bottom:1px solid #000;margin-bottom:4px;padding-bottom:2px}
-.pv .duties .dcols{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:4px 16px;font-size:11.5px}
+.pv .duties .dh{font-family:var(--f-display);font-weight:800;font-size:17px;border-bottom:1px solid #000;margin-bottom:4px;padding-bottom:2px}
+.pv .duties .dcols{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:4px 16px;font-size:14px}
 .pv .duties ul{margin:2px 0 0;padding-left:16px}.pv .duties li{margin:1px 0}
 .pv .sig span{border-top:1px solid #000;padding-top:3px;min-width:220px}
 @media print{
@@ -545,7 +555,13 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
     </div>
     <div class="langtog" role="group" aria-label="Language"><button data-lang="en" aria-pressed="true">English</button><button data-lang="es" aria-pressed="false">Español</button></div>
   </header>
-  <nav class="tabs mainnav" role="tablist">
+  <nav class="tabs mainnav admnav" id="admNav" role="tablist" hidden>
+      <button role="tab" data-atab="dash" class="navbig"><span class="ni" aria-hidden="true">🏠</span>Home</button>
+      <button role="tab" data-atab="store" class="navbig"><span class="ni" aria-hidden="true">🏪</span>Store view</button>
+      <button role="tab" data-atab="guide" class="navbig"><span class="ni" aria-hidden="true">📐</span>Staffing guide</button>
+      <button role="tab" data-atab="settings" class="navbig"><span class="ni" aria-hidden="true">⚙️</span>Settings</button>
+  </nav>
+  <nav class="tabs mainnav" id="storeNav" role="tablist">
       <button role="tab" id="tab-schedule" aria-selected="true" data-tab="schedule" class="navbig"><span class="ni" aria-hidden="true">📅</span>See full schedule</button>
       <button role="tab" id="tab-build" aria-selected="false" data-tab="build" class="navbig"><span class="ni" aria-hidden="true">✏️</span>Build schedule</button>
       <button role="tab" id="tab-staff" aria-selected="false" data-tab="staff" class="navbig"><span class="ni" aria-hidden="true">👥</span>Staff &amp; availability</button>
@@ -631,7 +647,7 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
 
   <section id="view-dash" class="panel" hidden>
     <div id="subSlot"></div>
-    <div id="dashSlot"></div>
+    <details class="dsumwrap"><summary>Staffing summary · all stores (hours, open spots)</summary><div id="dashSlot"></div></details>
   </section>
 
   <section id="view-guide" class="panel" hidden>
@@ -797,9 +813,9 @@ function watchLock(){if(unsubLock){unsubLock();unsubLock=null}if(!backend||!back
   unsubLock=backend.subLock(k,d=>{if(k!==key())return;S.lock=d||null;if(lockedForMe())LOCKED.add(k);else LOCKED.delete(k);S.readOnly=lockedForMe();renderAll();updFinal();SUBS.at=0})}
 function lockBannerHTML(){if(!S.store||!(S.tab==="schedule"||S.tab==="build"))return"";const st=stState(),adm=isAdm(),L=S.lock||{};
   if(st==="approved")return `<div class="lockban"><span class="lki">🔒</span><div><b>This week is approved and locked.</b><br><span class="note">Approved ${fdt(L.approvedAt||L.at)}. ${adm?"Unlock it to make changes.":"Shifts can't be changed. Ask the admin if something needs to change."}</span></div>${adm?`<div class="spacer"></div><button class="btn" data-lock="unlock">Unlock</button>`:""}</div>`;
-  if(st==="submitted")return adm?`<div class="lockban sub"><span class="lki">⏳</span><div><b>${esc(S.store)} submitted this week for approval.</b><br><span class="note">Submitted ${fdt(L.submittedAt||L.at)}. Review it, then approve it or ask for changes.</span></div><div class="spacer"></div><button class="btn warn" data-lock="revise">↩ Request changes</button><button class="btn approve" data-lock="go">✓ Approve &amp; lock</button></div>`
+  if(st==="submitted")return adm?`<div class="lockban sub"><span class="lki">⏳</span><div><b>${esc(S.store)} submitted this week for approval.</b><br><span class="note">Submitted ${fdt(L.submittedAt||L.at)}. Review it, then approve it or ask for changes.</span>${L.storeNote?`<div class="revnote"><b>Store's note:</b> <span translate="no">“${esc(L.storeNote)}”</span></div>`:""}${(L.fixes||[]).length?`<div class="note" style="margin-top:4px">You had asked for: ${L.fixes.map(f=>esc(f.dept)).join(", ")}</div>`:""}</div><div class="spacer"></div><button class="btn warn" data-lock="revise">↩ Request changes</button><button class="btn approve" data-lock="go">✓ Approve &amp; lock</button></div>`
     :`<div class="lockban sub"><span class="lki">⏳</span><div><b>Submitted. Waiting for the admin to approve.</b><br><span class="note">Submitted ${fdt(L.submittedAt||L.at)}. You can't make changes while it's being reviewed.</span></div></div>`;
-  if(st==="revise")return `<div class="lockban rev"><span class="lki">↩</span><div><b>The admin asked for changes.</b>${L.note?`<div class="revnote">“${esc(L.note)}”</div>`:""}<span class="note">${adm?"Waiting for the store to resubmit.":"Make the changes, then click <b>Resubmit to admin</b>."}</span></div>${adm?"":`<div class="spacer"></div><button class="btn primary" data-lock="submit">Resubmit to admin</button>`}</div>`;
+  if(st==="revise")return `<div class="lockban rev"><span class="lki">↩</span><div><b>The admin asked for changes${(L.fixes||[]).length?" in these departments":""}:</b>${fixesHTML(L)}<span class="note">${adm?"Waiting for the store to resubmit.":"Make the changes, then click <b>Resubmit to admin</b>."}</span></div>${adm?"":`<div class="spacer"></div><button class="btn primary" data-lock="submit">Resubmit to admin</button>`}</div>`;
   const now=new Date(),due=dueOf(S.week),end=addDays(S.week,7);if(now>=end)return"";const late=now>due;
   return `<div class="lockban due ${late?"late":""}"><span class="lki">📅</span><div><b>${late?"Late: this schedule was due":"Due"} ${due.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"long",month:"numeric",day:"numeric"})}</b><br><span class="note">${adm?"Not submitted by the store yet.":"When it's ready, click <b>Submit to admin</b>. You can't edit it after you submit unless the admin sends it back."}</span></div>${adm?"":`<div class="spacer"></div><button class="btn primary" data-lock="submit">Submit to admin</button>`}</div>`}
 function renderLock(){const el=$("#lockSlot");if(el)el.innerHTML=lockBannerHTML();if(S.tab==="dash")loadSubs()}
@@ -807,25 +823,36 @@ function submitChecks(){const out=[];const groups=new Set();for(const p of Objec
   for(const G of [...groups].sort((a,b)=>deptOrder(a)-deptOrder(b))){const o=openByDay(G);if(o){const n=o.reduce((a,b)=>a+b,0);if(n)out.push(`<b>${esc(G)}</b>: ${n} open spot${n===1?"":"s"} vs. staffing guide`)}}
   for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;const r=rowStats({id,...p});const m=limitMsgs(p,r.h,r.days);if(m.length)out.push(`<b>${esc(p.name)}</b>: ${m.map(esc).join(", ")}`)}
   return out}
+function storeGroups(){const g=new Set();for(const p of Object.values(S.staff))if(p&&!p._pending&&p.store===S.store)gsetOf(p).forEach(G=>g.add(G));return [...g].sort((a,b)=>deptOrder(a)-deptOrder(b))}
+function fixesHTML(L,cls){const f=(L&&L.fixes)||[];if(!f.length&&!(L&&L.note))return"";return `<div class="fixlist ${cls||""}">${f.map(x=>`<div class="fixrow"><b>${esc(x.dept)}</b>${x.note?` — <span translate="no">${esc(x.note)}</span>`:""}</div>`).join("")}${L.note?`<div class="revnote" translate="no">“${esc(L.note)}”</div>`:""}</div>`}
 const statusDoc=(state,extra)=>({...(S.lock||{}),store:S.store,weekStart:ymd(S.week),state,at:new Date().toISOString(),...extra});
 document.addEventListener("click",async e=>{const b=e.target.closest("[data-lock]");if(!b)return;const a=b.dataset.lock;const k=key();
   if(a==="submit"){const rows=pubSnapshot();if(!rows.length){toast("No shifts on this week yet.");return}const C=submitChecks();
     openModal(`<h3>Submit this schedule to the admin?</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)} (${rangeLabel(S.week)})</div>
     ${C.length?`<div class="alertlist"><div class="alerthead">⚠ Check these first</div>${C.map(x=>`<div class="alertrow">${x}</div>`).join("")}</div><p class="note" style="margin:0">You can go back and fix them, or submit anyway.</p>`:`<div class="banner ok">✓ No problems found: every shift in the staffing guide is covered and hours are within the rules.</div>`}
+    <label class="field"><span>Notes for the admin (optional)</span><textarea id="subNote" style="min-height:70px;font-family:var(--f-body);font-size:15px" placeholder="e.g. Maria is on vacation Tue–Thu. We're short one cashier Saturday.">${esc((S.lock&&S.lock.storeNote)||"")}</textarea></label>
     <p class="note" style="margin:0">After you submit, you can't change this week unless the admin sends it back.</p>
     <div class="row"><div class="spacer"></div><button class="btn" data-close>${C.length?"Go back and fix":"Cancel"}</button><button class="btn primary" id="subYes">${C.length?"Submit anyway":"Submit to admin"}</button></div>`);
-    $("#subYes").onclick=async()=>{try{await backend.saveLock(k,statusDoc("submitted",{submittedAt:new Date().toISOString(),note:""}));closeModal();toast("Submitted. The admin will review it.")}catch(x){showErr(x)}};return}
+    $("#subYes").onclick=async()=>{try{await backend.saveLock(k,statusDoc("submitted",{submittedAt:new Date().toISOString(),storeNote:$("#subNote").value.trim()}));closeModal();toast("Submitted. The admin will review it.")}catch(x){showErr(x)}};return}
   if(a==="go"){const rows=pubSnapshot();if(!rows.length){toast("No shifts on this week yet.");return}
     openModal(`<h3>Approve and lock this week?</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)} (${rangeLabel(S.week)})</div>
     <p class="note" style="margin:0">This shares the schedule with employees and locks it, so the store can't change shifts or days off. You can unlock it anytime.</p>
     <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button><button class="btn primary" id="lockYes">Approve &amp; lock</button></div>`);
     $("#lockYes").onclick=async()=>{try{const doc={store:S.store,weekStart:ymd(S.week),at:new Date().toISOString(),rows:pubSnapshot()};await backend.savePub(k,doc);S.pub=doc;
       await backend.saveLock(k,statusDoc("approved",{approvedAt:new Date().toISOString()}));closeModal();toast("Approved, shared and locked")}catch(x){showErr(x)}};return}
-  if(a==="revise"){openModal(`<h3>Request changes</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)}</div>
-    <label class="field"><span>What should they change?</span><textarea id="revNote" style="min-height:90px;font-family:var(--f-body);font-size:15px" placeholder="e.g. Hot Deli is short Saturday PM. Maria is over 40 hours."></textarea></label>
-    <p class="note" style="margin:0">The store can edit again and will see your note at the top of the schedule.</p>
-    <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button><button class="btn primary" id="revYes">Send back to store</button></div>`,true);setTimeout(()=>$("#revNote").focus(),0);
-    $("#revYes").onclick=async()=>{const note=$("#revNote").value.trim();if(!note){toast("Write a short note so they know what to fix.");return}try{await backend.saveLock(k,statusDoc("revise",{note,revisedAt:new Date().toISOString()}));closeModal();toast("Sent back to "+S.store)}catch(x){showErr(x)}};return}
+  if(a==="revise"){const gs=storeGroups();
+    openModal(`<h3>Request changes</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)}</div>
+    ${S.lock&&S.lock.storeNote?`<div class="banner info"><b>Store's note:</b> “${esc(S.lock.storeNote)}”</div>`:""}
+    <div class="field"><span>Which departments need changes? Click each one and say what to fix.</span></div>
+    <div class="revdepts">${gs.map((G,i)=>`<div class="revd"><label class="revchk"><input type="checkbox" data-revd="${i}"> ${esc(G)}</label><textarea data-revn="${i}" hidden placeholder="What should ${esc(G)} fix?"></textarea></div>`).join("")}</div>
+    <label class="field"><span>General note (optional)</span><textarea id="revNote" style="min-height:60px;font-family:var(--f-body);font-size:15px" placeholder="Anything for the whole store"></textarea></label>
+    <p class="note" style="margin:0">The store can edit again and will see your notes at the top of the schedule.</p>
+    <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button><button class="btn primary" id="revYes">Send back to store</button></div>`,true);
+    document.querySelectorAll("[data-revd]").forEach(c=>c.onchange=()=>{const t=document.querySelector(`[data-revn="${c.dataset.revd}"]`);t.hidden=!c.checked;if(c.checked)t.focus()});
+    $("#revYes").onclick=async()=>{const note=$("#revNote").value.trim();const fixes=[];document.querySelectorAll("[data-revd]").forEach(c=>{if(c.checked)fixes.push({dept:gs[+c.dataset.revd],note:document.querySelector(`[data-revn="${c.dataset.revd}"]`).value.trim()})});
+      if(!fixes.length&&!note){toast("Pick at least one department or write a note.");return}
+      if(fixes.some(f=>!f.note)&&!note){toast("Add a short note for each department you picked.");return}
+      try{await backend.saveLock(k,statusDoc("revise",{note,fixes,revisedAt:new Date().toISOString()}));closeModal();toast("Sent back to "+S.store)}catch(x){showErr(x)}};return}
   if(a==="info"){shareModal("This week is approved and locked");return}
   if(a==="unlock"){openModal(`<h3>Unlock this week?</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)}</div><p class="note" style="margin:0">The store will be able to change shifts again and must resubmit. Employees keep seeing the approved version until you approve again.</p>
     <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button><button class="btn primary" id="unlockYes">Unlock</button></div>`);
@@ -838,9 +865,14 @@ async function loadSubs(force){const el=$("#subSlot");if(!el)return;if(!isAdm()|
   const e2=$("#subSlot");if(e2)e2.innerHTML=subsHTML()}
 function subsHTML(){const due=dueOf(S.week),now=new Date();const pill={draft:["Not submitted","sp-draft"],submitted:["Waiting for you","sp-sub"],revise:["Changes requested","sp-rev"],approved:["Approved & locked","sp-ok"]};
   const rows=S.cfg.stores.map(st=>{const d=SUBS.docs[st];const s=d?(d.state||"approved"):"draft";const late=s==="draft"&&now>due;const[t,c]=pill[s];
-    return `<tr><td class="l"><b>${esc(st)}</b></td><td><span class="spill ${c} ${late?"sp-late":""}">${late?"Late · ":""}${t}</span></td><td>${d&&d.submittedAt?fdt(d.submittedAt):"—"}</td><td>${d&&d.state==="revise"&&d.note?`<span class="note">“${esc(d.note)}”</span>`:d&&d.approvedAt?"Approved "+fdt(d.approvedAt):""}</td><td style="white-space:nowrap"><button class="btn sm ${s==="submitted"?"primary":""}" data-goschedule="${esc(st)}">${s==="submitted"?"Review":"Open"}</button> <button class="btn sm" data-xls="${esc(st)}" title="Download ${esc(st)} as Excel">⬇ Excel</button></td></tr>`}).join("");
+    return `<tr><td class="l"><b>${esc(st)}</b></td><td><span class="spill ${c} ${late?"sp-late":""}">${late?"Late · ":""}${t}</span></td><td>${d&&d.submittedAt?fdt(d.submittedAt):"—"}</td><td class="l">${d&&d.state==="revise"?`<span class="note">Asked: ${(d.fixes||[]).map(f=>esc(f.dept)).join(", ")}${d.note?` “${esc(d.note)}”`:""}</span>`:d&&d.state==="submitted"&&d.storeNote?`<span class="note"><b>Store:</b> “${esc(d.storeNote)}”</span>`:d&&d.approvedAt?"Approved "+fdt(d.approvedAt):""}</td><td style="white-space:nowrap"><button class="btn sm ${s==="submitted"?"primary":""}" data-goschedule="${esc(st)}">${s==="submitted"?"Review":"Open"}</button> <button class="btn sm" data-xls="${esc(st)}" title="Download ${esc(st)} as Excel">⬇ Excel</button></td></tr>`}).join("");
   const n=S.cfg.stores.filter(st=>SUBS.docs[st]&&SUBS.docs[st].state==="submitted").length;
-  return `<div class="card subs"><div class="row"><div><h2 class="sec" style="margin:0">Schedule submissions · Week ${weekNo(S.week,S.cfg.wkOffset)}</h2><div class="note">${rangeLabel(S.week)} · due ${due.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"long",month:"numeric",day:"numeric"})}${n?` · <b>${n} waiting for your approval</b>`:""}</div></div><div class="spacer"></div><button class="btn sm" data-xls="__all">⬇ All stores (Excel)</button><button class="btn sm" data-subsref>Refresh</button></div>
+  const cnt=st=>Object.values(S.staff).filter(p=>p&&!p._pending&&p.store===st).length;
+  const cards=S.cfg.stores.map(st=>{const d=SUBS.docs[st];const s2=d?(d.state||"approved"):"draft";const late=s2==="draft"&&now>due;const[t,c]=pill[s2];
+    return `<button class="stcard ${s2==="submitted"?"sub":""}" data-goschedule="${esc(st)}"><h3>${esc(st)}</h3><span><span class="spill ${c} ${late?"sp-late":""}">${late?"Late · ":""}${t}</span></span><span class="note">${cnt(st)} employees</span><span class="btn sm ${s2==="submitted"?"primary":""}" style="align-self:flex-start">${s2==="submitted"?"Review schedule →":"Open store →"}</span></button>`}).join("");
+  return `<div class="homehead"><div><h2 class="sec">Home</h2><div class="note">Week ${weekNo(S.week,S.cfg.wkOffset)} · ${rangeLabel(S.week)}${n?` · <b>${n} waiting for your approval</b>`:""}</div></div></div>
+  <div class="stcards">${cards}</div>
+  <div class="card subs"><div class="row"><div><h2 class="sec" style="margin:0">Schedule submissions · Week ${weekNo(S.week,S.cfg.wkOffset)}</h2><div class="note">${rangeLabel(S.week)} · due ${due.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"long",month:"numeric",day:"numeric"})}${n?` · <b>${n} waiting for your approval</b>`:""}</div></div><div class="spacer"></div><button class="btn sm" data-xls="__all">⬇ All stores (Excel)</button><button class="btn sm" data-subsref>Refresh</button></div>
   <div class="sx"><table class="stab" style="min-width:640px"><thead><tr><th class="l">Store</th><th>Status</th><th>Submitted</th><th class="l">Notes</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`}
 document.addEventListener("click",e=>{if(e.target.closest("[data-subsref]"))loadSubs(true)});
 
@@ -909,25 +941,36 @@ document.addEventListener("click",async e=>{if(!e.target.closest("#bakBtn"))retu
 const XLSX_URL="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
 function loadXLSX(){if(window.XLSX)return Promise.resolve(window.XLSX);return new Promise((res,rej)=>{const sc=document.createElement("script");sc.src=XLSX_URL;sc.onload=()=>res(window.XLSX);sc.onerror=()=>rej(new Error("Couldn't load the Excel tool. Check your internet and try again."));document.head.appendChild(sc)})}
 const xt=t=>{const m=toMin(t);if(m==null)return"";let h=Math.floor(m/60)%24,mm=m%60;const ap=h<12?"AM":"PM";h=h%12||12;return h+":"+String(mm).padStart(2,"0")+" "+ap};
-function storeSheetRows(st,wk,shifts){const sh=shifts||{};const cv=(id,d)=>sh[id]&&sh[id][d]||null;
+function storeSheetRows(st,wk,shifts){const sh=shifts||{};const cv=(id,d)=>sh[id]&&sh[id][d]||null;const r2=x=>Math.round(x*100)/100;
   const ppl=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>s&&!s._pending&&s.store===st);
   const groups=[...new Set(ppl.flatMap(p=>gsetOf(p)))].sort((a,b)=>deptOrder(a)-deptOrder(b));
   const dates=DAYS.map((x,d)=>{const t=addDays(wk,d);return x+" "+(t.getMonth()+1)+"/"+t.getDate()});
-  const rows=[["Vista Markets · "+st+" · Week "+weekNo(wk,S.cfg.wkOffset)+" ("+rangeLabel(wk)+")"],[]];const merges=[];let grand=0;const dayTot=[0,0,0,0,0,0,0];
-  for(const G of groups){const ps=ppl.filter(p=>inGrp(p,G)).sort((a,b)=>a.name.localeCompare(b.name));let gT=0;const gD=[0,0,0,0,0,0,0];
-    rows.push([G]);rows.push(["Employee","Status",...dates,"Days","Hours"]);
-    for(const p of ps){let h=0,n=0;const cells=DAYS.map((x,d)=>{const v=cv(p.id,d);if(v&&v.s&&!v.off){if(shG(p,v)!==G)return "("+shG(p,v)+")";const x2=hoursOf(v,S.cfg);h+=x2;n++;gD[d]+=x2;return xt(v.s)+" - "+xt(v.e)}return"OFF"});
-      gT+=h;rows.push([p.name,p.type==="FT"?"Full-time":"Part-time",...cells,n,Math.round(h*100)/100])}
-    rows.push(["Total "+G,"",...gD.map(x=>Math.round(x*100)/100),"",Math.round(gT*100)/100]);rows.push([]);grand+=gT;gD.forEach((x,d)=>dayTot[d]+=x)}
-  rows.push(["All departments","",...dayTot.map(x=>Math.round(x*100)/100),"",Math.round(grand*100)/100]);
+  const rows=[["Vista Markets · "+st+" · Week "+weekNo(wk,S.cfg.wkOffset)+" ("+rangeLabel(wk)+")"],[]];let grand=0;const dayTot=[0,0,0,0,0,0,0];
+  for(const G of groups){const ps=ppl.filter(p=>inGrp(p,G)).sort((a,b)=>a.name.localeCompare(b.name));const gD=[0,0,0,0,0,0,0];
+    const slots=new Map();const off=[[],[],[],[],[],[],[]];const per={};
+    for(const p of ps){per[p.id]={n:0,h:0};for(let d=0;d<7;d++){const v=cv(p.id,d);
+      if(v&&v.s&&!v.off){if(shG(p,v)!==G)continue;const k=v.s+"-"+v.e;if(!slots.has(k))slots.set(k,{s:v.s,e:v.e,d:[[],[],[],[],[],[],[]]});slots.get(k).d[d].push(p.name);const x=hoursOf(v,S.cfg);gD[d]+=x;per[p.id].n++;per[p.id].h+=x}
+      else off[d].push(p.name)}}
+    rows.push([G]);rows.push(["Shift",...dates]);
+    const ord=[...slots.values()].sort((a,b)=>toMin(a.s)-toMin(b.s)||toMin(a.e)-toMin(b.e));
+    for(const r of ord){r.d.forEach(x=>x.sort());const n=Math.max(1,...r.d.map(x=>x.length));for(let i=0;i<n;i++)rows.push([i?"":xt(r.s)+" - "+xt(r.e),...r.d.map(x=>x[i]||"")])}
+    if(!ord.length)rows.push(["No shifts scheduled"]);
+    off.forEach(x=>x.sort());const no=Math.max(0,...off.map(x=>x.length));for(let i=0;i<no;i++)rows.push([i?"":"OFF",...off.map(x=>x[i]||"")]);
+    const gT=gD.reduce((a,b)=>a+b,0);rows.push(["Total hours",...gD.map(r2),"Week: "+r2(gT)]);rows.push([]);
+    rows.push(["Employee","Days","Hours"]);for(const p of ps)rows.push([p.name,per[p.id].n,r2(per[p.id].h)]);rows.push([]);rows.push([]);
+    grand+=gT;gD.forEach((x,d)=>dayTot[d]+=x)}
+  rows.push(["All departments",...dayTot.map(r2),"Week: "+r2(grand)]);
   if(S.cfg.mealDeduct)rows.push(["Hours exclude a 30-minute meal on shifts over 6 hours."]);
   return rows}
-function sheetFrom(X,rows){const ws=X.utils.aoa_to_sheet(rows);ws["!cols"]=[{wch:24},{wch:11},...DAYS.map(()=>({wch:19})),{wch:6},{wch:8}];ws["!pageSetup"]={orientation:"landscape"};return ws}
+function sheetFrom(X,rows){const ws=X.utils.aoa_to_sheet(rows);ws["!cols"]=[{wch:22},...DAYS.map(()=>({wch:20})),{wch:12}];ws["!pageSetup"]={orientation:"landscape"};return ws}
 async function getSchedFor(st,wk){const k=st.replace(/[^A-Za-z0-9_-]/g,"_")+"_"+ymd(wk);if(st===S.store&&ymd(wk)===ymd(S.week)&&S.sched)return S.sched;return await backend.getSched(k).catch(()=>null)}
 async function exportExcel(stores){try{toast("Preparing Excel…");const X=await loadXLSX();const wk=S.week;const wb=X.utils.book_new();
     for(const st of stores){const doc=await getSchedFor(st,wk);const ws=sheetFrom(X,storeSheetRows(st,wk,doc&&doc.shifts));X.utils.book_append_sheet(wb,ws,st.slice(0,31))}
     const name=(stores.length===1?stores[0].replace(/\s+/g,"-"):"All-stores")+"_Week"+weekNo(wk,S.cfg.wkOffset)+"_"+ymd(wk)+".xlsx";X.writeFile(wb,name);toast("Downloaded "+name)}catch(e){showErr(e)}}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-xls]");if(!b)return;const v=b.dataset.xls;exportExcel(v==="__all"?S.cfg.stores:[v||S.store])});
+
+/* ---------- admin top tabs ---------- */
+document.addEventListener("click",e=>{const b=e.target.closest("[data-atab]");if(!b)return;const t=b.dataset.atab;S.tab=t==="store"?(S._lastStoreTab||"schedule"):t;savePrefs();renderAll();window.scrollTo({top:0})});
 
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAYS_ES=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
@@ -1072,7 +1115,7 @@ async function boot(){
   if(window.SUPABASE_URL&&window.supabase){
     const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
     let c0=null;try{const r=await sb.from("docs").select("data").eq("collection","config").eq("id","main").maybeSingle();c0=r.data&&r.data.data}catch(e){}
-    const acc=await pinGate(c0);S.canEdit=acc.lvl==="admin";S._realCanEdit=S.canEdit;S.readOnly=false;LOCK=acc.store||null;if(LOCK){S.store=LOCK;if(S.tab==="dash")S.tab="build"}
+    const acc=await pinGate(c0);S.canEdit=acc.lvl==="admin";S._realCanEdit=S.canEdit;S.readOnly=false;LOCK=acc.store||null;if(LOCK){S.store=LOCK;if(S.tab==="dash")S.tab="build"}else if(S.canEdit)S.tab="dash";
     if(!acc.open){const so=document.createElement("button");so.className="btn sm";so.textContent="Sign out";so.style.marginLeft="12px";so.onclick=signOut;const br=document.querySelector(".brand");if(br)br.appendChild(so)}
     realBackend=supaBackend(sb);S.mode="shared";attach(realBackend);return;
   }
@@ -1121,6 +1164,12 @@ function renderControls(){
   $("#mainBar").hidden=S.tab==="build";
   document.querySelector('#storeSel').closest('.field').hidden=S.tab==="dash";document.querySelector('#deptSel').closest('.field').hidden=S.tab==="dash";
   $("#searchField").hidden=!(S.tab==="schedule"||S.tab==="staff");
+  {const adm=isAdm(),inStore=["schedule","build","staff","sum"].includes(S.tab);$("#admNav").hidden=!adm;if(inStore)S._lastStoreTab=S.tab;document.body.classList.toggle("adm",adm);
+   $("#storeNav").hidden=adm&&!inStore;$("#storeNav").classList.toggle("subnav",adm);
+   let sv=$("#svStore");if(adm&&!sv){const w=document.createElement("label");w.className="svpick";w.innerHTML=`<span>Store</span><select id="svStore"></select>`;$("#storeNav").prepend(w);sv=$("#svStore");sv.onchange=()=>{S.store=sv.value;S.dept="__all";savePrefs();renderAll();resub()}}
+   if(sv){sv.closest(".svpick").hidden=!adm;sv.innerHTML=S.cfg.stores.map(x=>`<option ${x===S.store?"selected":""}>${esc(x)}</option>`).join("")}
+   ["tab-dash","tab-guide","tab-settings"].forEach(id=>{if(adm)$("#"+id).hidden=true});
+   document.querySelectorAll("[data-atab]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.atab===(inStore?"store":S.tab))))}
   $("#weekField").hidden=S.tab!=="schedule"&&S.tab!=="dash"&&S.tab!=="sum";$("#schedActions").hidden=S.tab!=="schedule";
   ["genBtn","copyPrev","clearWeek"].forEach(id=>$("#"+id).disabled=S.readOnly);
 }
@@ -2133,11 +2182,12 @@ function printShiftHTML(){
 }
 function renderPrint(){if(S.store)$("#printArea").innerHTML=printHTML()}
 let printLayout="shift";
+function fitPrint(root){root=root||document.getElementById("printArea");if(!root)return;const prev=root.style.cssText;root.style.cssText="display:block;position:absolute;left:-99999px;top:0;width:980px";root.querySelectorAll(".pg").forEach(pg=>{pg.style.zoom="";const h=pg.scrollHeight;if(h>705)pg.style.zoom=(705/h).toFixed(3)});root.style.cssText=prev}
 async function doPrint(){
   const body=printLayout==="shift"?printShiftHTML():printHTML();
   const css=[...document.querySelectorAll("style")].map(s=>s.textContent).join("\n");
   const fontLink=`<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;600&display=swap">`;
-  const file=`<!doctype html><html><head><meta charset="utf-8"><title>${esc(S.store)} Week ${weekNo(S.week,S.cfg.wkOffset)} Schedule</title>${fontLink}<style>${css}\n#printArea{display:block}body{background:#fff;margin:0}@page{size:landscape;margin:10mm}</style></head><body><div id="printArea">${body}</div><script>window.onload=function(){setTimeout(function(){window.print()},400)}<\/script></body></html>`;
+  const file=`<!doctype html><html><head><meta charset="utf-8"><title>${esc(S.store)} Week ${weekNo(S.week,S.cfg.wkOffset)} Schedule</title>${fontLink}<style>${css}\n#printArea{display:block}body{background:#fff;margin:0}@page{size:landscape;margin:10mm}</style></head><body><div id="printArea">${body}</div><script>${fitPrint.toString()}window.onload=function(){setTimeout(function(){fitPrint();window.print()},400)}<\/script></body></html>`;
   const name=`Vista_${S.store}${S.dept!=="__all"?"_"+S.dept.replace(/\W+/g,""):""}_Week${weekNo(S.week,S.cfg.wkOffset)}_Schedule.html`;
   openModal(`<h3>Print schedule</h3><div class="ctx">${esc(S.store)}${S.dept!=="__all"?" · "+esc(S.dept):" · all departments"} · Week ${weekNo(S.week,S.cfg.wkOffset)}</div>
     <div class="tabs vtog" role="group" aria-label="Print layout" style="align-self:flex-start"><button data-plo="shift" aria-pressed="${printLayout==="shift"}">By shift (who's working)</button><button data-plo="person" aria-pressed="${printLayout==="person"}">By employee</button></div>
@@ -2146,7 +2196,7 @@ async function doPrint(){
     <div class="row"><div class="spacer"></div><button class="btn" data-close>Close</button><button class="btn primary" id="savePrint">${downloads?"Save printable file":"Print"}</button></div>`,true);
   document.querySelectorAll("[data-plo]").forEach(b=>b.onclick=()=>{printLayout=b.dataset.plo;doPrint()});
   $("#savePrint").onclick=async()=>{
-    if(!downloads){$("#printArea").innerHTML=body;closeModal();setTimeout(()=>window.print(),50);return}
+    if(!downloads){$("#printArea").innerHTML=body;fitPrint();closeModal();setTimeout(()=>window.print(),50);return}
     try{await downloads.save({filename:name,data:file});closeModal();toast("Saved. Open the file to print.")}
     catch(e){if(e&&e.code==="declined")return;toast("Couldn't save the file. Open this page in its own tab and press Ctrl+P.")}
   };
@@ -2430,6 +2480,7 @@ const DAY_ES={Sun:"Dom",Mon:"Lun",Tue:"Mar",Wed:"Mié",Thu:"Jue",Fri:"Vie",Sat:"
 const DAYL_ES={Sunday:"Domingo",Monday:"Lunes",Tuesday:"Martes",Wednesday:"Miércoles",Thursday:"Jueves",Friday:"Viernes",Saturday:"Sábado",Sundays:"domingos",Mondays:"lunes",Tuesdays:"martes",Wednesdays:"miércoles",Thursdays:"jueves",Fridays:"viernes",Saturdays:"sábados"};
 const MON_ES={Jan:"ene",Feb:"feb",Mar:"mar",Apr:"abr",May:"may",Jun:"jun",Jul:"jul",Aug:"ago",Sep:"sep",Oct:"oct",Nov:"nov",Dec:"dic"};
 const ES={
+"Notes for the admin (optional)":"Notas para el administrador (opcional)","The admin asked for changes in these departments:":"El administrador pidió cambios en estos departamentos:","The admin asked for changes:":"El administrador pidió cambios:","Store's note:":"Nota de la tienda:","Schedules by store":"Horarios por tienda","Home":"Inicio","Review schedule →":"Revisar horario →","Open store →":"Abrir tienda →","Staffing summary · all stores (hours, open spots)":"Resumen de personal · todas las tiendas (horas, lugares abiertos)","Store view":"Vista de tienda","Staffing guide":"Guía de personal","Settings":"Configuración",
 "See full schedule":"Ver horario completo","Build schedule":"Hacer horario","Staff & availability":"Personal y disponibilidad","Dashboard":"Panel","Summary":"Resumen","By department":"Por departamento","By day":"Por día","By shift":"Por turno","By employee":"Por empleado","Employees":"Empleados","Shifts":"Turnos","All departments":"Todos los departamentos","Employees working":"Empleados trabajando","Avg hours per person":"Promedio de horas por persona","Nothing scheduled this week yet.":"Todavía no hay nada programado esta semana.","Day":"Día","Morning":"Mañana","before 10a":"antes de 10a","Closing":"Cierre","2p+":"2p o después","people on each shift ·":"personas en cada turno ·","red = short":"rojo = falta","blue = over":"azul = de más","the staffing guide":"la guía de personal","Drag a name up onto a shift":"Arrastra un nombre a un turno","Off (no shift yet). Drag onto a shift, or tap to pick one.":"Libre (sin turno). Arrástralo a un turno o tócalo para elegir uno.","What should happen to shifts already on the schedule?":"¿Qué hacer con los turnos que ya están en el horario?","No, keep them off":"No, dejarlo libre","Schedule them anyway?":"¿Programarlo de todos modos?","No, keep the day off":"No, dejar el día libre","Yes, schedule them":"Sí, programarlo","Totals by day, shift and department are on the":"Los totales por día, turno y departamento están en la pestaña","tab.":".","Drag a name":"Arrastra un nombre","from the Off row onto a shift. Drag it to another shift to move it, or back to Off to remove it. While you drag,":"de la fila Libre a un turno. Arrástralo a otro turno para moverlo, o de regreso a Libre para quitarlo. Mientras arrastras,","green":"verde","= they're available,":"= está disponible,","red":"rojo","= they're not. You can also click an empty spot to pick from a list.":"= no está disponible. También puedes hacer clic en un espacio vacío para elegir de una lista.","Staffing guide":"Guía de personal","Settings":"Ajustes",
 "Store":"Tienda","Department":"Departamento","Find employee":"Buscar empleado","Week":"Semana","This week":"Esta semana","Week to submit":"Semana a entregar","The next week to schedule and submit":"La próxima semana para programar y entregar","All departments":"Todos los departamentos","Front End (all cashier, office & pricing roles)":"Front End (cajeros, oficina y precios)",
 "Fill automatically":"Llenar automáticamente","Copy last week":"Copiar semana pasada","Clear week":"Borrar semana","Print schedule":"Imprimir horario","Print":"Imprimir","Mark final & share":"Marcar final y compartir","✓ Approve & lock":"✓ Aprobar y bloquear","Submit to admin":"Enviar al administrador","Resubmit to admin":"Reenviar al administrador","⏳ Submitted · waiting for approval":"⏳ Enviado · esperando aprobación","↩ Request changes":"↩ Pedir cambios","Submitted. Waiting for the admin to approve.":"Enviado. Esperando la aprobación del administrador.","You can't make changes while it's being reviewed.":"No puedes hacer cambios mientras se revisa.","The admin asked for changes.":"El administrador pidió cambios.","Make the changes, then click":"Haz los cambios y luego haz clic en","When it's ready, click":"Cuando esté listo, haz clic en","You can't edit it after you submit unless the admin sends it back.":"No puedes editarlo después de enviarlo a menos que el administrador lo regrese.","Submit this schedule to the admin?":"¿Enviar este horario al administrador?","⚠ Check these first":"⚠ Revisa esto primero","You can go back and fix them, or submit anyway.":"Puedes regresar y corregirlos, o enviarlo de todos modos.","✓ No problems found: every shift in the staffing guide is covered and hours are within the rules.":"✓ Sin problemas: todos los turnos de la guía están cubiertos y las horas están dentro de las reglas.","After you submit, you can't change this week unless the admin sends it back.":"Después de enviarlo, no puedes cambiar esta semana a menos que el administrador lo regrese.","Go back and fix":"Regresar y corregir","Submit anyway":"Enviar de todos modos","Submitted. The admin will review it.":"Enviado. El administrador lo revisará.","Request changes":"Pedir cambios","What should they change?":"¿Qué deben cambiar?","Send back to store":"Regresar a la tienda","Waiting for the store to resubmit.":"Esperando que la tienda lo reenvíe.","Not submitted by the store yet.":"La tienda todavía no lo envía.","Download backup":"Descargar respaldo","Backup":"Respaldo","🔒 Approved & locked":"🔒 Aprobado y bloqueado","🔒 Approved · shared":"🔒 Aprobado · compartido","This week is approved and locked.":"Esta semana está aprobada y bloqueada.","Unlock it to make changes.":"Desbloquéala para hacer cambios.","Shifts can't be changed. Ask the admin if something needs to change.":"No se pueden cambiar los turnos. Pide al administrador si algo necesita cambio.","Unlock":"Desbloquear","Approve and lock this week?":"¿Aprobar y bloquear esta semana?","This shares the schedule with employees and locks it, so the store can't change shifts or days off. You can unlock it anytime.":"Esto comparte el horario con los empleados y lo bloquea, así la tienda no puede cambiar turnos ni días libres. Puedes desbloquearlo cuando quieras.","Approve & lock":"Aprobar y bloquear","Unlock this week?":"¿Desbloquear esta semana?","Approved, shared and locked":"Aprobado, compartido y bloqueado","Unlocked":"Desbloqueado","This week is approved and locked":"Esta semana está aprobada y bloqueada","This week is approved and locked. Ask the admin to unlock it.":"Esta semana está aprobada y bloqueada. Pide al administrador que la desbloquee.","✓ Final · shared":"✓ Final · compartido","Update final (changes not shared)":"Actualizar final (cambios sin compartir)",
