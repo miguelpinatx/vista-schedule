@@ -22,6 +22,16 @@
 .hchips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.hchip{border-radius:99px;padding:5px 12px;font-size:13px;background:rgba(255,255,255,.14);color:#fff}.hchip b{font-size:15px}
 .hchip.sub{background:#FEC938;color:#3d2e00}.hchip.ok{background:#e3f4e4;color:#1f5e23}.hchip.rev{background:#fde3df;color:#9b2c1f}.hchip.late{background:#c0392b;color:#fff}
 .hometiles{margin-bottom:18px}
+.dweek{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:center;justify-content:space-between;background:var(--surface);border:2px solid var(--brand);border-radius:16px;padding:16px 20px;margin-bottom:16px}
+.dwk{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}.dwr{font-family:var(--f-display);font-size:28px;font-weight:800;line-height:1.1}.dwd{font-size:15px;color:var(--muted)}.dwd.late{color:var(--bad-fg);font-weight:700}
+.dwnav{display:flex;gap:6px}.dwst{display:flex;flex-direction:column;gap:6px;min-width:220px}.dwst .spill{align-self:flex-start;font-size:14px;padding:5px 12px}.dprog{height:10px;background:var(--surface2);border-radius:99px;overflow:hidden}.dprog i{display:block;height:100%;background:var(--brand)}
+.dsteps{gap:8px}.dstep{display:flex;align-items:center;gap:14px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}.dstep .dtxt{flex:1;display:flex;flex-direction:column;gap:2px}.dstep .dtxt b{font-size:17px}
+.dnum{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:16px;flex:none;background:var(--surface2);color:var(--muted);border:2px solid var(--line)}
+.dstep.ok{background:#f3faf3}.dstep.ok .dnum{background:var(--brand);border-color:var(--brand);color:#fff}.dstep.ok .dtxt b{color:var(--good-fg)}
+.dstep.cur{border:2px solid var(--brand);background:#eef7ee;box-shadow:0 4px 14px rgba(46,125,50,.12)}.dstep.cur .dnum{background:#FEC938;border-color:#FEC938;color:#3d2e00}
+.dbtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+@media (max-width:640px){.dstep{flex-wrap:wrap}.dbtns{width:100%;justify-content:flex-start}.dwr{font-size:22px}}
+body.basic:not(.adm) #storeNav #tab-start{order:0}
 body.basic #storeNav .navsp{display:none}body.basic #selBtn,body.basic #pasteBtn,body.basic #chgAvail{display:none!important}body.basic [data-collapsed] .chips,body.basic [data-collapsed] .note{display:none}body.basic [data-collapsed]>span{cursor:pointer}body.basic [data-collapsed]>span::after{content:" ▸ click to add";font-weight:500;color:var(--muted);text-transform:none;letter-spacing:0}body.basic:not(.adm) #storeNav #tab-staff{order:1}body.basic:not(.adm) #storeNav #tab-build{order:2}body.basic:not(.adm) #storeNav #tab-sum{order:3}
 #featCard.dim .gtogs{opacity:.45;pointer-events:none}.hcard.st-posted{border-top-color:#2E7D32;background:#f6fbf6}.hcard.st-approved{border-top-color:#8bc34a}
 .lockban.topost{border-color:var(--brand);background:#eef7ee}.lockban.posted{border-color:var(--good-line);background:var(--good-bg)}
@@ -901,7 +911,7 @@ function lockBannerHTML(){if(!S.store||!(S.tab==="schedule"||S.tab==="build"||S.
 function renderLock(){if(LOCK)loadRev();const el=$("#lockSlot");if(el)el.innerHTML=lockBannerHTML();if(S.tab==="dash")loadSubs()}
 function submitChecks(){const out=[];const groups=new Set();for(const p of Object.values(S.staff))if(p&&!p._pending&&p.store===S.store)gsetOf(p).forEach(G=>groups.add(G));
   for(const G of [...groups].sort((a,b)=>deptOrder(a)-deptOrder(b))){const o=openByDay(G);if(o){const n=o.reduce((a,b)=>a+b,0);if(n)out.push(`<b>${esc(G)}</b>: ${n} open spot${n===1?"":"s"} vs. staffing guide`)}}
-  for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;const r=rowStats({id,...p});const m=limitMsgs(p,r.h,r.days);if(m.length)out.push(`<b>${esc(p.name)}</b>: ${m.map(esc).join(", ")}`)}
+  for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;const r=rowStats({id,...p});const m=limitMsgs(p,r.h,r.days);{const u=underMsg(p,r.h);if(u&&!m.length)out.push(`<b>${esc(p.name)}</b>: under · ${esc(u)}`)}if(m.length)out.push(`<b>${esc(p.name)}</b>: ${m.map(esc).join(", ")}`)}
   return out}
 function storeGroups(){const g=new Set();for(const p of Object.values(S.staff))if(p&&!p._pending&&p.store===S.store)gsetOf(p).forEach(G=>g.add(G));return [...g].sort((a,b)=>deptOrder(a)-deptOrder(b))}
 function fixesHTML(L,cls){const f=(L&&L.fixes)||[];if(!f.length&&!(L&&L.note))return"";return `<div class="fixlist ${cls||""}">${f.map(x=>`<div class="fixrow"><b>${esc(x.dept)}</b>${x.note?` — <span translate="no">${esc(x.note)}</span>`:""}</div>`).join("")}${L.note?`<div class="revnote" translate="no">“${esc(L.note)}”</div>`:""}</div>`}
@@ -1120,30 +1130,36 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-gosum]");i
 /* ---------- Start page (store managers) ---------- */
 function shiftCount(){let n=0;for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;for(let d=0;d<7;d++){const v=cellVal(id,d);if(v&&v.s&&!v.off)n++}}return n}
 function startHTML(){if(!S.store)return"";const h=new Date().getHours();const greet=h<12?"Good morning":h<18?"Good afternoon":"Good evening";
-  const st=stState(),L=S.lock||{};const n=shiftCount();const probs=n?submitChecks().length:0;const due=dueOf(S.week);
-  const dueTxt=due.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"long",month:"numeric",day:"numeric"});
-  const item=(done,title,sub,act)=>`<div class="ck ${done?"ok":""}"><span class="ckb">${done?"✓":""}</span><div class="ckt"><b>${title}</b><span class="note">${sub}</span></div>${act||""}</div>`;
-  const sent=st==="submitted"||st==="approved";
-  const checklist=`<div class="card startck"><div class="row"><div><h3 class="sec" style="margin:0"><span>This week's checklist</span></h3><div class="note"><span>Week</span> ${weekNo(S.week,S.cfg.wkOffset)} · ${rangeLabel(S.week)} · <span>due</span> ${dueTxt}</div></div><div class="spacer"></div>
-      <button class="btn sm" data-hwk="prevWk">‹</button><button class="btn sm" data-hwk="dueWk">Week to submit</button><button class="btn sm" data-hwk="nextWk">›</button></div>
-    ${item(n>0,"Build the schedule",n?`${n} shifts placed`:"No shifts yet for this week",n?"":`<button class="btn sm primary" data-sgo="build">Begin</button>`)}
-    ${(()=>{const rv=revOK();return item(n>0&&(probs===0||rv),"Fix any problems",!n?"Build the schedule first":probs?(rv?`Reviewed · ${probs} thing${probs===1?"":"s"} marked OK`:`${probs} thing${probs===1?"":"s"} to check (overtime, too many days, open spots)`):"Everything looks good",n&&probs?`<button class="btn sm ${rv?"":"primary"}" data-issues>${rv?"See list":"Show me"}</button>`:"")})()}
-    ${st==="revise"?`<div class="ck rev"><span class="ckb">↩</span><div class="ckt"><b>The admin asked for changes</b>${fixesHTML(L)}</div></div>`:""}
-    ${item(sent,"Submit to the admin",st==="approved"?"Approved by the admin":st==="submitted"?"Sent · waiting for the admin":st==="revise"?"Make the changes, then send it again":"Send it to the admin when it's ready",!sent&&n?`<button class="btn sm primary" data-lock="submit">${st==="revise"?"Resubmit":"Submit"}</button>`:"")}
-    ${item(!!(st==="approved"&&isPosted(L)),"Post to employees",st==="approved"?(isPosted(L)?"Posted · employees can see it":"Approved! Post it so your team can see it"):"After the admin approves, you post it here",st==="approved"&&!isPosted(L)?`<button class="btn sm primary" data-lock="post">📣 Post</button>`:`<button class="btn sm" data-final="link">📲 Link</button>`)}
-  </div>`;
-  const tile=(icon,title,sub,attr,primary)=>`<button class="stile ${primary?"pri":""}" ${attr}><span class="si">${icon}</span><span class="stx"><b>${title}</b><span>${sub}</span></span></button>`;
-  const locked=lockedForMe();
-  const tiles=[
-    locked?"":tile("✏️","Build or change the schedule","Step by step, one department at a time",'data-sgo="build"',!n),
-    tile("📅","See the full schedule","Every department, every day",'data-sgo="schedule"',n&&!sent),
-    tile("👥","Add or change employees","New hires, availability, days off",'data-sgo="staff"'),
-    featOn("sum_tab")?tile("📊","Check the summary","Who works AM, Mid, PM and After 5",'data-sgo="sum"'):"",
-    tile("🖨️","Print the schedule","One page per department",'data-sgo="print"'),
-    !sent&&n?tile("✅","Submit to the admin","Send it to the admin when it's ready",'data-lock="submit"'):"",
-    tile("📲","Share with employees","Get the link employees use to see it",'data-final="link"')].join("");
-  return `<div class="hello"><h2><span>${greet}</span>, ${esc(S.store)}! 👋</h2></div>${checklist}<div class="hsec"><span>What would you like to do?</span></div><div class="stiles">${tiles}</div>`}
-function renderStart(){const el=$("#startSlot");if(!el)return;if(S.tab!=="start"){el.innerHTML="";return}loadRev();el.innerHTML=startHTML()}
+  const st=stState(),L=S.lock||{};const n=shiftCount();const due=dueOf(S.week),late=st==="draft"&&new Date()>due;const ck=CK.k===key()&&CK.doc||{};
+  const dueTxt=due.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"long",month:"long",day:"numeric"});
+  const roster=Object.entries(S.staff).filter(([id,p])=>p&&!p._pending&&p.store===S.store).map(([id,p])=>({id,...p}));
+  const cant=roster.filter(p=>Object.values(p.avail||{}).some(a=>a&&a.mode==="no")).length;
+  let ov=0,un=0;for(const p of roster){const r=rowStats(p);if(limitMsgs(p,r.h,r.days).length)ov++;else if(underMsg(p,r.h))un++}
+  const sent=st==="submitted"||st==="approved",posted=st==="approved"&&isPosted(L),locked=lockedForMe();
+  const steps=[
+    {k:"roster",t:"Review your employee roster",sub:`${roster.length} employees. Add new hires, fix departments, remove anyone who left.`,done:!!ck.roster,btns:[["Open Employees",'data-sgo="staff"'],locked?null:[ck.roster?"Undo":"✓ Done",`data-ck="roster"`,!ck.roster]]},
+    {k:"avail",t:"Update availability",sub:`Mark the days people can't work this week (vacation, school, requests).${cant?` ${cant} have days marked.`:""}`,done:!!ck.avail,btns:[["Open Employees",'data-sgo="staff"'],locked?null:[ck.avail?"Undo":"✓ Done",`data-ck="avail"`,!ck.avail]]},
+    {k:"build",t:"Build the schedule",sub:n?`${n} shifts placed. Drag names from the Off row onto shifts.`:"Drag names from the Off row onto shifts. Tip: Copy last week saves time.",done:n>0,btns:[["Open Schedule",'data-sgo="build"']]},
+    {k:"review",t:"Review days & hours",sub:!n?"Build the schedule first.":(ov||un)?`${ov} over · ${un} under. Fix what you can, then mark it reviewed.`:"Nobody is over or under.",done:n>0&&revOK(),btns:n?[["Open Summary",'data-sgo="sum"'],locked?null:[revOK()?"Undo":"✓ Reviewed",revOK()?'data-ck="unreview"':'data-ck="review"',!revOK()]]:[]},
+    {k:"submit",t:"Submit for review",sub:sent?`Sent ${fdt(L.submittedAt||L.at)}`:st==="revise"?"Make the admin's changes, then send it again.":"Send it to the admin when it's ready.",done:sent,btns:!sent&&n?[[st==="revise"?"Resubmit":"Submit to admin",'data-lock="submit"',true]]:[]},
+    {k:"approve",t:"Wait for approval",sub:st==="approved"?`Approved ${fdt(L.approvedAt||L.at)}`:st==="submitted"?"The admin is reviewing it. You'll see the result here.":st==="revise"?"The admin asked for changes:":"After you submit, the admin approves it or asks for changes.",done:st==="approved",extra:st==="revise"?fixesHTML(L):"",btns:[]},
+    {k:"post",t:"Post & share with employees",sub:posted?"Posted! Employees can see it on their schedule link.":st==="approved"?"Approved! Post it, then share the link with your team.":"After approval, post it so employees can see it.",done:posted,btns:st==="approved"&&!posted?[["📣 Post to employees",'data-lock="post"',true]]:posted?[["📲 Share employee link",'data-final="link"',true]]:[]}];
+  const cur=steps.findIndex(x=>!x.done);const doneN=steps.filter(x=>x.done).length;
+  const stepHTML=(x,i)=>`<div class="dstep ${x.done?"ok":""} ${i===cur?"cur":""}"><span class="dnum">${x.done?"✓":i+1}</span><div class="dtxt"><b>${x.t}</b><span class="note">${x.sub}</span>${x.extra||""}</div><div class="dbtns">${x.btns.filter(Boolean).map(([l,a,pri])=>`<button class="btn ${pri&&i===cur?"primary":""} ${i===cur?"":"sm"}" ${a}>${l}</button>`).join("")}</div></div>`;
+  const statusTxt=posted?"Posted ✓":st==="approved"?"Approved · ready to post":st==="submitted"?"Submitted · waiting for approval":st==="revise"?"Changes requested":late?"Late · not submitted":"Not submitted yet";
+  return `<div class="hello"><h2><span>${greet}</span>, ${esc(S.store)}! 👋</h2></div>
+  <div class="dweek"><div class="dwl"><div class="dwk"><span>Schedule for</span> <span>Week</span> ${weekNo(S.week,S.cfg.wkOffset)}</div><div class="dwr">${rangeLabel(S.week)}</div><div class="dwd ${late?"late":""}"><span>Due</span> ${dueTxt}</div></div>
+    <div class="dwnav"><button class="btn" data-hwk="prevWk" aria-label="Previous week">‹</button><button class="btn" data-hwk="dueWk">Week to submit</button><button class="btn" data-hwk="nextWk" aria-label="Next week">›</button></div>
+    <div class="dwst"><span class="spill ${posted||st==="approved"?"sp-ok":st==="submitted"?"sp-sub":st==="revise"||late?"sp-rev":"sp-draft"}">${statusTxt}</span><div class="dprog"><i style="width:${(doneN/steps.length*100).toFixed(0)}%"></i></div><span class="note"><span>${doneN} of ${steps.length} done</span></span></div></div>
+  <div class="card dsteps"><h3 class="sec" style="margin:0 0 4px"><span>Your steps this week</span></h3>${steps.map(stepHTML).join("")}</div>`}
+const CK={k:null,doc:null,loading:false};
+async function loadCK(){const k=key();if(!S.store||!backend||!backend.getRev||CK.k===k||CK.loading)return;CK.loading=true;try{CK.doc=await backend.getRev(k+"__ck")}catch(e){CK.doc=null}CK.k=k;CK.loading=false;if(S.tab==="start")renderStart()}
+async function setCK(f,v){const k=key();const d={...(CK.k===k&&CK.doc||{}),store:S.store,weekStart:ymd(S.week),[f]:v,at:new Date().toISOString()};CK.k=k;CK.doc=d;renderStart();await backend.saveRev(k+"__ck",d)}
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-ck]");if(!b)return;const f=b.dataset.ck;const ck=CK.k===key()&&CK.doc||{};
+  if(f==="roster"||f==="avail"){setCK(f,!ck[f]);return}
+  if(f==="review"){const C=submitChecks();if(C.length){issuesModal();return}const doc={store:S.store,weekStart:ymd(S.week),sig:issueSig(),list:[],at:new Date().toISOString()};REV.k=key();REV.doc=doc;renderAll();await backend.saveRev(key(),doc);return}
+  if(f==="unreview"){REV.doc=null;renderAll();await backend.saveRev(key(),null)}});
+function renderStart(){const el=$("#startSlot");if(!el)return;if(S.tab!=="start"){el.innerHTML="";return}loadRev();loadCK();el.innerHTML=startHTML()}
 /* ---------- problems review ---------- */
 const REV={k:null,doc:null,loading:false};
 const plain=h=>{const d=document.createElement("div");d.innerHTML=h;return d.textContent};
@@ -1383,8 +1399,8 @@ function renderControls(){applyFeats();
   $("#mainBar").hidden=S.tab==="build"||S.tab==="start";
   document.querySelector('#storeSel').closest('.field').hidden=S.tab==="dash";document.querySelector('#deptSel').closest('.field').hidden=S.tab==="dash";
   $("#searchField").hidden=!(S.tab==="schedule"||S.tab==="staff");
-  $("#tab-start").hidden=!LOCK||BASIC();if(!LOCK&&S.tab==="start")S.tab=isAdm()?"dash":"schedule";
-  {const B=BASIC();document.body.classList.toggle("basic",B);if(B&&(S.tab==="start"||S.tab==="schedule"||S.tab==="guide"))S.tab=S.tab==="guide"?"dash":(isAdm()?"sum":"build");
+  $("#tab-start").hidden=!LOCK;if(!LOCK&&S.tab==="start")S.tab=isAdm()?"dash":"schedule";
+  {const B=BASIC();document.body.classList.toggle("basic",B);if(B&&((S.tab==="start"&&!LOCK)||S.tab==="schedule"||S.tab==="guide"))S.tab=S.tab==="guide"?"dash":(isAdm()?"sum":"build");
    $("#tab-schedule").hidden=B;const lab=(id,t,ic)=>{const b=$("#"+id);if(!b)return;if(!b.dataset.orig)b.dataset.orig=b.innerHTML;b.innerHTML=B?`<span class="ni" aria-hidden="true">${ic}</span>${t}`:b.dataset.orig};
    lab("tab-build","Schedule","📅");lab("tab-staff","Employees","👥");
    const ga=document.querySelector('[data-atab="guide"]');if(ga)ga.hidden=B;["chgAvail","selBtn","pasteBtn"].forEach(id=>{const x=$("#"+id);if(x)x.hidden=B});
@@ -2730,6 +2746,12 @@ const DAY_ES={Sun:"Dom",Mon:"Lun",Tue:"Mar",Wed:"Mié",Thu:"Jue",Fri:"Vie",Sat:"
 const DAYL_ES={Sunday:"Domingo",Monday:"Lunes",Tuesday:"Martes",Wednesday:"Miércoles",Thursday:"Jueves",Friday:"Viernes",Saturday:"Sábado",Sundays:"domingos",Mondays:"lunes",Tuesdays:"martes",Wednesdays:"miércoles",Thursdays:"jueves",Fridays:"viernes",Saturdays:"sábados"};
 const MON_ES={Jan:"ene",Feb:"feb",Mar:"mar",Apr:"abr",May:"may",Jun:"jun",Jul:"jul",Aug:"ago",Sep:"sep",Oct:"oct",Nov:"nov",Dec:"dic"};
 const ES={
+"Your steps this week":"Tus pasos esta semana","Schedule for":"Horario de","Due":"Entrega","Review your employee roster":"Revisa tu lista de empleados","Update availability":"Actualiza la disponibilidad","Review days & hours":"Revisa días y horas","Submit for review":"Enviar para revisión","Wait for approval":"Esperar aprobación","Post & share with employees":"Publicar y compartir con empleados",
+"Open Employees":"Abrir Empleados","Open Schedule":"Abrir Horario","Open Summary":"Abrir Resumen","✓ Done":"✓ Listo","Undo":"Deshacer","✓ Reviewed":"✓ Revisado","Submit to admin":"Enviar al administrador","📲 Share employee link":"📲 Compartir enlace de empleados",
+"Build the schedule first.":"Primero haz el horario.","Nobody is over or under.":"Nadie tiene de más ni de menos.","Send it to the admin when it's ready.":"Envíalo al administrador cuando esté listo.","Make the admin's changes, then send it again.":"Haz los cambios del administrador y envíalo otra vez.",
+"The admin is reviewing it. You'll see the result here.":"El administrador lo está revisando. Aquí verás el resultado.","The admin asked for changes:":"El administrador pidió cambios:","After you submit, the admin approves it or asks for changes.":"Después de enviarlo, el administrador lo aprueba o pide cambios.",
+"Posted! Employees can see it on their schedule link.":"¡Publicado! Los empleados lo pueden ver en su enlace.","Approved! Post it, then share the link with your team.":"¡Aprobado! Publícalo y comparte el enlace con tu equipo.","After approval, post it so employees can see it.":"Después de la aprobación, publícalo para que los empleados lo vean.",
+"Submitted · waiting for approval":"Enviado · esperando aprobación","Drag names from the Off row onto shifts. Tip: Copy last week saves time.":"Arrastra nombres de la fila Libre a los turnos. Consejo: Copiar semana pasada ahorra tiempo.",
 "Drag a name from the Off row onto a shift.":"Arrastra un nombre de la fila Libre a un turno.","Drag it back to Off to remove it, or click + to pick someone.":"Regrésalo a Libre para quitarlo, o haz clic en + para escoger a alguien.","Red means they can't work that day.":"Rojo = no puede trabajar ese día.",
 "Posted! Your team can see this schedule.":"¡Publicado! Tu equipo ya puede ver este horario.","Posted ✓":"Publicado ✓","Approved · ready to post":"Aprobado · listo para publicar","The admin approved this schedule.":"El administrador aprobó este horario.","Post it so your employees can see it on their schedule link.":"Publícalo para que tus empleados lo vean en su enlace.",
 "Basic mode":"Modo básico","Flags them as":"Los marca como","if scheduled less":"si tienen menos horas","Days they're marked off turn":"Los días marcados se ponen","if you schedule them.":"si los programas.","Under (1)":"De menos (1)",
@@ -2781,6 +2803,11 @@ const ES={
 "Saved for everyone with this link":"Guardado para todos con este enlace","Loading…":"Cargando…","Search results":"Resultados","Clear search":"Borrar búsqueda","Tap a department or person to show only that department.":"Toca un departamento o persona para ver solo ese departamento."
 };
 const ES_RE=[
+[/^(\d+) employees\. Add new hires, fix departments, remove anyone who left\.$/,"$1 empleados. Agrega nuevos, corrige departamentos, quita a quien ya no trabaja."],
+[/^Mark the days people can't work this week \(vacation, school, requests\)\.(?: (\d+) have days marked\.)?$/,m=>"Marca los días que no pueden trabajar esta semana (vacaciones, escuela, permisos)."+(m[1]?" "+m[1]+" tienen días marcados.":"")],
+[/^(\d+) shifts placed\. Drag names from the Off row onto shifts\.$/,"$1 turnos puestos. Arrastra nombres de la fila Libre a los turnos."],
+[/^(\d+) over · (\d+) under\. Fix what you can, then mark it reviewed\.$/,"$1 de más · $2 de menos. Corrige lo que puedas y márcalo como revisado."],
+[/^(\d+) of (\d+) done$/,"$1 de $2 listos"],[/^Sent (.+)$/,"Enviado $1"],[/^Approved (.+)$/,"Aprobado $1"],
 [/^Posted (.+)\. Shifts are locked\. Ask the admin if something needs to change\.$/,"Publicado $1. Los turnos están bloqueados. Pide al administrador si algo necesita cambiar."],[/^(\d+) can't-work days?$/,"$1 día(s) que no puede trabajar"],
 [/^Over \((\d+)\)$/,"De más ($1)"],[/^Under \((\d+)\)$/,"De menos ($1)"],[/^Under (.+) h target$/,"Menos de $1 h meta"],[/^Under · (.+) of (.+) target hours$/,"De menos · $1 de $2 horas meta"],
 [/^Reviewed · (\d+) things? marked OK$/,"Revisado · $1 marcados como OK"],
