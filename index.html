@@ -29,7 +29,8 @@
 .dnum{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:16px;flex:none;background:var(--surface2);color:var(--muted);border:2px solid var(--line)}
 .dstep.ok{background:#f3faf3}.dstep.ok .dnum{background:var(--brand);border-color:var(--brand);color:#fff}.dstep.ok .dtxt b{color:var(--good-fg)}
 .dstep.cur{border:2px solid var(--brand);background:#eef7ee;box-shadow:0 4px 14px rgba(46,125,50,.12)}.dstep.cur .dnum{background:#FEC938;border-color:#FEC938;color:#3d2e00}
-.dbtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.dbtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.dstep.rev{border:3px solid #c0392b;background:#fdf1ef;box-shadow:0 4px 16px rgba(192,57,43,.18)}.dstep.rev .dnum{background:#c0392b;border-color:#c0392b;color:#fff}.dstep.rev .dtxt>b{color:#9b2c1f;font-size:19px;letter-spacing:.02em}.dstep.rev .btn.primary{background:#c0392b;border-color:#c0392b}
+.revbox{margin-top:6px;background:#fff;border:1px solid var(--bad-line);border-radius:10px;padding:8px 10px}.revbox .fixlist{margin-top:4px}
 @media (max-width:640px){.dstep{flex-wrap:wrap}.dbtns{width:100%;justify-content:flex-start}.dwr{font-size:22px}}
 body.basic:not(.adm) #storeNav #tab-start{order:0}
 body.basic #storeNav .navsp{display:none}body.basic #selBtn,body.basic #pasteBtn,body.basic #chgAvail{display:none!important}body.basic [data-collapsed] .chips,body.basic [data-collapsed] .note{display:none}body.basic [data-collapsed]>span{cursor:pointer}body.basic [data-collapsed]>span::after{content:" ▸ click to add";font-weight:500;color:var(--muted);text-transform:none;letter-spacing:0}body.basic:not(.adm) #storeNav #tab-staff{order:1}body.basic:not(.adm) #storeNav #tab-build{order:2}body.basic:not(.adm) #storeNav #tab-sum{order:3}
@@ -240,7 +241,7 @@ tr.cov td.who{font-size:12px;color:var(--muted);font-weight:600;text-transform:u
 .cv.over{background:var(--warn-bg);color:var(--warn-fg)}
 .cv.none{color:var(--muted)}
 body.nf-home_totals [data-feat~="home_totals"],body.nf-card_stats [data-feat~="card_stats"],body.nf-home_summary [data-feat~="home_summary"],body.nf-store_stats [data-feat~="store_stats"],body.nf-emp_totals [data-feat~="emp_totals"],body.nf-issues [data-feat~="issues"],body.nf-sum_tab [data-feat~="sum_tab"],body.nf-sum_tiles [data-feat~="sum_tiles"],body.nf-sum_dept [data-feat~="sum_dept"],body.nf-sum_day [data-feat~="sum_day"],body.nf-sum_shift [data-feat~="sum_shift"],body.nf-sum_emp [data-feat~="sum_emp"]{display:none!important}
-details.exact{margin-top:10px}.rt.cov{background:#e3effa;color:#0d4a75;border-color:#b9d6ef}@media (max-width:640px){.lockban{flex-wrap:wrap}.lockban .spacer{display:none}}
+details.exact{margin-top:10px}.btn.bclear{color:var(--bad-fg);border-color:var(--bad-line)}.rt.cov{background:#e3effa;color:#0d4a75;border-color:#b9d6ef}@media (max-width:640px){.lockban{flex-wrap:wrap}.lockban .spacer{display:none}}
 .flag.under{background:#e3effa;color:#0d4a75}.ptitle.bad{color:var(--bad-fg)}.ptitle.und{color:#0d4a75}
 .ovgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.ovrow{padding:6px 0;border-bottom:1px solid var(--line)}@media (max-width:640px){.ovgrid{grid-template-columns:1fr}}
 .cwdays{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}.cw{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--line);border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer;user-select:none}.cw input{width:18px;height:18px}.cw.on{border-color:var(--bad-fg);background:var(--bad-bg);color:var(--bad-fg)}
@@ -1141,11 +1142,11 @@ function startHTML(){if(!S.store)return"";const h=new Date().getHours();const gr
     {k:"avail",t:"Update availability",sub:`Mark the days people can't work this week (vacation, school, requests).${cant?` ${cant} have days marked.`:""}`,done:!!ck.avail,btns:[["Open Employees",'data-sgo="staff"'],locked?null:[ck.avail?"Undo":"✓ Done",`data-ck="avail"`,!ck.avail]]},
     {k:"build",t:"Build the schedule",sub:n?`${n} shifts placed. Drag names from the Off row onto shifts.`:"Drag names from the Off row onto shifts. Tip: Copy last week saves time.",done:n>0,btns:[["Open Schedule",'data-sgo="build"']]},
     {k:"review",t:"Review days & hours",sub:!n?"Build the schedule first.":(ov||un)?`${ov} over · ${un} under. Fix what you can, then mark it reviewed.`:"Nobody is over or under.",done:n>0&&revOK(),btns:n?[["Open Summary",'data-sgo="sum"'],locked?null:[revOK()?"Undo":"✓ Reviewed",revOK()?'data-ck="unreview"':'data-ck="review"',!revOK()]]:[]},
-    {k:"submit",t:"Submit for review",sub:sent?`Sent ${fdt(L.submittedAt||L.at)}`:st==="revise"?"Make the admin's changes, then send it again.":"Send it to the admin when it's ready.",done:sent,btns:!sent&&n?[[st==="revise"?"Resubmit":"Submit to admin",'data-lock="submit"',true]]:[]},
-    {k:"approve",t:"Wait for approval",sub:st==="approved"?`Approved ${fdt(L.approvedAt||L.at)}`:st==="submitted"?"The admin is reviewing it. You'll see the result here.":st==="revise"?"The admin asked for changes:":"After you submit, the admin approves it or asks for changes.",done:st==="approved",extra:st==="revise"?fixesHTML(L):"",btns:[]},
+    {k:"submit",t:st==="revise"?"RESUBMIT for review":"Submit for review",rev:st==="revise",sub:sent?`Sent ${fdt(L.submittedAt||L.at)}`:st==="revise"?"The admin asked for changes. Fix these on the schedule, then resubmit.":"Send it to the admin when it's ready.",done:sent,extra:st==="revise"?`<div class="revbox"><b>Admin's notes:</b>${fixesHTML(L)}</div>`:"",btns:!sent&&n?(st==="revise"?[["Open Schedule",'data-sgo="build"'],["↩ Resubmit for review",'data-lock="submit"',true]]:[["Submit to admin",'data-lock="submit"',true]]):[]},
+    {k:"approve",t:"Wait for approval",sub:st==="approved"?`Approved ${fdt(L.approvedAt||L.at)}`:st==="submitted"?"The admin is reviewing it. You'll see the result here.":st==="revise"?"Waiting for you to resubmit.":"After you submit, the admin approves it or asks for changes.",done:st==="approved",btns:[]},
     {k:"post",t:"Post & share with employees",sub:posted?"Posted! Employees can see it on their schedule link.":st==="approved"?"Approved! Post it, then share the link with your team.":"After approval, post it so employees can see it.",done:posted,btns:st==="approved"&&!posted?[["📣 Post to employees",'data-lock="post"',true]]:posted?[["📲 Share employee link",'data-final="link"',true]]:[]}];
-  const cur=steps.findIndex(x=>!x.done);const doneN=steps.filter(x=>x.done).length;
-  const stepHTML=(x,i)=>`<div class="dstep ${x.done?"ok":""} ${i===cur?"cur":""}"><span class="dnum">${x.done?"✓":i+1}</span><div class="dtxt"><b>${x.t}</b><span class="note">${x.sub}</span>${x.extra||""}</div><div class="dbtns">${x.btns.filter(Boolean).map(([l,a,pri])=>`<button class="btn ${pri&&i===cur?"primary":""} ${i===cur?"":"sm"}" ${a}>${l}</button>`).join("")}</div></div>`;
+  let cur=steps.findIndex(x=>!x.done);if(st==="revise")cur=steps.findIndex(x=>x.k==="submit");const doneN=steps.filter(x=>x.done).length;
+  const stepHTML=(x,i)=>`<div class="dstep ${x.done?"ok":""} ${i===cur?"cur":""} ${x.rev?"rev":""}"><span class="dnum">${x.done?"✓":i+1}</span><div class="dtxt"><b>${x.t}</b><span class="note">${x.sub}</span>${x.extra||""}</div><div class="dbtns">${x.btns.filter(Boolean).map(([l,a,pri])=>`<button class="btn ${pri&&i===cur?"primary":""} ${i===cur?"":"sm"}" ${a}>${l}</button>`).join("")}</div></div>`;
   const statusTxt=posted?"Posted ✓":st==="approved"?"Approved · ready to post":st==="submitted"?"Submitted · waiting for approval":st==="revise"?"Changes requested":late?"Late · not submitted":"Not submitted yet";
   return `<div class="hello"><h2><span>${greet}</span>, ${esc(S.store)}! 👋</h2></div>
   <div class="dweek"><div class="dwl"><div class="dwk"><span>Schedule for</span> <span>Week</span> ${weekNo(S.week,S.cfg.wkOffset)}</div><div class="dwr">${rangeLabel(S.week)}</div><div class="dwd ${late?"late":""}"><span>Due</span> ${dueTxt}</div></div>
@@ -1826,7 +1827,7 @@ function basicBoard(){if(!S.store)return"";
   const cnt=G=>all.filter(p=>inGrp(p,G)).length;const ppl=all.filter(p=>grpMatch(p));
   const chips=`<div class="bchips"><button class="bchip ${S.dept==="__all"?"on":""}" data-bdept="__all">All departments<small>${all.length}</small></button>${groups.map(G=>`<button class="bchip ${S.dept!=="__all"&&grp(S.dept)===G?"on":""}" data-bdept="${esc(G)}">${esc(G)}<small>${cnt(G)}</small></button>`).join("")}</div>`;
   const wk=`<div class="bweek"><button class="btn icon" data-bwk="prevWk" aria-label="Previous week">‹</button><div><b>Week ${weekNo(S.week,S.cfg.wkOffset)}</b><span>${rangeLabel(S.week)}</span></div><button class="btn icon" data-bwk="nextWk" aria-label="Next week">›</button><button class="btn sm" data-bwk="dueWk">Week to submit</button></div>`;
-  const acts=`<div class="bacts">${S.readOnly?"":`<button class="btn" data-bwk="copyPrev">Copy last week</button>`}<button class="btn" data-bwk="printBtn">Print</button></div>`;
+  const acts=`<div class="bacts">${S.readOnly?"":`<button class="btn" data-bwk="copyPrev">Copy last week</button>`}<button class="btn" data-bwk="printBtn">Print</button>${S.readOnly?"":`<button class="btn bclear" data-bclear>🗑 ${S.dept==="__all"?"Clear week":"Clear "+esc(grp(S.dept))}</button>`}</div>`;
   return `<div class="bhead"><div><h2 class="wh" style="margin:0">Schedule</h2><p class="wsub" style="margin:2px 0 0"><span>Drag a name from the Off row onto a shift.</span> <span>Drag it back to Off to remove it, or click + to pick someone.</span> <span>Red means they can't work that day.</span></p></div>${wk}</div>
   <div class="bbar">${chips}${acts}</div>${S.readOnly?"":wAlertsHTML(ppl)}<div id="wBoard">${shiftGridHTML(true)}</div>`}
 function wStep4(){
@@ -2642,6 +2643,13 @@ $("#chatClose").onclick=()=>{CH.open=false;renderChat()};
 $("#chatForm").addEventListener("submit",e=>{e.preventDefault();if(CH.busy){CH.ctl&&CH.ctl.abort();return}const t=$("#chatIn").value;$("#chatIn").value="";sendChat(t)});
 $("#chatIn").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("#chatForm").requestSubmit()}});
 $("#chatStaged").addEventListener("click",e=>{const b=e.target.closest("[data-unstage]");if(!b)return;const it=CH.staged.find(x=>x.k===b.dataset.unstage);if(it&&it.type==="new")delete S.staff[it.id];CH.staged=CH.staged.filter(x=>x.k!==b.dataset.unstage);renderChat()});
+document.addEventListener("click",e=>{if(!e.target.closest("[data-bclear]"))return;if(S.readOnly)return;
+  const all=S.dept==="__all",G=all?null:grp(S.dept);const sh=(S.sched&&S.sched.shifts)||{};let n=0;const next={};
+  for(const[id,days]of Object.entries(sh)){const p=S.staff[id];const nd={};for(const[d,v]of Object.entries(days||{})){const drop=all||(p&&v&&v.s&&!v.off&&shG(p,v)===G)||(p&&v&&v.off&&grp(p.dept)===G);if(drop){if(v&&v.s&&!v.off)n++}else nd[d]=v}if(Object.keys(nd).length)next[id]=nd}
+  openModal(`<h3>${all?"Clear the whole week?":"Clear "+esc(G)+"?"}</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)} (${rangeLabel(S.week)})</div>
+    <p style="margin:0">This removes <b>${n} shift${n===1?"":"s"}</b> ${all?"in every department":"in "+esc(G)} so you can start fresh. Employees and their availability stay. This can't be undone.</p>
+    <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button><button class="btn danger" id="doBClear">Yes, clear ${all?"week":esc(G)}</button></div>`);
+  $("#doBClear").onclick=()=>{backend.setSched(key(),{...meta(),shifts:next}).catch(showErr);closeModal();toast(all?"Week cleared":G+" cleared")}});
 document.addEventListener("click",e=>{const b=e.target.closest("[data-bdept]");if(b){S.dept=b.dataset.bdept;savePrefs();renderAll();return}
   const w=e.target.closest("[data-bwk]");if(w){const t=document.getElementById(w.dataset.bwk);if(t)t.click()}});
 $("#copyPrev").onclick=()=>{
@@ -2747,6 +2755,7 @@ const DAY_ES={Sun:"Dom",Mon:"Lun",Tue:"Mar",Wed:"Mié",Thu:"Jue",Fri:"Vie",Sat:"
 const DAYL_ES={Sunday:"Domingo",Monday:"Lunes",Tuesday:"Martes",Wednesday:"Miércoles",Thursday:"Jueves",Friday:"Viernes",Saturday:"Sábado",Sundays:"domingos",Mondays:"lunes",Tuesdays:"martes",Wednesdays:"miércoles",Thursdays:"jueves",Fridays:"viernes",Saturdays:"sábados"};
 const MON_ES={Jan:"ene",Feb:"feb",Mar:"mar",Apr:"abr",May:"may",Jun:"jun",Jul:"jul",Aug:"ago",Sep:"sep",Oct:"oct",Nov:"nov",Dec:"dic"};
 const ES={
+"Clear week":"Borrar semana","Clear the whole week?":"¿Borrar toda la semana?","Resubmit for review":"Reenviar para revisión","RESUBMIT for review":"REENVIAR para revisión","Admin's notes:":"Notas del administrador:",
 "Primary department":"Departamento principal","Coverage departments (optional)":"Departamentos que cubre (opcional)",
 "Your steps this week":"Tus pasos esta semana","Schedule for":"Horario de","Due":"Entrega","Review your employee roster":"Revisa tu lista de empleados","Update availability":"Actualiza la disponibilidad","Review days & hours":"Revisa días y horas","Submit for review":"Enviar para revisión","Wait for approval":"Esperar aprobación","Post & share with employees":"Publicar y compartir con empleados",
 "Open Employees":"Abrir Empleados","Open Schedule":"Abrir Horario","Open Summary":"Abrir Resumen","✓ Done":"✓ Listo","Undo":"Deshacer","✓ Reviewed":"✓ Revisado","Submit to admin":"Enviar al administrador","📲 Share employee link":"📲 Compartir enlace de empleados",
@@ -2805,6 +2814,7 @@ const ES={
 "Saved for everyone with this link":"Guardado para todos con este enlace","Loading…":"Cargando…","Search results":"Resultados","Clear search":"Borrar búsqueda","Tap a department or person to show only that department.":"Toca un departamento o persona para ver solo ese departamento."
 };
 const ES_RE=[
+[/^🗑 Clear week$/,"🗑 Borrar semana"],[/^🗑 Clear (.+)$/,"🗑 Borrar $1"],[/^Clear (.+)\?$/,"¿Borrar $1?"],
 [/^Coverage · (.+)$/,"Cubre · $1"],
 [/^(\d+) employees\. Add new hires, fix departments, remove anyone who left\.$/,"$1 empleados. Agrega nuevos, corrige departamentos, quita a quien ya no trabaja."],
 [/^Mark the days people can't work this week \(vacation, school, requests\)\.(?: (\d+) have days marked\.)?$/,m=>"Marca los días que no pueden trabajar esta semana (vacaciones, escuela, permisos)."+(m[1]?" "+m[1]+" tienen días marcados.":"")],
