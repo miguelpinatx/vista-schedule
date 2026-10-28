@@ -22,6 +22,11 @@
 .hchips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.hchip{border-radius:99px;padding:5px 12px;font-size:13px;background:rgba(255,255,255,.14);color:#fff}.hchip b{font-size:15px}
 .hchip.sub{background:#FEC938;color:#3d2e00}.hchip.ok{background:#e3f4e4;color:#1f5e23}.hchip.rev{background:#fde3df;color:#9b2c1f}.hchip.late{background:#c0392b;color:#fff}
 .hometiles{margin-bottom:18px}
+#storeNav #tab-pay{order:0}body.adm #storeNav #tab-pay{order:0}
+.gbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#fffbea;border:2px solid #FEC938;border-radius:14px;padding:12px 16px;margin:0 0 12px;position:sticky;top:6px;z-index:20;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.gtx{flex:1;display:flex;flex-direction:column;min-width:220px}.gtx b{font-size:18px}.gstep{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8a6d00}
+.payprog{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 10px;font-size:15px}.payprog .dprog{flex:1;min-width:160px;max-width:320px}.paytab td.pck{width:34px}.paytab td.pck input,.pdchk input{width:20px;height:20px;cursor:pointer}.paytab tr.pdone td{background:#f1faf1}.paytab tr.pdone td.l b{color:var(--good-fg)}.pdchk{display:inline-flex;align-items:center;gap:8px;cursor:pointer}.hcpay{font-size:12.5px}.payhead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.paytab td.pin b{font-size:14px}.paytab td.pin small{display:block;color:var(--muted);font-size:11.5px}.paytab td.poff{color:#9a948a;font-weight:700;font-size:12px;background:var(--surface2)}.paytab tr.pzero td.l b{color:var(--muted)}.paytab th small{display:block;font-weight:600;color:var(--muted)}
 .trainbtn{margin-left:8px;background:#fff4d6;border-color:#f1d98a;color:#6b4d00;font-weight:700}
 #trainBar{position:sticky;top:0;z-index:50;background:repeating-linear-gradient(135deg,#f59e0b 0 18px,#f7b23b 18px 36px);color:#2b1d00;border-radius:14px;padding:12px 16px;margin:0 0 12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.15)}
 #trainBar b{font-size:17px}#trainBar .tnote{background:rgba(255,255,255,.85);border-radius:8px;padding:4px 10px;font-size:13.5px}#trainBar .btn{background:#fff}#trainBar .btn.exit{background:#2b1d00;color:#fff;border-color:#2b1d00}
@@ -629,6 +634,7 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
   <div id="storeHero" hidden></div>
   <nav class="tabs mainnav" id="storeNav" role="tablist">
       <button role="tab" id="tab-start" aria-selected="false" data-tab="start" class="navbig"><span class="ni" aria-hidden="true">🏠</span>Home</button>
+      <button role="tab" id="tab-pay" aria-selected="false" data-tab="pay" class="navbig" hidden><span class="ni" aria-hidden="true">🕒</span>Payclock</button>
       <button role="tab" id="tab-schedule" aria-selected="true" data-tab="schedule" class="navbig"><span class="ni" aria-hidden="true">📅</span>See full schedule</button>
       <button role="tab" id="tab-build" aria-selected="false" data-tab="build" class="navbig"><span class="ni" aria-hidden="true">✏️</span>Build schedule</button>
       <button role="tab" id="tab-staff" aria-selected="false" data-tab="staff" class="navbig"><span class="ni" aria-hidden="true">👥</span>Staff &amp; availability</button>
@@ -711,6 +717,7 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
   </section>
 
   <section id="view-start" class="panel" hidden><div id="startSlot"></div></section>
+  <section id="view-pay" class="panel" hidden><div id="payViewSlot"></div></section>
   <section id="view-sum" class="panel" hidden><div id="sumTabSlot"></div></section>
 
   <section id="view-dash" class="panel" hidden>
@@ -957,7 +964,7 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-lock
 const SUBS={week:null,at:0,docs:{},loading:false};
 async function loadSubs(force){const el=$("#subSlot");if(!el)return;if(!isAdm()||!backend.getLock){el.innerHTML="";return}const wk=ymd(S.week);
   if(!force&&SUBS.week===wk&&Date.now()-SUBS.at<30000){el.innerHTML=subsHTML();return}if(SUBS.loading)return;SUBS.loading=true;
-  try{const out={};await Promise.all(S.cfg.stores.map(async st=>{out[st]=await backend.getLock(st.replace(/[^A-Za-z0-9_-]/g,"_")+"_"+wk).catch(()=>null)}));SUBS.docs=out;SUBS.week=wk;SUBS.at=Date.now()}finally{SUBS.loading=false}
+  try{const out={};await Promise.all(S.cfg.stores.map(async st=>{const k=st.replace(/[^A-Za-z0-9_-]/g,"_")+"_"+wk;const L=await backend.getLock(k).catch(()=>null);if(L&&backend.getRev){const pd=await backend.getRev(k+"__pay").catch(()=>null);if(pd&&pd.ids){const n=Object.keys(pd.ids).length;L.payDone=n+" entered"}}out[st]=L}));SUBS.docs=out;SUBS.week=wk;SUBS.at=Date.now()}finally{SUBS.loading=false}
   const e2=$("#subSlot");if(e2)e2.innerHTML=subsHTML()}
 function subsHTML(){const due=dueOf(S.week),now=new Date();const pill={draft:["Not submitted","sp-draft"],submitted:["Waiting for you","sp-sub"],revise:["Changes requested","sp-rev"],approved:["Approved & locked","sp-ok"],posted:["Posted","sp-ok"]};
   const dueTxt=due.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"long",month:"numeric",day:"numeric"});
@@ -984,6 +991,7 @@ function subsHTML(){const due=dueOf(S.week),now=new Date();const pill={draft:["N
       <div class="hc-num" data-feat="card_stats">${r?`<div class="hcn"><b>${r.ppl}</b><span>people</span></div><div class="hcn"><b>${Math.round(r.hrs).toLocaleString()}</b><span>hours</span></div>`:`<span class="note">${haveDash?"No schedule yet":"Loading…"}</span>`}</div>
       <div class="hc-bar" data-feat="card_stats"><i style="width:${r?(r.hrs/maxH*100).toFixed(1):0}%"></i></div>
       <div class="hc-meta note" data-feat="card_stats">${r?`${r.ppl} of ${roster} employees scheduled`:`${roster} employees`}</div>
+      ${s2==="approved"||s2==="posted"?`<div class="note hcpay">🕒 Payclock: ${d&&d.payDone!=null?d.payDone:"not started"}</div>`:""}
       <div class="hc-flags" data-feat="card_stats">${r?(fl?`<span class="flag bad">${fl} hour problem${fl>1?"s":""}</span>`:`<span class="okpill">Hours OK</span>`)+(r.need?(r.open?` <span class="flag">${r.open} open</span>`:` <span class="okpill">Covered</span>`):""):""}</div>
       ${note}
       <div class="hc-acts"><button class="btn ${s2==="submitted"?"primary":""}" data-gosum="${esc(st)}">${s2==="submitted"?"Review →":"Open →"}</button>${featOn("home_summary")?`<button class="btn sm" data-dsum="${esc(st)}" title="Staffing summary">📊</button>`:""}<button class="btn sm" data-xls="${esc(st)}" title="Download Excel">⬇ Excel</button></div></div>`}).join("");
@@ -1150,7 +1158,7 @@ function startHTML(){if(!S.store)return"";const h=new Date().getHours();const gr
     {k:"approve",t:"Wait for approval",sub:st==="approved"?`Approved ${fdt(L.approvedAt||L.at)}`:st==="submitted"?"The admin is reviewing it. You'll see the result here.":st==="revise"?"Waiting for you to resubmit.":"After you submit, the admin approves it or asks for changes.",done:st==="approved",btns:[]},
     {k:"post",t:"Post & share with employees",sub:posted?"Posted! Employees can see it on their schedule link.":st==="approved"?"Approved! Post it, then share the link with your team.":"After approval, post it so employees can see it.",done:posted,btns:st==="approved"&&!posted?[["📣 Post to employees",'data-lock="post"',true]]:posted?[["📲 Share employee link",'data-final="link"',true]]:[]}];
   let cur=steps.findIndex(x=>!x.done);if(st==="revise")cur=steps.findIndex(x=>x.k==="submit");const doneN=steps.filter(x=>x.done).length;
-  const stepHTML=(x,i)=>`<div class="dstep ${x.done?"ok":""} ${i===cur?"cur":""} ${x.rev?"rev":""}"><span class="dnum">${x.done?"✓":i+1}</span><div class="dtxt"><b>${x.t}</b><span class="note">${x.sub}</span>${x.extra||""}</div><div class="dbtns">${x.btns.filter(Boolean).map(([l,a,pri])=>`<button class="btn ${pri&&i===cur?"primary":""} ${i===cur?"":"sm"}" ${a}>${l}</button>`).join("")}</div></div>`;
+  const stepHTML=(x,i)=>`<div class="dstep ${x.done?"ok":""} ${i===cur?"cur":""} ${x.rev?"rev":""}" data-k="${x.k}"><span class="dnum">${x.done?"✓":i+1}</span><div class="dtxt"><b>${x.t}</b><span class="note">${x.sub}</span>${x.extra||""}</div><div class="dbtns">${x.btns.filter(Boolean).map(([l,a,pri])=>`<button class="btn ${pri&&i===cur?"primary":""} ${i===cur?"":"sm"}" ${a}>${l}</button>`).join("")}</div></div>`;
   const statusTxt=posted?"Posted ✓":st==="approved"?"Approved · ready to post":st==="submitted"?"Submitted · waiting for approval":st==="revise"?"Changes requested":late?"Late · not submitted":"Not submitted yet";
   return `<div class="hello"><h2><span>${greet}</span>, ${esc(S.store)}! 👋</h2></div>
   <div class="dweek"><div class="dwl"><div class="dwk"><span>Schedule for</span> <span>Week</span> ${weekNo(S.week,S.cfg.wkOffset)}</div><div class="dwr">${rangeLabel(S.week)}</div><div class="dwd ${late?"late":""}"><span>Due</span> ${dueTxt}</div></div>
@@ -1182,7 +1190,7 @@ function issuesModal(){const C=submitChecks();const rv=revOK();const staff=C.fil
   const o=$("#revOk");if(o)o.onclick=async()=>{const doc={store:S.store,weekStart:ymd(S.week),sig:issueSig(),list:C.map(plain),at:new Date().toISOString()};REV.k=key();REV.doc=doc;closeModal();toast("Marked as reviewed");renderAll();await backend.saveRev(key(),doc)};
   const u=$("#revUndo");if(u)u.onclick=async()=>{REV.doc=null;closeModal();renderAll();await backend.saveRev(key(),null)}}
 document.addEventListener("click",e=>{if(e.target.closest("[data-issues]"))issuesModal()});
-document.addEventListener("click",e=>{const b=e.target.closest("[data-sgo]");if(!b)return;const g=b.dataset.sgo;
+document.addEventListener("click",e=>{const b=e.target.closest("[data-sgo]");if(!b)return;const g=b.dataset.sgo;{const ds=b.closest(".dstep");S.gstep=ds?ds.dataset.k:null}
   if(g==="build"){W.step=0;S.tab="build"}else if(g==="probs"){S.tab="schedule";S.dept="__all"}else if(g==="print"){S.tab="schedule";savePrefs();renderAll();setTimeout(()=>{const p=$("#printBtn");if(p)p.click()},50);return}else S.tab=g;
   savePrefs();renderAll();window.scrollTo({top:0});if(g==="probs")setTimeout(()=>{const d=document.querySelector("#issuesSlot details,#gridSlot .totbad");if(d&&d.scrollIntoView)d.scrollIntoView({behavior:"smooth",block:"center"})},100)});
 
@@ -1224,6 +1232,56 @@ document.addEventListener("click",async e=>{const t=e.target.closest("[data-trai
   if(a==="revise"){await backend.saveLock(k,statusDoc("revise",{note:"Practice note: please check Saturday coverage.",fixes:[{dept:storeGroups()[0]||"Hot Deli",note:"Short on Saturday PM (practice)"}],revisedAt:new Date().toISOString()}));toast("Practice: the admin asked for changes. See Home, step 5.")}
   if(a==="submit"){await backend.saveLock(k,statusDoc("submitted",{submittedAt:new Date().toISOString(),storeNote:"Practice submission",issues:[],reviewed:true}));SUBS.at=0;loadSubs(true);toast("Practice: "+S.store+" submitted. Review it, then approve or request changes.")}
   renderAll()});
+
+/* ---------- guided steps: Next bar ---------- */
+const GSTEPS=[{k:"roster",tab:"staff",t:"Review your employee roster",h:"Add new hires (+ Add employee), fix departments, or remove anyone who left."},
+  {k:"avail",tab:"staff",t:"Update availability",h:"Click Edit on an employee and tick the days they can't work this week."},
+  {k:"build",tab:"build",t:"Build the schedule",h:"Drag names from the Off row onto shifts. Copy last week saves time."},
+  {k:"review",tab:"sum",t:"Review days & hours",h:"Check Over / Under and the totals by day and department."},
+  {k:"submit",tab:"sum",t:"Submit for review",h:"Send it to the admin when it's ready."}];
+function renderGuideBar(){let b=$("#guideBar");if(!b){b=document.createElement("div");b.id="guideBar";const n=$("#storeNav");if(!n)return;n.after(b)}
+  const i=GSTEPS.findIndex(x=>x.k===S.gstep);if(!LOCK||i<0||GSTEPS[i].tab!==S.tab){b.innerHTML="";b.hidden=true;if(i>=0&&GSTEPS[i].tab!==S.tab&&S.tab!=="start")S.gstep=null;return}
+  const x=GSTEPS[i],nx=GSTEPS[i+1];const st=stState();const sent=st==="submitted"||st==="approved";
+  const main=x.k==="submit"?(sent?`<button class="btn primary big" data-gnext="home">✓ Sent · Back to Home</button>`:`<button class="btn primary big" data-lock="submit">${st==="revise"?"↩ Resubmit for review":"Submit to admin →"}</button>`)
+    :`<button class="btn primary big" data-gnext="${x.k}">✓ Done · Next: ${esc(nx.t)} →</button>`;
+  b.hidden=false;b.innerHTML=`<div class="gbar"><button class="btn" data-gnext="home">← Home</button><div class="gtx"><span class="gstep">Step ${i+1} of 7</span><b>${esc(x.t)}</b><span class="note">${esc(x.h)}</span></div>${main}</div>`}
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-gnext]");if(!b)return;const k=b.dataset.gnext;
+  if(k==="home"){S.gstep=null;S.tab="start";savePrefs();renderAll();window.scrollTo({top:0});return}
+  if((k==="roster"||k==="avail")&&!(CK.k===key()&&CK.doc&&CK.doc[k]))await setCK(k,true);
+  if(k==="review"&&!revOK()){const C=submitChecks();if(C.length){issuesModal();return}const doc={store:S.store,weekStart:ymd(S.week),sig:issueSig(),list:[],at:new Date().toISOString()};REV.k=key();REV.doc=doc;await backend.saveRev(key(),doc)}
+  const i=GSTEPS.findIndex(x=>x.k===k);const nx=GSTEPS[i+1];if(!nx)return;S.gstep=nx.k;S.tab=nx.tab;savePrefs();renderAll();window.scrollTo({top:0});toast("Step "+(i+1)+" done ✓")});
+
+/* ---------- Payclock view (by employee) ---------- */
+function payRows(){const all=Object.entries(S.staff).map(([id,p])=>({id,...p})).filter(p=>p&&!p._pending&&p.store===S.store&&(S.dept==="__all"||inGrp(p,grp(S.dept))));
+  const rows=all.map(p=>{let h=0,n=0;const days=DAYS.map((x,d)=>{const v=cellVal(p.id,d);if(v&&v.s&&!v.off){const hh=hoursOf(v,S.cfg);h+=hh;n++;return{t:fmtRange(v.s,v.e),s:v.s,e:v.e,h:hh,g:shG(p,v)}}return null});return{p,days,h,n}});
+  rows.sort((a,b)=>deptOrder(grp(a.p.dept))-deptOrder(grp(b.p.dept))||String(a.p.role||"~").localeCompare(String(b.p.role||"~"))||a.p.name.localeCompare(b.p.name));return rows}
+const PAYD={k:null,doc:null,loading:false};
+async function loadPayDone(){const k=key();if(!S.store||!backend||!backend.getRev||PAYD.k===k||PAYD.loading)return;PAYD.loading=true;try{PAYD.doc=await backend.getRev(k+"__pay")}catch(e){PAYD.doc=null}PAYD.k=k;PAYD.loading=false;renderPayView()}
+const payDone=()=>(PAYD.k===key()&&PAYD.doc&&PAYD.doc.ids)||{};
+async function savePayDone(ids){const k=key();PAYD.k=k;PAYD.doc={store:S.store,weekStart:ymd(S.week),ids,at:new Date().toISOString()};renderPayView();SUBS.at=0;await backend.saveRev(k+"__pay",PAYD.doc)}
+function renderPayView(){const el=$("#payViewSlot");if(!el)return;if(S.tab!=="pay"){el.innerHTML="";return}loadPayDone();
+  const rows=payRows();const done=payDone();const work=rows.filter(r=>r.n);const nDone=work.filter(r=>done[r.p.id]).length;const dh=DAYS.map((x,d)=>{const t=addDays(S.week,d);return `<th>${x}<small>${t.getMonth()+1}/${t.getDate()}</small></th>`}).join("");
+  let last=null,body="";const dT=[0,0,0,0,0,0,0];let tT=0;
+  for(const r of rows){const G=grp(r.p.dept);if(G!==last){const gw=work.filter(x=>grp(x.p.dept)===G),gd=gw.filter(x=>done[x.p.id]).length;body+=`<tr class="sg"><td colspan="11"><label class="pdchk"><input type="checkbox" data-paydept="${esc(G)}" ${gw.length&&gd===gw.length?"checked":""} ${gw.length?"":"disabled"}> ${esc(G)}</label> <span class="note">${gd} of ${gw.length} entered</span></td></tr>`;last=G}
+    r.days.forEach((x,d)=>{if(x)dT[d]+=x.h});tT+=r.h;
+    body+=`<tr class="${r.n?"":"pzero"} ${done[r.p.id]?"pdone":""}"><td class="pck">${r.n?`<input type="checkbox" data-payid="${r.p.id}" ${done[r.p.id]?"checked":""} aria-label="Entered ${esc(r.p.name)} in payclock">`:""}</td><td class="l"><b>${esc(r.p.name)}</b>${r.p.role?` <span class="rt role">${esc(r.p.role)}</span>`:""}</td>${r.days.map(x=>x?`<td class="pin"><b>${x.t}</b><small>${fmtH(x.h)} h${x.g!==G?" · "+esc(x.g):""}</small></td>`:`<td class="poff">OFF</td>`).join("")}<td><b>${r.n}</b></td><td><b>${fmtH(Math.round(r.h*100)/100)}</b></td></tr>`}
+  const st=stState();
+  el.innerHTML=`<div class="payhead"><div><h2 class="sec" style="margin:0">Payclock · ${esc(S.store)}${S.dept!=="__all"?" · "+esc(grp(S.dept)):""}</h2><div class="note">Week ${weekNo(S.week,S.cfg.wkOffset)} · ${rangeLabel(S.week)} · one row per employee, in department order · ${st==="approved"?"✓ approved":"⚠ not approved yet"}${S.cfg.mealDeduct?" · hours exclude a 30-min meal on 6h+ shifts":""}</div></div>
+    <div class="row"><button class="btn" id="payCopy">📋 Copy table</button><button class="btn" id="payXls">⬇ Excel (by employee)</button><button class="btn" id="payPrint">🖨 Print</button></div></div>
+    <div class="card payclock"><div class="sx"><div class="payprog"><b>${nDone} of ${work.length}</b> employees entered in the payclock <div class="dprog"><i style="width:${work.length?(nDone/work.length*100).toFixed(0):0}%"></i></div>${work.length&&nDone===work.length?`<span class="okpill">All entered ✓</span>`:""}</div>
+    <table class="stab paytab"><thead><tr><th title="Entered in payclock">✓</th><th class="l">Employee</th>${dh}<th>Days</th><th>Hours</th></tr></thead><tbody>${body||`<tr><td colspan="11" class="note">No employees.</td></tr>`}</tbody>
+    <tfoot><tr><td></td><td class="l">Total · ${rows.filter(r=>r.n).length} working</td>${dT.map(x=>`<td>${fmtH(Math.round(x*100)/100)}</td>`).join("")}<td></td><td>${fmtH(Math.round(tT*100)/100)}</td></tr></tfoot></table></div></div>`;
+  $("#payCopy").onclick=async()=>{const lines=[["Department","Employee","Role",...DAYS,"Days","Hours"].join("\t")];for(const r of rows)lines.push([grp(r.p.dept),r.p.name,r.p.role||"",...r.days.map(x=>x?x.t:"OFF"),r.n,Math.round(r.h*100)/100].join("\t"));
+    try{await navigator.clipboard.writeText(lines.join("\n"));toast("Copied. Paste it into Excel or Sheets.")}catch(x){toast("Couldn't copy. Use Excel instead.")}};
+  el.querySelectorAll("[data-payid]").forEach(c=>c.onchange=()=>{const ids={...payDone()};if(c.checked)ids[c.dataset.payid]=true;else delete ids[c.dataset.payid];savePayDone(ids)});
+  el.querySelectorAll("[data-paydept]").forEach(c=>c.onchange=()=>{const ids={...payDone()};work.filter(x=>grp(x.p.dept)===c.dataset.paydept).forEach(x=>{if(c.checked)ids[x.p.id]=true;else delete ids[x.p.id]});savePayDone(ids)});
+  $("#payXls").onclick=()=>exportPayExcel();$("#payPrint").onclick=()=>{const w=window.open("","_blank");if(!w){toast("Allow pop-ups to print.");return}
+    w.document.write(`<html><head><title>Payclock ${esc(S.store)} Week ${weekNo(S.week,S.cfg.wkOffset)}</title><style>body{font:13px system-ui;margin:16px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #999;padding:4px 6px;text-align:center}td.l,th.l{text-align:left}tr.sg td{background:#eee;font-weight:800;text-align:left}td small{display:block;color:#555}.rt{font-size:11px;color:#555}@page{size:landscape;margin:10mm}</style></head><body><h2>Payclock · ${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)} (${rangeLabel(S.week)})</h2>${el.querySelector("table").outerHTML}<script>window.print()<\/script></body></html>`);w.document.close()}}
+async function exportPayExcel(){try{const X=await loadXLSX();const rows=payRows();const dates=DAYS.map((x,d)=>{const t=addDays(S.week,d);return x+" "+(t.getMonth()+1)+"/"+t.getDate()});
+  const aoa=[["Vista Markets · "+S.store+" · Week "+weekNo(S.week,S.cfg.wkOffset)+" ("+rangeLabel(S.week)+")"],[],["Department","Employee","Role",...dates.flatMap(d=>[d+" In",d+" Out",d+" Hrs"]),"Days","Total hrs"]];
+  for(const r of rows)aoa.push([grp(r.p.dept),r.p.name,r.p.role||"",...r.days.flatMap(x=>x?[xt(x.s),xt(x.e),Math.round(x.h*100)/100]:["OFF","",""]),r.n,Math.round(r.h*100)/100]);
+  const ws=X.utils.aoa_to_sheet(aoa);ws["!cols"]=[{wch:14},{wch:20},{wch:12},...DAYS.flatMap(()=>[{wch:9},{wch:9},{wch:5}]),{wch:5},{wch:8}];const wb=X.utils.book_new();X.utils.book_append_sheet(wb,ws,"Payclock");
+  const name=S.store.replace(/\s+/g,"-")+"_Payclock_Week"+weekNo(S.week,S.cfg.wkOffset)+".xlsx";X.writeFile(wb,name);toast("Downloaded "+name)}catch(e){showErr(e)}}
 
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAYS_ES=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
@@ -1445,8 +1503,8 @@ function renderControls(){applyFeats();
    $("#tab-schedule").hidden=B;const lab=(id,t,ic)=>{const b=$("#"+id);if(!b)return;if(!b.dataset.orig)b.dataset.orig=b.innerHTML;b.innerHTML=B?`<span class="ni" aria-hidden="true">${ic}</span>${t}`:b.dataset.orig};
    lab("tab-build","Schedule","📅");lab("tab-staff","Employees","👥");
    const ga=document.querySelector('[data-atab="guide"]');if(ga)ga.hidden=false;["chgAvail","selBtn","pasteBtn"].forEach(id=>{const x=$("#"+id);if(x)x.hidden=B});
-   document.querySelectorAll('.tabs button[data-tab]').forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));["build","schedule","staff","sum","dash","guide","settings","start"].forEach(t=>{const v=$("#view-"+t);if(v)v.hidden=t!==S.tab});$("#mainBar").hidden=S.tab==="build"||S.tab==="start"||(S.tab==="dash"&&isAdm());}{const fs=$("#finalSlot");if(fs)fs.hidden=!!LOCK}renderStart();
-  {const adm=isAdm(),inStore=["schedule","build","staff","sum"].includes(S.tab);$("#admNav").hidden=!adm;if(inStore)S._lastStoreTab=S.tab;document.body.classList.toggle("adm",adm);
+   document.querySelectorAll('.tabs button[data-tab]').forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));$("#tab-pay").hidden=!isAdm();if(S.tab==="pay"&&!isAdm())S.tab="build";["build","schedule","staff","sum","dash","guide","settings","start","pay"].forEach(t=>{const v=$("#view-"+t);if(v)v.hidden=t!==S.tab});renderGuideBar();renderPayView();$("#mainBar").hidden=S.tab==="build"||S.tab==="start"||(S.tab==="dash"&&isAdm());}{const fs=$("#finalSlot");if(fs)fs.hidden=!!LOCK}renderStart();
+  {const adm=isAdm(),inStore=["schedule","build","staff","sum","pay"].includes(S.tab);$("#admNav").hidden=!adm;if(inStore)S._lastStoreTab=S.tab;document.body.classList.toggle("adm",adm);
    $("#storeNav").hidden=adm&&!inStore;if(adm&&S.tab==="dash")$("#mainBar").hidden=true;$("#storeNav").classList.toggle("subnav",adm);
    renderHero();if((adm&&inStore)||LOCK){document.querySelector('#storeSel').closest('.field').hidden=true}
    ["tab-dash","tab-guide","tab-settings"].forEach(id=>{if(adm)$("#"+id).hidden=true});
@@ -1495,7 +1553,7 @@ function renderSum(){const el=$("#sumSlot");if(!el)return;el.innerHTML="";return
     .sort((a,b)=>deptOrder(grp(a.dept))-deptOrder(grp(b.dept))||grp(a.dept).localeCompare(grp(b.dept))||a.name.localeCompare(b.name));
   el.innerHTML=`<div style="margin-top:12px">${summaryHTML(ppl,S.dept==="__all")}</div>`;
   const t=el.querySelector(".ptitle");if(t)t.textContent="Employee summary · hours & days"+(S.dept==="__all"?"":" · "+grp(S.dept));}
-function renderGrid(){renderSum();renderPay();renderLock();renderHero();if(S.tab==="start")renderStart();if(S.tab==="sum")renderSumTab();
+function renderGrid(){renderSum();renderPay();renderLock();renderHero();if(S.tab==="start")renderStart();if(S.tab==="pay")renderPayView();if(S.gstep)renderGuideBar();if(S.tab==="sum")renderSumTab();
   const slot=$("#gridSlot");if(!S.store){slot.innerHTML="";return}
   document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===S.view)));
   document.querySelectorAll("[data-color]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.color===S.colorBy)));
@@ -2785,14 +2843,14 @@ function renderSumTab(){const el=$("#sumTabSlot");if(!el)return;if(S.tab!=="sum"
 ${(()=>{const adm=typeof LOCK!=="undefined"&&!LOCK&&S.canEdit;if(!(adm||(!BASIC()&&featOn("sum_need"))))return"";
     const gs=[...new Set(S.cfg.depts.map(grp))].filter(G=>(!F||G===F)&&guideRaw(S.store,G));
     if(!gs.length)return adm?`<div class="card" data-feat="sum_need"><h3 class="sec">Staffing needs</h3><div class="note">No staffing needs set for ${esc(S.store)} yet. Enter them in <b>Staffing guide</b> (AM / Mid / PM / After 5 per day).</div></div>`:"";
-    const cellC=(h,n)=>!n&&!h?`<td class="z">—</td>`:`<td class="${h<n?"short":h>n?"over":"ok"}"><b>${h}</b><small>of ${n}</small></td>`;
+    const cellC=(h,n)=>!n&&!h?`<td class="z">—</td>`:`<td><b>${h}</b><small> / ${n}</small></td>`;
     const body=gs.map(G=>{const g=guideRaw(S.store,G);const R2=D[G];const have=PART4.map((x,k)=>DAYS.map((y,d)=>R2?R2.pc[k][d]:0));
       const need=PART4.map((x,k)=>DAYS.map((y,d)=>+((g.slots[k]||{}).need||[])[d]||0));
       const rows=PART4.map(([n],k)=>{if(!need[k].some(x=>x)&&!have[k].some(x=>x))return"";return `<tr><td class="l"><span class="pt k${k}">${n}</span></td>${DAYS.map((y,d)=>cellC(have[k][d],need[k][d])).join("")}</tr>`}).join("");
       const tH=DAYS.map((y,d)=>have.reduce((a,r)=>a+r[d],0)),tN=DAYS.map((y,d)=>need.reduce((a,r)=>a+r[d],0));
       const short=DAYS.reduce((a,y,d)=>a+PART4.reduce((b,x,k)=>b+Math.max(0,need[k][d]-have[k][d]),0),0);
-      return `<tr class="sg"><td colspan="8">${esc(G)} ${short?`<span class="flag bad">${short} short</span>`:`<span class="okpill">Covered</span>`}</td></tr>${rows}<tr class="needtot"><td class="l">Total</td>${DAYS.map((y,d)=>cellC(tH[d],tN[d])).join("")}</tr>`}).join("");
-    return `<div class="card" data-feat="sum_need"><h3 class="sec">Staffing needs <span class="note" style="font-weight:500">scheduled <b>of</b> needed · <span class="short">red = short</span> · <span class="over">blue = over</span> · from the staffing guide</span></h3><div class="sx"><table class="stab needs"><thead><tr><th class="l">Shift</th>${dh}</tr></thead><tbody>${body}</tbody></table></div></div>`})()}
+      return `<tr class="sg"><td colspan="8">${esc(G)}</td></tr>${rows}<tr class="needtot"><td class="l">Total</td>${DAYS.map((y,d)=>cellC(tH[d],tN[d])).join("")}</tr>`}).join("");
+    return `<div class="card" data-feat="sum_need"><h3 class="sec">Staffing needs <span class="note" style="font-weight:500">each cell: <b>scheduled</b> / needed (from the staffing guide)</span></h3><div class="sx"><table class="stab needs"><thead><tr><th class="l">Shift</th>${dh}</tr></thead><tbody>${body}</tbody></table></div></div>`})()}
   <div class="card" data-feat="sum_shift"><h3 class="sec">By shift <span class="note" style="font-weight:500">people starting in each part of the day · AM before 10a · Mid 10a–2p · PM 2p–5p · After 5 = 5p or later</span></h3><div class="sx"><table class="stab part4"><thead><tr><th class="l">Department</th><th class="l">Shift</th>${dh}<th>Week</th></tr></thead><tbody>${part4Blocks||`<tr><td colspan="10" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody></table></div>
   <details class="exact" open data-feat="sum_exact"><summary>${guideOn(S.store)?"Compared to the staffing guide (short / over)":"Exact shift times"}</summary><div class="sx"><table class="stab shifts"><thead><tr><th class="l">Shift</th>${dh}</tr></thead><tbody>${shiftBlocks||`<tr><td colspan="8" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody></table></div></details></div>
   <div class="card" data-feat="sum_dept"><h3 class="sec">By department</h3><div class="sx"><table class="stab"><thead><tr><th class="l">Department</th><th>Employees</th><th>Shifts</th><th>Hours</th>${dh}</tr></thead><tbody>${deptRows||`<tr><td colspan="11" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody>
@@ -2807,6 +2865,8 @@ const DAY_ES={Sun:"Dom",Mon:"Lun",Tue:"Mar",Wed:"Mié",Thu:"Jue",Fri:"Vie",Sat:"
 const DAYL_ES={Sunday:"Domingo",Monday:"Lunes",Tuesday:"Martes",Wednesday:"Miércoles",Thursday:"Jueves",Friday:"Viernes",Saturday:"Sábado",Sundays:"domingos",Mondays:"lunes",Tuesdays:"martes",Wednesdays:"miércoles",Thursdays:"jueves",Fridays:"viernes",Saturdays:"sábados"};
 const MON_ES={Jan:"ene",Feb:"feb",Mar:"mar",Apr:"abr",May:"may",Jun:"jun",Jul:"jul",Aug:"ago",Sep:"sep",Oct:"oct",Nov:"nov",Dec:"dic"};
 const ES={
+"← Home":"← Inicio","Add new hires (+ Add employee), fix departments, or remove anyone who left.":"Agrega nuevos (+ Agregar empleado), corrige departamentos o quita a quien ya no trabaja.","Click Edit on an employee and tick the days they can't work this week.":"Haz clic en Editar y marca los días que no puede trabajar esta semana.",
+"Drag names from the Off row onto shifts. Copy last week saves time.":"Arrastra nombres de la fila Libre a los turnos. Copiar semana pasada ahorra tiempo.","Check Over / Under and the totals by day and department.":"Revisa De más / De menos y los totales por día y departamento.","Submit to admin →":"Enviar al administrador →","✓ Sent · Back to Home":"✓ Enviado · Volver a Inicio","Payclock":"Reloj de nómina","📋 Copy table":"📋 Copiar tabla","⬇ Excel (by employee)":"⬇ Excel (por empleado)","🖨 Print":"🖨 Imprimir",
 "🎓 Practice":"🎓 Practicar","🎓 PRACTICE MODE":"🎓 MODO DE PRÁCTICA","Nothing is saved. Real schedules aren't touched.":"No se guarda nada. Los horarios reales no se tocan.","Exit practice":"Salir de práctica","Practice the admin's side:":"Practica la parte del administrador:","✓ Pretend admin approves":"✓ Simular que el administrador aprueba","↩ Pretend admin asks for changes":"↩ Simular que pide cambios","Start practice":"Empezar práctica",
 "Staffing needs":"Necesidades de personal","Covered":"Cubierto","Total":"Total",
 "Role / position (optional)":"Puesto (opcional)",
@@ -2869,6 +2929,8 @@ const ES={
 "Saved for everyone with this link":"Guardado para todos con este enlace","Loading…":"Cargando…","Search results":"Resultados","Clear search":"Borrar búsqueda","Tap a department or person to show only that department.":"Toca un departamento o persona para ver solo ese departamento."
 };
 const ES_RE=[
+[/^(\d+) of (\d+) entered$/,"$1 de $2 capturados"],
+[/^Step (\d) of 7$/,"Paso $1 de 7"],[/^✓ Done · Next: (.+) →$/,m=>"✓ Listo · Siguiente: "+(ES[m[1]]||m[1])+" →"],
 [/^🗑 Clear week$/,"🗑 Borrar semana"],[/^🗑 Clear (.+)$/,"🗑 Borrar $1"],[/^Clear (.+)\?$/,"¿Borrar $1?"],
 [/^Coverage · (.+)$/,"Cubre · $1"],
 [/^(\d+) employees\. Add new hires, fix departments, remove anyone who left\.$/,"$1 empleados. Agrega nuevos, corrige departamentos, quita a quien ya no trabaja."],
