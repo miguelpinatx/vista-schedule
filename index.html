@@ -22,6 +22,10 @@
 .hchips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.hchip{border-radius:99px;padding:5px 12px;font-size:13px;background:rgba(255,255,255,.14);color:#fff}.hchip b{font-size:15px}
 .hchip.sub{background:#FEC938;color:#3d2e00}.hchip.ok{background:#e3f4e4;color:#1f5e23}.hchip.rev{background:#fde3df;color:#9b2c1f}.hchip.late{background:#c0392b;color:#fff}
 .hometiles{margin-bottom:18px}
+.trainbtn{margin-left:8px;background:#fff4d6;border-color:#f1d98a;color:#6b4d00;font-weight:700}
+#trainBar{position:sticky;top:0;z-index:50;background:repeating-linear-gradient(135deg,#f59e0b 0 18px,#f7b23b 18px 36px);color:#2b1d00;border-radius:14px;padding:12px 16px;margin:0 0 12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+#trainBar b{font-size:17px}#trainBar .tnote{background:rgba(255,255,255,.85);border-radius:8px;padding:4px 10px;font-size:13.5px}#trainBar .btn{background:#fff}#trainBar .btn.exit{background:#2b1d00;color:#fff;border-color:#2b1d00}
+body.training .top{outline:4px solid #f59e0b;outline-offset:2px}
 .dweek{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:center;justify-content:space-between;background:var(--surface);border:2px solid var(--brand);border-radius:16px;padding:16px 20px;margin-bottom:16px}
 .dwk{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}.dwr{font-family:var(--f-display);font-size:28px;font-weight:800;line-height:1.1}.dwd{font-size:15px;color:var(--muted)}.dwd.late{color:var(--bad-fg);font-weight:700}
 .dwnav{display:flex;gap:6px}.dwst{display:flex;flex-direction:column;gap:6px;min-width:220px}.dwst .spill{align-self:flex-start;font-size:14px;padding:5px 12px}.dprog{height:10px;background:var(--surface2);border-radius:99px;overflow:hidden}.dprog i{display:block;height:100%;background:var(--brand)}
@@ -241,7 +245,7 @@ tr.cov td.who{font-size:12px;color:var(--muted);font-weight:600;text-transform:u
 .cv.over{background:var(--warn-bg);color:var(--warn-fg)}
 .cv.none{color:var(--muted)}
 body.nf-home_totals [data-feat~="home_totals"],body.nf-card_stats [data-feat~="card_stats"],body.nf-home_summary [data-feat~="home_summary"],body.nf-store_stats [data-feat~="store_stats"],body.nf-emp_totals [data-feat~="emp_totals"],body.nf-issues [data-feat~="issues"],body.nf-sum_tab [data-feat~="sum_tab"],body.nf-sum_tiles [data-feat~="sum_tiles"],body.nf-sum_dept [data-feat~="sum_dept"],body.nf-sum_day [data-feat~="sum_day"],body.nf-sum_shift [data-feat~="sum_shift"],body.nf-sum_emp [data-feat~="sum_emp"]{display:none!important}
-details.exact{margin-top:10px}.rt.role{background:#fff4d6;color:#6b4d00;border-color:#f1d98a}.btn.bclear{color:var(--bad-fg);border-color:var(--bad-line)}.rt.cov{background:#e3effa;color:#0d4a75;border-color:#b9d6ef}@media (max-width:640px){.lockban{flex-wrap:wrap}.lockban .spacer{display:none}}
+details.exact{margin-top:10px}.stab.needs td.ok{background:#e9f6ea;color:#1f5e23}.stab.needs td.z{color:#c9c3b6}.stab.needs tr.needtot td{border-top:2px solid var(--line);font-weight:800}.stab.needs td small{display:inline;margin-left:3px}.rt.role{background:#fff4d6;color:#6b4d00;border-color:#f1d98a}.btn.bclear{color:var(--bad-fg);border-color:var(--bad-line)}.rt.cov{background:#e3effa;color:#0d4a75;border-color:#b9d6ef}@media (max-width:640px){.lockban{flex-wrap:wrap}.lockban .spacer{display:none}}
 .flag.under{background:#e3effa;color:#0d4a75}.ptitle.bad{color:var(--bad-fg)}.ptitle.und{color:#0d4a75}
 .ovgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.ovrow{padding:6px 0;border-bottom:1px solid var(--line)}@media (max-width:640px){.ovgrid{grid-template-columns:1fr}}
 .cwdays{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}.cw{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--line);border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer;user-select:none}.cw input{width:18px;height:18px}.cw.on{border-color:var(--bad-fg);background:var(--bad-bg);color:var(--bad-fg)}
@@ -909,7 +913,7 @@ function lockBannerHTML(){if(!S.store||!(S.tab==="schedule"||S.tab==="build"||S.
   if(st==="revise")return `<div class="lockban rev"><span class="lki">↩</span><div><b>The admin asked for changes${(L.fixes||[]).length?" in these departments":""}:</b>${fixesHTML(L)}<span class="note">${adm?"Waiting for the store to resubmit.":"Make the changes, then click <b>Resubmit to admin</b>."}</span></div>${adm?"":`<div class="spacer"></div><button class="btn primary" data-lock="submit">Resubmit to admin</button>`}</div>`;
   const now=new Date(),due=dueOf(S.week),end=addDays(S.week,7);if(now>=end)return"";const late=now>due;
   return `<div class="lockban due ${late?"late":""}"><span class="lki">📅</span><div><b>${late?"Late: this schedule was due":"Due"} ${due.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"long",month:"numeric",day:"numeric"})}</b><br><span class="note">${adm?"Not submitted by the store yet.":"When it's ready, click <b>Submit to admin</b>. You can't edit it after you submit unless the admin sends it back."}</span></div>${adm?"":`<div class="spacer"></div><button class="btn primary" data-lock="submit">Submit to admin</button>`}</div>`}
-function renderLock(){if(LOCK)loadRev();const el=$("#lockSlot");if(el)el.innerHTML=lockBannerHTML();if(S.tab==="dash")loadSubs()}
+function renderLock(){if(LOCK)loadRev();if(TRAIN)renderTrainBar();const el=$("#lockSlot");if(el)el.innerHTML=lockBannerHTML();if(S.tab==="dash")loadSubs()}
 function submitChecks(){const out=[];const groups=new Set();for(const p of Object.values(S.staff))if(p&&!p._pending&&p.store===S.store)gsetOf(p).forEach(G=>groups.add(G));
   for(const G of [...groups].sort((a,b)=>deptOrder(a)-deptOrder(b))){const o=openByDay(G);if(o){const n=o.reduce((a,b)=>a+b,0);if(n)out.push(`<b>${esc(G)}</b>: ${n} open spot${n===1?"":"s"} vs. staffing guide`)}}
   for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;const r=rowStats({id,...p});const m=limitMsgs(p,r.h,r.days);{const u=underMsg(p,r.h);if(u&&!m.length)out.push(`<b>${esc(p.name)}</b>: under · ${esc(u)}`)}if(m.length)out.push(`<b>${esc(p.name)}</b>: ${m.map(esc).join(", ")}`)}
@@ -1187,6 +1191,40 @@ document.addEventListener("click",async e=>{if(!e.target.closest("#basicTog"))re
 function renderBasicTog(){const t=$("#basicTog");if(!t)return;const on=BASIC();t.classList.toggle("on",on);t.setAttribute("aria-pressed",String(on));$("#basicLbl").textContent=on?"On":"Off";t.disabled=!(S.canEdit&&!LOCK);const fc=$("#featCard");if(fc)fc.classList.toggle("dim",on);const bn=$("#featBasicNote");if(bn)bn.hidden=!on}
 document.addEventListener("click",e=>{const s=e.target.closest("[data-collapsed]>span");if(s)s.parentElement.removeAttribute("data-collapsed")});
 
+/* ---------- Training mode (practice, nothing saved) ---------- */
+let TRAIN=false;
+function trainingBackend(){const clone=o=>JSON.parse(JSON.stringify(o||{}));
+  const staff={};for(const[id,p]of Object.entries(S.staff))if(p&&!p._pending&&(!LOCK||p.store===LOCK))staff[id]=clone(p);
+  const mb=memoryBackend({cfg:clone(S.cfg),staff,guides:clone(S.guides),tasks:clone(S.tasks),sched:{}},null);
+  const docs={locks:{},published:{},sales:{},reviews:{}};const subs={};
+  const emit=k=>(subs[k]||[]).forEach(f=>f(docs.locks[k]||null));
+  return Object.assign(mb,{
+    async getPub(k){return docs.published[k]||null},async savePub(k,o){docs.published[k]=o},async delPub(k){delete docs.published[k]},
+    async getLock(k){return docs.locks[k]||null},async saveLock(k,o){docs.locks[k]=o;emit(k)},async delLock(k){delete docs.locks[k];emit(k)},
+    subLock(k,cb){(subs[k]=subs[k]||[]).push(cb);setTimeout(()=>cb(docs.locks[k]||null),0);return()=>{subs[k]=(subs[k]||[]).filter(f=>f!==cb)}},
+    async getSales(k){return docs.sales[k]||null},async saveSales(k,o){docs.sales[k]=o},
+    async getRev(k){return docs.reviews[k]||null},async saveRev(k,o){if(o)docs.reviews[k]=o;else delete docs.reviews[k]},
+    async saveCfg(c){S.cfg=c;renderAll()}})}
+function startTraining(){if(TRAIN)return;
+  openModal(`<h3>🎓 Practice mode</h3><div class="ctx">Training · nothing you do here is saved</div>
+    <p style="margin:0">You'll practice with ${LOCK?"your real employee list":"the real employee lists"} and an <b>empty</b> schedule. Try everything: add employees, drag names onto shifts, check the summary, submit${LOCK?", and pretend to be the admin to approve it, then post":", review, approve or request changes"}.</p>
+    <p class="note" style="margin:0">Nothing changes in the real schedule, roster or employee links. Click <b>Exit practice</b> any time to go back.</p>
+    <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button><button class="btn primary" id="trainGo">Start practice</button></div>`);
+  $("#trainGo").onclick=()=>{closeModal();TRAIN=true;document.body.classList.add("training");CK.k=null;REV.k=null;SUBS.week=null;SUBS.at=0;if(typeof DASH!=="undefined"){DASH.week=null;DASH.docs={}}
+    attach(trainingBackend());resub();S.lock=null;S.readOnly=false;watchLock();renderTrainBar();toast("Practice mode on. Nothing is saved.")}}
+function renderTrainBar(){let b=$("#trainBar");if(!TRAIN){if(b)b.remove();return}
+  if(!b){b=document.createElement("div");b.id="trainBar";const w=document.querySelector(".wrap");w.insertBefore(b,w.children[1]||null)}
+  const st=stState();
+  const acts=LOCK?(st==="submitted"?`<span class="tnote">Practice the admin's side:</span><button class="btn" data-train="approve">✓ Pretend admin approves</button><button class="btn" data-train="revise">↩ Pretend admin asks for changes</button>`:"")
+    :(st==="draft"&&S.store?`<button class="btn" data-train="submit">Pretend ${esc(S.store)} submits this week</button>`:"");
+  b.innerHTML=`<b>🎓 PRACTICE MODE</b><span class="tnote">Nothing is saved. Real schedules aren't touched.</span>${acts}<span style="flex:1"></span><button class="btn exit" data-train="exit">Exit practice</button>`}
+document.addEventListener("click",async e=>{const t=e.target.closest("[data-train]");if(!t)return;const a=t.dataset.train;const k=key();
+  if(a==="exit"){location.reload();return}
+  if(a==="approve"){await backend.saveLock(k,statusDoc("approved",{approvedAt:new Date().toISOString(),postedAt:null}));toast("Practice: the admin approved it. Now post it to employees.")}
+  if(a==="revise"){await backend.saveLock(k,statusDoc("revise",{note:"Practice note: please check Saturday coverage.",fixes:[{dept:storeGroups()[0]||"Hot Deli",note:"Short on Saturday PM (practice)"}],revisedAt:new Date().toISOString()}));toast("Practice: the admin asked for changes. See Home, step 5.")}
+  if(a==="submit"){await backend.saveLock(k,statusDoc("submitted",{submittedAt:new Date().toISOString(),storeNote:"Practice submission",issues:[],reviewed:true}));SUBS.at=0;loadSubs(true);toast("Practice: "+S.store+" submitted. Review it, then approve or request changes.")}
+  renderAll()});
+
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAYS_ES=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
 const DAYS_LONG=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -1313,9 +1351,9 @@ const grpMatch=s=>S.dept==="__all"||inGrp(s,grp(S.dept));
 const FEATS=[["Home page",[["home_totals","People scheduled · Total hours · Waiting for you","The 3 boxes under the week banner"],["card_stats","People · hours (store cards)","Numbers on each store card"],["home_summary","Staffing summary","Whole section below the store cards"]]],
   ["Staffing summary (Home, after you pick a store)",[["ds_text","Written summary","Paragraph at the top"],["ds_tiles","Hours · People working · Shift mix · Hour problems","The 4 boxes"],["ds_daychart","People working each day","Bar chart"],["ds_checks","Hour checks","List of hour problems"],["ds_dept","By department","Table"],["ds_traffic","Customer traffic","BRdata transactions"],["ds_details","Show details","Hours & people breakdown"],["hs_heat","Hours by department, every store","Shows when All stores is picked"]]],
   ["Store pages",[["store_stats","Employees · Working · Hours · Due","Boxes in the green store banner"],["emp_totals","Days · hours","Row under each department on the full schedule"],["issues","Issues to review","Admin list above the schedule"]]],
-  ["Summary tab",[["sum_tab","Summary","The tab itself"],["sum_tiles","Total hours · People scheduled","The 2 boxes at the top"],["sum_shift","By shift","AM · Mid · PM · After 5"],["sum_exact","Compared to the staffing guide (short / over)","Under By shift · called Exact shift times when the guide is off"],["sum_dept","By department","Table"],["sum_day","By day","Table"],["sum_emp","By employee","Table"]]]];
+  ["Summary tab",[["sum_tab","Summary","The tab itself"],["sum_tiles","Total hours · People scheduled","The 2 boxes at the top"],["sum_need","Staffing needs","Scheduled vs. needed per department (AM · Mid · PM · After 5)"],["sum_shift","By shift","AM · Mid · PM · After 5"],["sum_exact","Compared to the staffing guide (short / over)","Under By shift · called Exact shift times when the guide is off"],["sum_dept","By department","Table"],["sum_day","By day","Table"],["sum_emp","By employee","Table"]]]];
 const BASIC=()=>!!(S.cfg&&S.cfg.basic!==false);
-const BASIC_ON=new Set(["sum_tab","sum_tiles","sum_flags","sum_dept","sum_day","sum_emp","emp_totals","card_stats","home_totals"]);
+const BASIC_ON=new Set(["sum_need","sum_tab","sum_tiles","sum_flags","sum_dept","sum_day","sum_emp","emp_totals","card_stats","home_totals"]);
 const featOn=k=>BASIC()?BASIC_ON.has(k):!((S.cfg&&S.cfg.featOff)||{})[k];
 function applyFeats(){let css="";for(const[,list]of FEATS)for(const[k]of list)if(!featOn(k))css+=`[data-feat~="${k}"]{display:none!important}`;let el=document.getElementById("featCss");if(!el){el=document.createElement("style");el.id="featCss";document.head.appendChild(el)}if(el.textContent!==css)el.textContent=css;if(!featOn("sum_tab")&&S.tab==="sum")S.tab="schedule"}
 const FTPT=()=>!!(S.cfg&&S.cfg.ftpt);
@@ -1354,6 +1392,7 @@ async function boot(){
     let c0=null;try{const r=await sb.from("docs").select("data").eq("collection","config").eq("id","main").maybeSingle();c0=r.data&&r.data.data}catch(e){}
     const acc=await pinGate(c0);S.canEdit=acc.lvl==="admin";S._realCanEdit=S.canEdit;S.readOnly=false;LOCK=acc.store||null;if(LOCK){S.store=LOCK;S.tab="start"}else if(S.canEdit)S.tab="dash";
     if(!acc.open){const so=document.createElement("button");so.className="btn sm";so.textContent="Sign out";so.style.marginLeft="12px";so.onclick=signOut;const br=document.querySelector(".brand");if(br)br.appendChild(so)}
+    {const tr=document.createElement("button");tr.className="btn sm trainbtn";tr.id="trainBtn";tr.textContent="🎓 Practice";tr.title="Training mode: practice with your real roster. Nothing is saved.";tr.onclick=()=>startTraining();const br=document.querySelector(".brand");if(br)br.appendChild(tr)}
     realBackend=supaBackend(sb);S.mode="shared";attach(realBackend);return;
   }
   let db=null;
@@ -1402,10 +1441,10 @@ function renderControls(){applyFeats();
   document.querySelector('#storeSel').closest('.field').hidden=S.tab==="dash";document.querySelector('#deptSel').closest('.field').hidden=S.tab==="dash";
   $("#searchField").hidden=!(S.tab==="schedule"||S.tab==="staff");
   $("#tab-start").hidden=!LOCK;if(!LOCK&&S.tab==="start")S.tab=isAdm()?"dash":"schedule";
-  {const B=BASIC();document.body.classList.toggle("basic",B);if(B&&((S.tab==="start"&&!LOCK)||S.tab==="schedule"||S.tab==="guide"))S.tab=S.tab==="guide"?"dash":(isAdm()?"sum":"build");
+  {const B=BASIC();document.body.classList.toggle("basic",B);if(B&&((S.tab==="start"&&!LOCK)||S.tab==="schedule"))S.tab=isAdm()?"sum":"build";
    $("#tab-schedule").hidden=B;const lab=(id,t,ic)=>{const b=$("#"+id);if(!b)return;if(!b.dataset.orig)b.dataset.orig=b.innerHTML;b.innerHTML=B?`<span class="ni" aria-hidden="true">${ic}</span>${t}`:b.dataset.orig};
    lab("tab-build","Schedule","📅");lab("tab-staff","Employees","👥");
-   const ga=document.querySelector('[data-atab="guide"]');if(ga)ga.hidden=B;["chgAvail","selBtn","pasteBtn"].forEach(id=>{const x=$("#"+id);if(x)x.hidden=B});
+   const ga=document.querySelector('[data-atab="guide"]');if(ga)ga.hidden=false;["chgAvail","selBtn","pasteBtn"].forEach(id=>{const x=$("#"+id);if(x)x.hidden=B});
    document.querySelectorAll('.tabs button[data-tab]').forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));["build","schedule","staff","sum","dash","guide","settings","start"].forEach(t=>{const v=$("#view-"+t);if(v)v.hidden=t!==S.tab});$("#mainBar").hidden=S.tab==="build"||S.tab==="start"||(S.tab==="dash"&&isAdm());}{const fs=$("#finalSlot");if(fs)fs.hidden=!!LOCK}renderStart();
   {const adm=isAdm(),inStore=["schedule","build","staff","sum"].includes(S.tab);$("#admNav").hidden=!adm;if(inStore)S._lastStoreTab=S.tab;document.body.classList.toggle("adm",adm);
    $("#storeNav").hidden=adm&&!inStore;if(adm&&S.tab==="dash")$("#mainBar").hidden=true;$("#storeNav").classList.toggle("subnav",adm);
@@ -2743,6 +2782,17 @@ function renderSumTab(){const el=$("#sumTabSlot");if(!el)return;if(S.tab!=="sum"
   <div class="dtiles" data-feat="sum_tiles"><div class="dtile"><span>Total hours</span><b>${r1(T.h)}</b></div><div class="dtile"><span>People scheduled</span><b>${T.ids.size}</b><small>of ${ppl.length} on the team</small></div></div>
   ${(()=>{const L=ppl.map(p=>{const r=rowStats(p);return{p,r,m:limitMsgs(p,r.h,r.days),u:underMsg(p,r.h)}});const ov=L.filter(x=>x.m.length),un=L.filter(x=>x.u);
     return `<div class="card ovun" data-feat="sum_flags"><h3 class="sec">Over / Under</h3>${!ov.length&&!un.length?`<div class="banner ok">✓ Nobody is over or under.</div>`:`<div class="ovgrid"><div><div class="ptitle bad">Over (${ov.length})</div>${ov.map(x=>`<div class="ovrow"><b>${esc(x.p.name)}</b> <span class="note">${esc(grp(x.p.dept))}</span><br><span class="flag bad">${x.m.map(esc).join(" · ")}</span></div>`).join("")||`<div class="note">Nobody</div>`}</div><div><div class="ptitle und">Under (${un.length})</div>${un.map(x=>`<div class="ovrow"><b>${esc(x.p.name)}</b> <span class="note">${esc(grp(x.p.dept))}</span><br><span class="flag under">${esc(x.u)}</span></div>`).join("")||`<div class="note">Nobody</div>`}</div></div>`}</div>`})()}
+${(()=>{const adm=typeof LOCK!=="undefined"&&!LOCK&&S.canEdit;if(!(adm||(!BASIC()&&featOn("sum_need"))))return"";
+    const gs=[...new Set(S.cfg.depts.map(grp))].filter(G=>(!F||G===F)&&guideRaw(S.store,G));
+    if(!gs.length)return adm?`<div class="card" data-feat="sum_need"><h3 class="sec">Staffing needs</h3><div class="note">No staffing needs set for ${esc(S.store)} yet. Enter them in <b>Staffing guide</b> (AM / Mid / PM / After 5 per day).</div></div>`:"";
+    const cellC=(h,n)=>!n&&!h?`<td class="z">—</td>`:`<td class="${h<n?"short":h>n?"over":"ok"}"><b>${h}</b><small>of ${n}</small></td>`;
+    const body=gs.map(G=>{const g=guideRaw(S.store,G);const R2=D[G];const have=PART4.map((x,k)=>DAYS.map((y,d)=>R2?R2.pc[k][d]:0));
+      const need=PART4.map((x,k)=>DAYS.map((y,d)=>+((g.slots[k]||{}).need||[])[d]||0));
+      const rows=PART4.map(([n],k)=>{if(!need[k].some(x=>x)&&!have[k].some(x=>x))return"";return `<tr><td class="l"><span class="pt k${k}">${n}</span></td>${DAYS.map((y,d)=>cellC(have[k][d],need[k][d])).join("")}</tr>`}).join("");
+      const tH=DAYS.map((y,d)=>have.reduce((a,r)=>a+r[d],0)),tN=DAYS.map((y,d)=>need.reduce((a,r)=>a+r[d],0));
+      const short=DAYS.reduce((a,y,d)=>a+PART4.reduce((b,x,k)=>b+Math.max(0,need[k][d]-have[k][d]),0),0);
+      return `<tr class="sg"><td colspan="8">${esc(G)} ${short?`<span class="flag bad">${short} short</span>`:`<span class="okpill">Covered</span>`}</td></tr>${rows}<tr class="needtot"><td class="l">Total</td>${DAYS.map((y,d)=>cellC(tH[d],tN[d])).join("")}</tr>`}).join("");
+    return `<div class="card" data-feat="sum_need"><h3 class="sec">Staffing needs <span class="note" style="font-weight:500">scheduled <b>of</b> needed · <span class="short">red = short</span> · <span class="over">blue = over</span> · from the staffing guide</span></h3><div class="sx"><table class="stab needs"><thead><tr><th class="l">Shift</th>${dh}</tr></thead><tbody>${body}</tbody></table></div></div>`})()}
   <div class="card" data-feat="sum_shift"><h3 class="sec">By shift <span class="note" style="font-weight:500">people starting in each part of the day · AM before 10a · Mid 10a–2p · PM 2p–5p · After 5 = 5p or later</span></h3><div class="sx"><table class="stab part4"><thead><tr><th class="l">Department</th><th class="l">Shift</th>${dh}<th>Week</th></tr></thead><tbody>${part4Blocks||`<tr><td colspan="10" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody></table></div>
   <details class="exact" open data-feat="sum_exact"><summary>${guideOn(S.store)?"Compared to the staffing guide (short / over)":"Exact shift times"}</summary><div class="sx"><table class="stab shifts"><thead><tr><th class="l">Shift</th>${dh}</tr></thead><tbody>${shiftBlocks||`<tr><td colspan="8" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody></table></div></details></div>
   <div class="card" data-feat="sum_dept"><h3 class="sec">By department</h3><div class="sx"><table class="stab"><thead><tr><th class="l">Department</th><th>Employees</th><th>Shifts</th><th>Hours</th>${dh}</tr></thead><tbody>${deptRows||`<tr><td colspan="11" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody>
@@ -2757,6 +2807,8 @@ const DAY_ES={Sun:"Dom",Mon:"Lun",Tue:"Mar",Wed:"Mié",Thu:"Jue",Fri:"Vie",Sat:"
 const DAYL_ES={Sunday:"Domingo",Monday:"Lunes",Tuesday:"Martes",Wednesday:"Miércoles",Thursday:"Jueves",Friday:"Viernes",Saturday:"Sábado",Sundays:"domingos",Mondays:"lunes",Tuesdays:"martes",Wednesdays:"miércoles",Thursdays:"jueves",Fridays:"viernes",Saturdays:"sábados"};
 const MON_ES={Jan:"ene",Feb:"feb",Mar:"mar",Apr:"abr",May:"may",Jun:"jun",Jul:"jul",Aug:"ago",Sep:"sep",Oct:"oct",Nov:"nov",Dec:"dic"};
 const ES={
+"🎓 Practice":"🎓 Practicar","🎓 PRACTICE MODE":"🎓 MODO DE PRÁCTICA","Nothing is saved. Real schedules aren't touched.":"No se guarda nada. Los horarios reales no se tocan.","Exit practice":"Salir de práctica","Practice the admin's side:":"Practica la parte del administrador:","✓ Pretend admin approves":"✓ Simular que el administrador aprueba","↩ Pretend admin asks for changes":"↩ Simular que pide cambios","Start practice":"Empezar práctica",
+"Staffing needs":"Necesidades de personal","Covered":"Cubierto","Total":"Total",
 "Role / position (optional)":"Puesto (opcional)",
 "Clear week":"Borrar semana","Clear the whole week?":"¿Borrar toda la semana?","Resubmit for review":"Reenviar para revisión","RESUBMIT for review":"REENVIAR para revisión","Admin's notes:":"Notas del administrador:",
 "Primary department":"Departamento principal","Coverage departments (optional)":"Departamentos que cubre (opcional)",
