@@ -767,6 +767,11 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
       <div class="note">Start simple and turn on more as your managers get comfortable. Turning something off only hides it; nothing is deleted. <b>Simple setup</b> keeps the schedule, store cards with hours, the days · hours row, and the Summary tab with By department and By shift.</div>
       <div id="featToggles" class="gtogs"></div>
     </div>
+    <div class="card" id="cmpCard">
+      <h2 class="sec">Compare to staffing guide</h2>
+      <div class="note">When it's <b>off</b>, the Summary shows just the totals: how many people are scheduled in AM, Mid, PM and After 5 for each department. Turn it <b>on</b> later to show <b>scheduled / needed</b> from the Staffing guide.</div>
+      <div class="gtogs"><button class="gtog" id="cmpTog" aria-pressed="false"><span>Compare to guide<small id="cmpLbl">Off</small></span><span class="sw2"></span></button></div>
+    </div>
     <div class="card" id="ftptCard">
       <h2 class="sec">Full-time / part-time rules</h2>
       <div class="note">When it's <b>on</b>: FT/PT tags show next to names, part-timers are flagged over 29.99 hrs, full-timers under 30, and Fill automatically keeps part-timers at 29.99 or less. When it's <b>off</b>: no FT/PT tags or flags; everyone is checked only for overtime (over 40), personal hour limits and max days. Each employee's FT/PT setting is kept, so you can turn this back on anytime.</div>
@@ -1282,6 +1287,8 @@ async function exportPayExcel(){try{const X=await loadXLSX();const rows=payRows(
   for(const r of rows)aoa.push([grp(r.p.dept),r.p.name,r.p.role||"",...r.days.flatMap(x=>x?[xt(x.s),xt(x.e),Math.round(x.h*100)/100]:["OFF","",""]),r.n,Math.round(r.h*100)/100]);
   const ws=X.utils.aoa_to_sheet(aoa);ws["!cols"]=[{wch:14},{wch:20},{wch:12},...DAYS.flatMap(()=>[{wch:9},{wch:9},{wch:5}]),{wch:5},{wch:8}];const wb=X.utils.book_new();X.utils.book_append_sheet(wb,ws,"Payclock");
   const name=S.store.replace(/\s+/g,"-")+"_Payclock_Week"+weekNo(S.week,S.cfg.wkOffset)+".xlsx";X.writeFile(wb,name);toast("Downloaded "+name)}catch(e){showErr(e)}}
+
+document.addEventListener("click",async e=>{if(!e.target.closest("#cmpTog"))return;try{await backend.saveCfg({...S.cfg,needCompare:!S.cfg.needCompare});toast(S.cfg.needCompare?"Comparing to the staffing guide":"Showing totals only")}catch(x){showErr(x)}});
 
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAYS_ES=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
@@ -2028,7 +2035,7 @@ function renderPinState(){const el=$("#pinState");if(!el)return;const p=S.cfg.pi
   const box=$("#pinStores");if(box&&!box.contains(document.activeElement))box.innerHTML=S.cfg.stores.map(s=>`<label class="field"><span>${esc(s)} PIN</span><input type="password" autocomplete="new-password" data-pinstore="${esc(s)}" placeholder="${st[s]?"set · type to change":"not set"}"></label>`).join("");
   const missing=S.cfg.stores.filter(s=>!st[s]);
   el.textContent=p.admin?`PINs are on. ${missing.length?"No PIN yet for: "+missing.join(", ")+" (those stores can't sign in).":"Every store has a PIN."}`:"PINs are off: anyone with the link sees every store."}
-function renderGoals(){renderPinState();renderPayCfg();renderGuideToggles();renderFeatToggles();renderBasicTog();{const t=$("#ftptTog");if(t){const on=FTPT();t.classList.toggle("on",on);t.setAttribute("aria-pressed",String(on));$("#ftptLbl").textContent=on?"On":"Off";t.disabled=!(S.canEdit&&!LOCK)}}
+function renderGoals(){renderPinState();renderPayCfg();renderGuideToggles();renderFeatToggles();renderBasicTog();{const t=$("#cmpTog");if(t){const on=!!S.cfg.needCompare;t.classList.toggle("on",on);t.setAttribute("aria-pressed",String(on));$("#cmpLbl").textContent=on?"On":"Off";t.disabled=!(S.canEdit&&!LOCK)}}{const t=$("#ftptTog");if(t){const on=FTPT();t.classList.toggle("on",on);t.setAttribute("aria-pressed",String(on));$("#ftptLbl").textContent=on?"On":"Off";t.disabled=!(S.canEdit&&!LOCK)}}
   const slot=$("#goalsSlot");if(!slot||slot.contains(document.activeElement))return;const groups=wGroups();const G=S.cfg.goals||{};
   slot.innerHTML=`<div style="overflow-x:auto"><table class="gtable" style="min-width:${180+S.cfg.stores.length*92}px"><thead><tr><th>Weekly hours goal</th>${S.cfg.stores.map(s=>`<th>${esc(s)}</th>`).join("")}</tr></thead><tbody>
   <tr><td style="text-align:left"><b>Whole store</b></td>${S.cfg.stores.map(s=>`<td><input type="number" min="0" step="0.5" style="width:80px" data-goal="${esc(s)}" data-g="" value="${(G[s]&&G[s].total)||""}" placeholder="—" ${S.canEdit?"":"disabled"}></td>`).join("")}</tr>
@@ -2394,6 +2401,7 @@ function renderGuide(){
   if(S.dept==="__all"){
     slot.innerHTML=`<div class="row"><h2 class="sec">${esc(S.store)} staffing guide</h2><div class="spacer"></div>${lockNote}</div>
       <div class="note">Corporate sets the shifts and recommended headcount for each department. The schedule then shows scheduled vs. recommended under each department, and the department's shifts become the first buttons in the shift picker. Pick a department to ${S.canEdit?"set it up":"see it"}.</div>
+      ${S.canEdit?`<div class="row"><div class="spacer"></div><button class="btn" id="gClearAll" style="color:var(--bad-fg)">🗑 Clear all departments for ${esc(S.store)}</button></div>`:""}
       <div class="gsum">${[...new Set(S.cfg.depts.map(grp))].map(d=>{const g=guideRaw(S.store,d);return `<button class="card" data-gdept="${esc(d)}"><span class="nm">${esc(d)}</span>${d===FE?`<span class="note">Counts everyone in: ${esc(feList().join(", "))}</span>`:""}<span class="note">${g?fmtH(guideHours(g))+" recommended hrs/week":"Not set up yet"}</span><span class="note">${g?g.slots.map(sl=>esc(sl.label)+" "+Math.max(...(sl.need||[0]).map(n=>+n||0))+"/day").join(" · "):""}</span></button>`}).join("")}</div>`;
     return;
   }
@@ -2418,6 +2426,7 @@ function renderGuide(){
 ${D.isNew?`<span class="note">Not set up yet. Enter the numbers and save.</span>`:""}
         <div class="spacer"></div>
         ${D.dirty?`<span class="note">Unsaved changes</span><button class="btn" data-gact="revert">Discard</button>`:""}
+        <button class="btn" data-gact="clear" style="color:var(--bad-fg)">🗑 Clear numbers</button>
         <button class="btn" data-gact="copyall" ${D.isNew&&!D.dirty?"disabled":""}>Copy to all stores</button>
         <button class="btn primary" data-gact="save" ${D.dirty?"":"disabled"}>Save guide</button></div>`}
     </div>
@@ -2431,6 +2440,7 @@ function guideAct(a){
   if(a==="add"){const last=D.slots[D.slots.length-1];D.slots.push({label:"Shift",start:last?last.end:"08:00",end:last?fmtAdd(last.end,8):"16:00",need:[0,0,0,0,0,0,0]});D.dirty=true;renderGuide()}
   else if(a==="tpl"){D.slots=TEMPLATE.map(t=>({...t,need:[0,0,0,0,0,0,0]}));D.dirty=true;renderGuide()}
   else if(a==="revert"){D.dirty=false;renderGuide()}
+  else if(a==="clear"){D.slots.forEach(sl=>sl.need=[0,0,0,0,0,0,0]);D.dirty=true;renderGuide();toast("Cleared. Click Save guide to keep it.")}
   else if(a==="save"){const doc={store:S.store,dept:grp(S.dept),parts:true,slots:cleanParts(D.slots)};D.isNew=false;backend.saveGuide(D.id,doc).then(()=>toast("Guide saved for "+grp(S.dept)+" at "+S.store)).catch(showErr);D.dirty=false;renderGuide()}
   else if(a==="copyall"){
     const others=S.cfg.stores.filter(s=>s!==S.store);
@@ -2749,6 +2759,10 @@ document.addEventListener("click",e=>{if(!e.target.closest("[data-bclear]"))retu
     <p style="margin:0">This removes <b>${n} shift${n===1?"":"s"}</b> ${all?"in every department":"in "+esc(G)} so you can start fresh. Employees and their availability stay. This can't be undone.</p>
     <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button><button class="btn danger" id="doBClear">Yes, clear ${all?"week":esc(G)}</button></div>`);
   $("#doBClear").onclick=()=>{backend.setSched(key(),{...meta(),shifts:next}).catch(showErr);closeModal();toast(all?"Week cleared":G+" cleared")}});
+document.addEventListener("click",e=>{if(!e.target.closest("#gClearAll"))return;const pre=skey(S.store)+"__";const ids=Object.keys(S.guides||{}).filter(k=>k.startsWith(pre));
+  openModal(`<h3>Clear the whole staffing guide for ${esc(S.store)}?</h3><div class="ctx">${ids.length} department${ids.length===1?"":"s"} set up</div><p style="margin:0">This removes the numbers for every department at ${esc(S.store)} so you can start over. Schedules and employees aren't touched. Other stores aren't touched.</p>
+    <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button><button class="btn danger" id="gClearYes">Yes, clear ${esc(S.store)}</button></div>`);
+  $("#gClearYes").onclick=async()=>{closeModal();for(const id of ids)await backend.saveGuide(id,null).catch(showErr);S.gDraft=null;toast("Staffing guide cleared for "+S.store)}});
 document.addEventListener("click",e=>{const b=e.target.closest("[data-bdept]");if(b){S.dept=b.dataset.bdept;savePrefs();renderAll();return}
   const w=e.target.closest("[data-bwk]");if(w){const t=document.getElementById(w.dataset.bwk);if(t)t.click()}});
 $("#copyPrev").onclick=()=>{
@@ -2840,17 +2854,18 @@ function renderSumTab(){const el=$("#sumTabSlot");if(!el)return;if(S.tab!=="sum"
   <div class="dtiles" data-feat="sum_tiles"><div class="dtile"><span>Total hours</span><b>${r1(T.h)}</b></div><div class="dtile"><span>People scheduled</span><b>${T.ids.size}</b><small>of ${ppl.length} on the team</small></div></div>
   ${(()=>{const L=ppl.map(p=>{const r=rowStats(p);return{p,r,m:limitMsgs(p,r.h,r.days),u:underMsg(p,r.h)}});const ov=L.filter(x=>x.m.length),un=L.filter(x=>x.u);
     return `<div class="card ovun" data-feat="sum_flags"><h3 class="sec">Over / Under</h3>${!ov.length&&!un.length?`<div class="banner ok">✓ Nobody is over or under.</div>`:`<div class="ovgrid"><div><div class="ptitle bad">Over (${ov.length})</div>${ov.map(x=>`<div class="ovrow"><b>${esc(x.p.name)}</b> <span class="note">${esc(grp(x.p.dept))}</span><br><span class="flag bad">${x.m.map(esc).join(" · ")}</span></div>`).join("")||`<div class="note">Nobody</div>`}</div><div><div class="ptitle und">Under (${un.length})</div>${un.map(x=>`<div class="ovrow"><b>${esc(x.p.name)}</b> <span class="note">${esc(grp(x.p.dept))}</span><br><span class="flag under">${esc(x.u)}</span></div>`).join("")||`<div class="note">Nobody</div>`}</div></div>`}</div>`})()}
-${(()=>{const adm=typeof LOCK!=="undefined"&&!LOCK&&S.canEdit;if(!(adm||(!BASIC()&&featOn("sum_need"))))return"";
-    const gs=[...new Set(S.cfg.depts.map(grp))].filter(G=>(!F||G===F)&&guideRaw(S.store,G));
+${(()=>{const adm=typeof LOCK!=="undefined"&&!LOCK&&S.canEdit;if(!(adm||(!BASIC()&&featOn("sum_need"))))return"";const CMP=!!S.cfg.needCompare;
+    const gs=CMP?[...new Set(S.cfg.depts.map(grp))].filter(G=>(!F||G===F)&&guideRaw(S.store,G)):order.filter(G=>!F||G===F);
+    if(!gs.length&&!CMP)return"";
     if(!gs.length)return adm?`<div class="card" data-feat="sum_need"><h3 class="sec">Staffing needs</h3><div class="note">No staffing needs set for ${esc(S.store)} yet. Enter them in <b>Staffing guide</b> (AM / Mid / PM / After 5 per day).</div></div>`:"";
-    const cellC=(h,n)=>!n&&!h?`<td class="z">—</td>`:`<td><b>${h}</b><small> / ${n}</small></td>`;
-    const body=gs.map(G=>{const g=guideRaw(S.store,G);const R2=D[G];const have=PART4.map((x,k)=>DAYS.map((y,d)=>R2?R2.pc[k][d]:0));
+    const cellC=(h,n)=>!n&&!h?`<td class="z">—</td>`:CMP?`<td><b>${h}</b><small> / ${n}</small></td>`:`<td><b>${h}</b></td>`;
+    const body=gs.map(G=>{const g=guideRaw(S.store,G)||{slots:[]};const R2=D[G];const have=PART4.map((x,k)=>DAYS.map((y,d)=>R2?R2.pc[k][d]:0));
       const need=PART4.map((x,k)=>DAYS.map((y,d)=>+((g.slots[k]||{}).need||[])[d]||0));
       const rows=PART4.map(([n],k)=>{if(!need[k].some(x=>x)&&!have[k].some(x=>x))return"";return `<tr><td class="l"><span class="pt k${k}">${n}</span></td>${DAYS.map((y,d)=>cellC(have[k][d],need[k][d])).join("")}</tr>`}).join("");
       const tH=DAYS.map((y,d)=>have.reduce((a,r)=>a+r[d],0)),tN=DAYS.map((y,d)=>need.reduce((a,r)=>a+r[d],0));
       const short=DAYS.reduce((a,y,d)=>a+PART4.reduce((b,x,k)=>b+Math.max(0,need[k][d]-have[k][d]),0),0);
       return `<tr class="sg"><td colspan="8">${esc(G)}</td></tr>${rows}<tr class="needtot"><td class="l">Total</td>${DAYS.map((y,d)=>cellC(tH[d],tN[d])).join("")}</tr>`}).join("");
-    return `<div class="card" data-feat="sum_need"><h3 class="sec">Staffing needs <span class="note" style="font-weight:500">each cell: <b>scheduled</b> / needed (from the staffing guide)</span></h3><div class="sx"><table class="stab needs"><thead><tr><th class="l">Shift</th>${dh}</tr></thead><tbody>${body}</tbody></table></div></div>`})()}
+    return `<div class="card" data-feat="sum_need"><h3 class="sec">${CMP?"Staffing needs":"Staffing by shift"} <span class="note" style="font-weight:500">${CMP?"each cell: <b>scheduled</b> / needed (from the staffing guide)":"people scheduled in each part of the day · AM before 10a · Mid 10a–2p · PM 2p–5p · After 5"}</span></h3><div class="sx"><table class="stab needs"><thead><tr><th class="l">Shift</th>${dh}</tr></thead><tbody>${body}</tbody></table></div></div>`})()}
   <div class="card" data-feat="sum_shift"><h3 class="sec">By shift <span class="note" style="font-weight:500">people starting in each part of the day · AM before 10a · Mid 10a–2p · PM 2p–5p · After 5 = 5p or later</span></h3><div class="sx"><table class="stab part4"><thead><tr><th class="l">Department</th><th class="l">Shift</th>${dh}<th>Week</th></tr></thead><tbody>${part4Blocks||`<tr><td colspan="10" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody></table></div>
   <details class="exact" open data-feat="sum_exact"><summary>${guideOn(S.store)?"Compared to the staffing guide (short / over)":"Exact shift times"}</summary><div class="sx"><table class="stab shifts"><thead><tr><th class="l">Shift</th>${dh}</tr></thead><tbody>${shiftBlocks||`<tr><td colspan="8" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody></table></div></details></div>
   <div class="card" data-feat="sum_dept"><h3 class="sec">By department</h3><div class="sx"><table class="stab"><thead><tr><th class="l">Department</th><th>Employees</th><th>Shifts</th><th>Hours</th>${dh}</tr></thead><tbody>${deptRows||`<tr><td colspan="11" class="note">Nothing scheduled this week yet.</td></tr>`}</tbody>
@@ -2865,6 +2880,7 @@ const DAY_ES={Sun:"Dom",Mon:"Lun",Tue:"Mar",Wed:"Mié",Thu:"Jue",Fri:"Vie",Sat:"
 const DAYL_ES={Sunday:"Domingo",Monday:"Lunes",Tuesday:"Martes",Wednesday:"Miércoles",Thursday:"Jueves",Friday:"Viernes",Saturday:"Sábado",Sundays:"domingos",Mondays:"lunes",Tuesdays:"martes",Wednesdays:"miércoles",Thursdays:"jueves",Fridays:"viernes",Saturdays:"sábados"};
 const MON_ES={Jan:"ene",Feb:"feb",Mar:"mar",Apr:"abr",May:"may",Jun:"jun",Jul:"jul",Aug:"ago",Sep:"sep",Oct:"oct",Nov:"nov",Dec:"dic"};
 const ES={
+"🗑 Clear numbers":"🗑 Borrar números","Staffing by shift":"Personal por turno",
 "← Home":"← Inicio","Add new hires (+ Add employee), fix departments, or remove anyone who left.":"Agrega nuevos (+ Agregar empleado), corrige departamentos o quita a quien ya no trabaja.","Click Edit on an employee and tick the days they can't work this week.":"Haz clic en Editar y marca los días que no puede trabajar esta semana.",
 "Drag names from the Off row onto shifts. Copy last week saves time.":"Arrastra nombres de la fila Libre a los turnos. Copiar semana pasada ahorra tiempo.","Check Over / Under and the totals by day and department.":"Revisa De más / De menos y los totales por día y departamento.","Submit to admin →":"Enviar al administrador →","✓ Sent · Back to Home":"✓ Enviado · Volver a Inicio","Payclock":"Reloj de nómina","📋 Copy table":"📋 Copiar tabla","⬇ Excel (by employee)":"⬇ Excel (por empleado)","🖨 Print":"🖨 Imprimir",
 "🎓 Practice":"🎓 Practicar","🎓 PRACTICE MODE":"🎓 MODO DE PRÁCTICA","Nothing is saved. Real schedules aren't touched.":"No se guarda nada. Los horarios reales no se tocan.","Exit practice":"Salir de práctica","Practice the admin's side:":"Practica la parte del administrador:","✓ Pretend admin approves":"✓ Simular que el administrador aprueba","↩ Pretend admin asks for changes":"↩ Simular que pide cambios","Start practice":"Empezar práctica",
