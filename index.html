@@ -1156,8 +1156,7 @@ function startHTML(){if(!S.store)return"";const h=new Date().getHours();const gr
   let ov=0,un=0;for(const p of roster){const r=rowStats(p);if(limitMsgs(p,r.h,r.days).length)ov++;else if(underMsg(p,r.g))un++}
   const sent=st==="submitted"||st==="approved",posted=st==="approved"&&isPosted(L),locked=lockedForMe();
   const steps=[
-    {k:"roster",t:"Review your employee roster",sub:`${roster.length} employees. Add new hires, fix departments, remove anyone who left.`,done:!!ck.roster,btns:[["Open Employees",'data-sgo="staff"'],locked?null:[ck.roster?"Undo":"✓ Done",`data-ck="roster"`,!ck.roster]]},
-    {k:"avail",t:"Update availability",sub:`Mark the days people can't work this week (vacation, school, requests).${cant?` ${cant} have days marked.`:""}`,done:!!ck.avail,btns:[["Open Employees",'data-sgo="staff"'],locked?null:[ck.avail?"Undo":"✓ Done",`data-ck="avail"`,!ck.avail]]},
+    {k:"roster",t:"Check your employees",sub:`${roster.length} employees. Add new hires, remove anyone who left, and mark days they can't work.${cant?` ${cant} have days marked.`:""}`,done:!!ck.roster,btns:[["Open Employees",'data-sgo="staff"'],locked?null:[ck.roster?"Undo":"✓ Done",`data-ck="roster"`,!ck.roster]]},
     {k:"build",t:"Build the schedule",sub:n?`${n} shifts placed. Drag names from the Off row onto shifts.`:"Drag names from the Off row onto shifts. Tip: Copy last week saves time.",done:n>0,btns:[["Open Schedule",'data-sgo="build"']]},
     {k:"review",t:"Review days & hours",sub:!n?"Build the schedule first.":(ov||un)?`${ov} over · ${un} under. Fix what you can, then mark it reviewed.`:"Nobody is over or under.",done:n>0&&revOK(),btns:n?[["Open Summary",'data-sgo="sum"'],locked?null:[revOK()?"Undo":"✓ Reviewed",revOK()?'data-ck="unreview"':'data-ck="review"',!revOK()]]:[]},
     {k:"submit",t:st==="revise"?"RESUBMIT for review":"Submit for review",rev:st==="revise",sub:sent?`Sent ${fdt(L.submittedAt||L.at)}`:st==="revise"?"The admin asked for changes. Fix these on the schedule, then resubmit.":"Send it to the admin when it's ready.",done:sent,extra:st==="revise"?`<div class="revbox"><b>Admin's notes:</b>${fixesHTML(L)}</div>`:"",btns:!sent&&n?(st==="revise"?[["Open Schedule",'data-sgo="build"'],["↩ Resubmit for review",'data-lock="submit"',true]]:[["Submit to admin",'data-lock="submit"',true]]):[]},
@@ -1240,8 +1239,7 @@ document.addEventListener("click",async e=>{const t=e.target.closest("[data-trai
   renderAll()});
 
 /* ---------- guided steps: Next bar ---------- */
-const GSTEPS=[{k:"roster",tab:"staff",t:"Review your employee roster",h:"Add new hires (+ Add employee), fix departments, or remove anyone who left."},
-  {k:"avail",tab:"staff",t:"Update availability",h:"Click Edit on an employee and tick the days they can't work this week."},
+const GSTEPS=[{k:"roster",tab:"staff",t:"Check your employees",h:"Add new hires (+ Add employee), remove anyone who left. Click Edit to tick days they can't work."},
   {k:"build",tab:"build",t:"Build the schedule",h:"Drag names from the Off row onto shifts. Copy last week saves time."},
   {k:"review",tab:"sum",t:"Review days & hours",h:"Check Over / Under and the totals by day and department."},
   {k:"submit",tab:"sum",t:"Submit for review",h:"Send it to the admin when it's ready."}];
@@ -1250,7 +1248,7 @@ function renderGuideBar(){let b=$("#guideBar");if(!b){b=document.createElement("
   const x=GSTEPS[i],nx=GSTEPS[i+1];const st=stState();const sent=st==="submitted"||st==="approved";
   const main=x.k==="submit"?(sent?`<button class="btn primary big" data-gnext="home">✓ Sent · Back to Home</button>`:`<button class="btn primary big" data-lock="submit">${st==="revise"?"↩ Resubmit for review":"Submit to admin →"}</button>`)
     :`<button class="btn primary big" data-gnext="${x.k}">✓ Done · Next: ${esc(nx.t)} →</button>`;
-  b.hidden=false;b.innerHTML=`<div class="gbar"><button class="btn" data-gnext="home">← Home</button><div class="gtx"><span class="gstep">Step ${i+1} of 7</span><b>${esc(x.t)}</b><span class="note">${esc(x.h)}</span></div>${main}</div>`}
+  b.hidden=false;b.innerHTML=`<div class="gbar"><button class="btn" data-gnext="home">← Home</button><div class="gtx"><span class="gstep">Step ${i+1} of 6</span><b>${esc(x.t)}</b><span class="note">${esc(x.h)}</span></div>${main}</div>`}
 document.addEventListener("click",async e=>{const b=e.target.closest("[data-gnext]");if(!b)return;const k=b.dataset.gnext;
   if(k==="home"){S.gstep=null;S.tab="start";savePrefs();renderAll();window.scrollTo({top:0});return}
   if((k==="roster"||k==="avail")&&!(CK.k===key()&&CK.doc&&CK.doc[k]))await setCK(k,true);
@@ -2897,7 +2895,7 @@ const ES={
 "Role / position (optional)":"Puesto (opcional)",
 "Clear week":"Borrar semana","Clear the whole week?":"¿Borrar toda la semana?","Resubmit for review":"Reenviar para revisión","RESUBMIT for review":"REENVIAR para revisión","Admin's notes:":"Notas del administrador:",
 "Primary department":"Departamento principal","Coverage departments (optional)":"Departamentos que cubre (opcional)",
-"Your steps this week":"Tus pasos esta semana","Schedule for":"Horario de","Due":"Entrega","Review your employee roster":"Revisa tu lista de empleados","Update availability":"Actualiza la disponibilidad","Review days & hours":"Revisa días y horas","Submit for review":"Enviar para revisión","Wait for approval":"Esperar aprobación","Post & share with employees":"Publicar y compartir con empleados",
+"Your steps this week":"Tus pasos esta semana","Schedule for":"Horario de","Due":"Entrega","Review your employee roster":"Revisa tu lista de empleados","Check your employees":"Revisa tus empleados","Add new hires (+ Add employee), remove anyone who left. Click Edit to tick days they can't work.":"Agrega nuevos (+ Agregar empleado), quita a quien ya no trabaja. Haz clic en Editar para marcar los días que no puede trabajar.","Update availability":"Actualiza la disponibilidad","Review days & hours":"Revisa días y horas","Submit for review":"Enviar para revisión","Wait for approval":"Esperar aprobación","Post & share with employees":"Publicar y compartir con empleados",
 "Open Employees":"Abrir Empleados","Open Schedule":"Abrir Horario","Open Summary":"Abrir Resumen","✓ Done":"✓ Listo","Undo":"Deshacer","✓ Reviewed":"✓ Revisado","Submit to admin":"Enviar al administrador","📲 Share employee link":"📲 Compartir enlace de empleados",
 "Build the schedule first.":"Primero haz el horario.","Nobody is over or under.":"Nadie tiene de más ni de menos.","Send it to the admin when it's ready.":"Envíalo al administrador cuando esté listo.","Make the admin's changes, then send it again.":"Haz los cambios del administrador y envíalo otra vez.",
 "The admin is reviewing it. You'll see the result here.":"El administrador lo está revisando. Aquí verás el resultado.","The admin asked for changes:":"El administrador pidió cambios:","After you submit, the admin approves it or asks for changes.":"Después de enviarlo, el administrador lo aprueba o pide cambios.",
@@ -2955,10 +2953,10 @@ const ES={
 };
 const ES_RE=[
 [/^(\d+) of (\d+) entered$/,"$1 de $2 capturados"],
-[/^Step (\d) of 7$/,"Paso $1 de 7"],[/^✓ Done · Next: (.+) →$/,m=>"✓ Listo · Siguiente: "+(ES[m[1]]||m[1])+" →"],
+[/^Step (\d) of (\d)$/,"Paso $1 de $2"],[/^✓ Done · Next: (.+) →$/,m=>"✓ Listo · Siguiente: "+(ES[m[1]]||m[1])+" →"],
 [/^🗑 Clear week$/,"🗑 Borrar semana"],[/^🗑 Clear (.+)$/,"🗑 Borrar $1"],[/^Clear (.+)\?$/,"¿Borrar $1?"],
 [/^Coverage · (.+)$/,"Cubre · $1"],
-[/^(\d+) employees\. Add new hires, fix departments, remove anyone who left\.$/,"$1 empleados. Agrega nuevos, corrige departamentos, quita a quien ya no trabaja."],
+[/^(\d+) employees\. Add new hires, fix departments, remove anyone who left\.$/,"$1 empleados. Agrega nuevos, corrige departamentos, quita a quien ya no trabaja."],[/^(\d+) employees\. Add new hires, remove anyone who left, and mark days they can't work\.(?: (\d+) have days marked\.)?$/,m=>m[1]+" empleados. Agrega nuevos, quita a quien ya no trabaja y marca los días que no pueden trabajar."+(m[2]?" "+m[2]+" tienen días marcados.":"")],
 [/^Mark the days people can't work this week \(vacation, school, requests\)\.(?: (\d+) have days marked\.)?$/,m=>"Marca los días que no pueden trabajar esta semana (vacaciones, escuela, permisos)."+(m[1]?" "+m[1]+" tienen días marcados.":"")],
 [/^(\d+) shifts placed\. Drag names from the Off row onto shifts\.$/,"$1 turnos puestos. Arrastra nombres de la fila Libre a los turnos."],
 [/^(\d+) over · (\d+) under\. Fix what you can, then mark it reviewed\.$/,"$1 de más · $2 de menos. Corrige lo que puedas y márcalo como revisado."],
