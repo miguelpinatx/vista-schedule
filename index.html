@@ -500,12 +500,14 @@ tr.sumg td{background:var(--surface2);font-weight:700;font-size:13px;text-transf
 .pv th,.pv td{border:1.5px solid #000;padding:7px 8px;text-align:center}
 .pv th{font-size:16px}
 .pv th{background:#e6e6e6}
-.pv td.n{text-align:left;font-weight:600}
+.pv td.n{text-align:left;font-weight:800;font-size:17px}
+.pv table:not(.ps) tbody tr:nth-child(even):not(.tot) td:not(.o){background:#f1f1f1}
 .pv td.o{background:#000;color:#fff;font-weight:700}
 .pv,.pv *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .pv td.e{background:#e6e6e6 repeating-linear-gradient(135deg,transparent 0 6px,#b5b5b5 6px 7px)}
-.pv td.names{text-align:left;vertical-align:top;font-size:16px;line-height:1.45}
-.pv td.names .ct{font-size:13px;color:#333}
+.pv td.names{text-align:left;vertical-align:top;font-size:16px;line-height:1.35;padding:4px 6px}
+.pv td.names>div{font-weight:800;padding:3px 0;border-bottom:1px dashed #888}.pv td.names>div:last-child{border-bottom:0}
+.pv td.names .ct{font-size:13px;color:#333;font-weight:500}
 .pv table.ps td.n{vertical-align:top;white-space:nowrap}
 .pv tr.g td{background:#d0d0d0;text-align:left;font-weight:800;font-family:var(--f-display);font-size:18px}
 .pv .sig{display:flex;gap:40px;margin-top:22px;font-size:15px}
@@ -1074,31 +1076,53 @@ document.addEventListener("click",async e=>{if(!e.target.closest("#bakBtn"))retu
     st.textContent="Downloaded "+all.length+" records."}catch(x){st.textContent="";showErr(x)}});
 
 /* ---------- Excel export (admin) ---------- */
-const XLSX_URL="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+const XLSX_URL="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js";
 function loadXLSX(){if(window.XLSX)return Promise.resolve(window.XLSX);return new Promise((res,rej)=>{const sc=document.createElement("script");sc.src=XLSX_URL;sc.onload=()=>res(window.XLSX);sc.onerror=()=>rej(new Error("Couldn't load the Excel tool. Check your internet and try again."));document.head.appendChild(sc)})}
 const xt=t=>{const m=toMin(t);if(m==null)return"";let h=Math.floor(m/60)%24,mm=m%60;const ap=h<12?"AM":"PM";h=h%12||12;return h+":"+String(mm).padStart(2,"0")+" "+ap};
 function storeSheetRows(st,wk,shifts){const sh=shifts||{};const cv=(id,d)=>sh[id]&&sh[id][d]||null;const r2=x=>Math.round(x*100)/100;
   const ppl=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>s&&!s._pending&&s.store===st);
   const groups=[...new Set(ppl.flatMap(p=>gsetOf(p)))].sort((a,b)=>deptOrder(a)-deptOrder(b));
   const dates=DAYS.map((x,d)=>{const t=addDays(wk,d);return x+" "+(t.getMonth()+1)+"/"+t.getDate()});
-  const rows=[["Vista Markets · "+st+" · Week "+weekNo(wk,S.cfg.wkOffset)+" ("+rangeLabel(wk)+")"],[]];let grand=0;const dayTot=[0,0,0,0,0,0,0];
+  const rows=[],K=[];const P=(k,r)=>{rows.push(r);K.push(k)};
+  P("title",["Vista Markets · "+st+" · Week "+weekNo(wk,S.cfg.wkOffset)+" ("+rangeLabel(wk)+")"]);P("blank",[]);let grand=0;const dayTot=[0,0,0,0,0,0,0];
   for(const G of groups){const ps=ppl.filter(p=>inGrp(p,G)).sort((a,b)=>a.name.localeCompare(b.name));const gD=[0,0,0,0,0,0,0];
     const slots=new Map();const off=[[],[],[],[],[],[],[]];const per={};
     for(const p of ps){per[p.id]={n:0,h:0};for(let d=0;d<7;d++){const v=cv(p.id,d);
       if(v&&v.s&&!v.off){if(shG(p,v)!==G)continue;const k=v.s+"-"+v.e;if(!slots.has(k))slots.set(k,{s:v.s,e:v.e,d:[[],[],[],[],[],[],[]]});slots.get(k).d[d].push(p.role?p.name+" ("+p.role+")":p.name);const x=hoursOf(v,S.cfg);gD[d]+=x;per[p.id].n++;per[p.id].h+=x}
       else off[d].push(p.name)}}
-    rows.push([G]);rows.push(["Shift",...dates]);
+    P("dept",[G]);P("head",["Shift",...dates,"Week"]);
     const ord=[...slots.values()].sort((a,b)=>toMin(a.s)-toMin(b.s)||toMin(a.e)-toMin(b.e));
-    for(const r of ord){r.d.forEach(x=>x.sort());const n=Math.max(1,...r.d.map(x=>x.length));for(let i=0;i<n;i++)rows.push([i?"":xt(r.s)+" - "+xt(r.e),...r.d.map(x=>x[i]||"")])}
-    if(!ord.length)rows.push(["No shifts scheduled"]);
-    off.forEach(x=>x.sort());const no=Math.max(0,...off.map(x=>x.length));for(let i=0;i<no;i++)rows.push([i?"":"OFF",...off.map(x=>x[i]||"")]);
-    const gT=gD.reduce((a,b)=>a+b,0);rows.push(["Total hours",...gD.map(r2),"Week: "+r2(gT)]);rows.push([]);
-    rows.push(["Employee","Days","Hours"]);for(const p of ps)rows.push([p.name,per[p.id].n,r2(per[p.id].h)]);rows.push([]);rows.push([]);
+    ord.forEach((r,j)=>{r.d.forEach(x=>x.sort());const n=Math.max(1,...r.d.map(x=>x.length));for(let i=0;i<n;i++)P(i?"shift":(j%2?"shift1b":"shift1"),[i?"":xt(r.s)+" - "+xt(r.e),...r.d.map(x=>x[i]||"")]);if(j%2)for(let i=K.length-n+1;i<K.length;i++)K[i]="shiftb"});
+    if(!ord.length)P("note",["No shifts scheduled"]);
+    off.forEach(x=>x.sort());const no=Math.max(0,...off.map(x=>x.length));for(let i=0;i<no;i++)P(i?"off":"off1",[i?"":"OFF",...off.map(x=>x[i]||"")]);
+    const gT=gD.reduce((a,b)=>a+b,0);P("total",["Total hours",...gD.map(r2),r2(gT)]);P("blank",[]);
+    P("ehead",["Employee","Days","Hours"]);for(const p of ps)P("emp",[p.name,per[p.id].n,r2(per[p.id].h)]);P("blank",[]);P("blank",[]);
     grand+=gT;gD.forEach((x,d)=>dayTot[d]+=x)}
-  rows.push(["All departments",...dayTot.map(r2),"Week: "+r2(grand)]);
-  if(S.cfg.mealDeduct)rows.push(["Hours exclude a 30-minute meal on shifts over 6 hours."]);
-  return rows}
-function sheetFrom(X,rows){const ws=X.utils.aoa_to_sheet(rows);ws["!cols"]=[{wch:22},...DAYS.map(()=>({wch:20})),{wch:12}];ws["!pageSetup"]={orientation:"landscape"};return ws}
+  P("ghead",["",...dates,"Week"]);P("grand",["All departments",...dayTot.map(r2),r2(grand)]);
+  if(S.cfg.mealDeduct)P("note",["Hours exclude a 30-minute meal on shifts over 6 hours."]);
+  rows.kinds=K;return rows}
+/* ---------- Excel styling (xlsx-js-style) ---------- */
+const XC={green:"3E8E2F",greenD:"2F7A22",green50:"EEF7EA",yellow:"FEC938",yel50:"FFF4D0",cream:"FFF8E7",ink:"222222",muted:"6B6B6B",line:"D9D9D9",off:"F3F1EC",white:"FFFFFF"};
+const xB=(c)=>({style:"thin",color:{rgb:c||XC.line}});
+const xBox=(c)=>({top:xB(c),bottom:xB(c),left:xB(c),right:xB(c)});
+function xStyle(ws,X,r,c1,c2,st){for(let c=c1;c<=c2;c++){const a=X.utils.encode_cell({r,c});if(!ws[a])ws[a]={t:"s",v:""};ws[a].s=st}}
+function sheetFrom(X,rows){const ws=X.utils.aoa_to_sheet(rows);const NC=9;ws["!cols"]=[{wch:20},...DAYS.map(()=>({wch:19})),{wch:11}];
+  const K=rows.kinds||[];const merges=[];const hts=[];
+  const F="Calibri";const font=(o)=>({name:F,sz:11,color:{rgb:XC.ink},...o});
+  K.forEach((k,r)=>{
+    if(k==="title"){xStyle(ws,X,r,0,NC-1,{font:font({sz:16,bold:true,color:{rgb:XC.greenD}})});merges.push({s:{r,c:0},e:{r,c:NC-1}});hts[r]={hpt:26}}
+    else if(k==="dept"){xStyle(ws,X,r,0,NC-1,{font:font({sz:13,bold:true,color:{rgb:XC.white}}),fill:{fgColor:{rgb:XC.green}},alignment:{vertical:"center"}});merges.push({s:{r,c:0},e:{r,c:NC-1}});hts[r]={hpt:22}}
+    else if(k==="head"||k==="ghead"){xStyle(ws,X,r,0,NC-1,{font:font({bold:true,color:{rgb:XC.greenD}}),fill:{fgColor:{rgb:XC.green50}},border:xBox(),alignment:{horizontal:"center",vertical:"center"}})}
+    else if(k.startsWith("shift")){const band=k.endsWith("b")||k==="shift1b";const first=k.startsWith("shift1");
+      const base={font:font(),border:{...xBox(),top:first?{style:"thin",color:{rgb:"9DB89A"}}:xB()},alignment:{horizontal:"center",vertical:"center"},fill:band?{fgColor:{rgb:"F7FBF5"}}:undefined};
+      xStyle(ws,X,r,0,NC-1,base);const a=X.utils.encode_cell({r,c:0});ws[a].s={...base,font:font({bold:true}),alignment:{horizontal:"left",vertical:"center"}}}
+    else if(k==="off"||k==="off1"){const st={font:font({italic:true,color:{rgb:XC.muted}}),fill:{fgColor:{rgb:XC.off}},border:xBox(),alignment:{horizontal:"center"}};xStyle(ws,X,r,0,NC-1,st);ws[X.utils.encode_cell({r,c:0})].s={...st,font:font({bold:true,color:{rgb:XC.muted}}),alignment:{horizontal:"left"}}}
+    else if(k==="total"||k==="grand"){const g=k==="grand";const st={font:font({bold:true,sz:g?12:11}),fill:{fgColor:{rgb:g?XC.yellow:XC.yel50}},border:xBox("C9B26A"),alignment:{horizontal:"center"},numFmt:"0.0"};xStyle(ws,X,r,0,NC-1,st);ws[X.utils.encode_cell({r,c:0})].s={...st,alignment:{horizontal:"left"}};hts[r]={hpt:g?22:18}}
+    else if(k==="ehead"){xStyle(ws,X,r,0,2,{font:font({bold:true,color:{rgb:XC.greenD}}),fill:{fgColor:{rgb:XC.green50}},border:xBox(),alignment:{horizontal:"center"}});ws[X.utils.encode_cell({r,c:0})].s.alignment={horizontal:"left"}}
+    else if(k==="emp"){xStyle(ws,X,r,0,2,{font:font(),border:xBox(),alignment:{horizontal:"center"},numFmt:"0.0"});ws[X.utils.encode_cell({r,c:0})].s={font:font(),border:xBox(),alignment:{horizontal:"left"}};const d=ws[X.utils.encode_cell({r,c:1})];if(d)d.s={...d.s,numFmt:"0"}}
+    else if(k==="note"){xStyle(ws,X,r,0,0,{font:font({italic:true,color:{rgb:XC.muted}})})}
+  });
+  ws["!merges"]=merges;ws["!rows"]=hts;ws["!pageSetup"]={orientation:"landscape",fitToWidth:1,fitToHeight:0};ws["!margins"]={left:0.3,right:0.3,top:0.4,bottom:0.4,header:0.2,footer:0.2};return ws}
 async function getSchedFor(st,wk){const k=st.replace(/[^A-Za-z0-9_-]/g,"_")+"_"+ymd(wk);if(st===S.store&&ymd(wk)===ymd(S.week)&&S.sched)return S.sched;return await backend.getSched(k).catch(()=>null)}
 async function exportExcel(stores){try{toast("Preparing Excel…");const X=await loadXLSX();const wk=S.week;const wb=X.utils.book_new();
     for(const st of stores){const doc=await getSchedFor(st,wk);const ws=sheetFrom(X,storeSheetRows(st,wk,doc&&doc.shifts));X.utils.book_append_sheet(wb,ws,st.slice(0,31))}
@@ -1282,9 +1306,23 @@ function renderPayView(){const el=$("#payViewSlot");if(!el)return;if(S.tab!=="pa
   $("#payXls").onclick=()=>exportPayExcel();$("#payPrint").onclick=()=>{const w=window.open("","_blank");if(!w){toast("Allow pop-ups to print.");return}
     w.document.write(`<html><head><title>Payclock ${esc(S.store)} Week ${weekNo(S.week,S.cfg.wkOffset)}</title><style>body{font:13px system-ui;margin:16px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #999;padding:4px 6px;text-align:center}td.l,th.l{text-align:left}tr.sg td{background:#eee;font-weight:800;text-align:left}td small{display:block;color:#555}.rt{font-size:11px;color:#555}@page{size:landscape;margin:10mm}</style></head><body><h2>Payclock · ${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)} (${rangeLabel(S.week)})</h2>${el.querySelector("table").outerHTML}<script>window.print()<\/script></body></html>`);w.document.close()}}
 async function exportPayExcel(){try{const X=await loadXLSX();const rows=payRows();const dates=DAYS.map((x,d)=>{const t=addDays(S.week,d);return x+" "+(t.getMonth()+1)+"/"+t.getDate()});
-  const aoa=[["Vista Markets · "+S.store+" · Week "+weekNo(S.week,S.cfg.wkOffset)+" ("+rangeLabel(S.week)+")"],[],["Department","Employee","Role",...dates.flatMap(d=>[d+" In",d+" Out",d+" Hrs"]),"Days","Total hrs"]];
-  for(const r of rows)aoa.push([grp(r.p.dept),r.p.name,r.p.role||"",...r.days.flatMap(x=>x?[xt(x.s),xt(x.e),Math.round(x.h*100)/100]:["OFF","",""]),r.n,Math.round(r.h*100)/100]);
-  const ws=X.utils.aoa_to_sheet(aoa);ws["!cols"]=[{wch:14},{wch:20},{wch:12},...DAYS.flatMap(()=>[{wch:9},{wch:9},{wch:5}]),{wch:5},{wch:8}];const wb=X.utils.book_new();X.utils.book_append_sheet(wb,ws,"Payclock");
+  const NC=3+21+2;const aoa=[["Vista Markets · Payclock · "+S.store+" · Week "+weekNo(S.week,S.cfg.wkOffset)+" ("+rangeLabel(S.week)+")"],[],["Department","Employee","Role",...dates.flatMap(d=>[d,"",""]),"Days","Total hrs"],["","","",...DAYS.flatMap(()=>["In","Out","Hrs"]),"",""]];
+  const kinds=["title","blank","h1","h2"];let lastG=null,band=0;
+  for(const r of rows){const G=grp(r.p.dept);if(G!==lastG){band^=1;lastG=G}
+    aoa.push([G,r.p.name,r.p.role||"",...r.days.flatMap(x=>x?[xt(x.s),xt(x.e),Math.round(x.h*100)/100]:["OFF","",""]),r.n,Math.round(r.h*100)/100]);kinds.push(band?"rowa":"rowb")}
+  const ws=X.utils.aoa_to_sheet(aoa);ws["!cols"]=[{wch:14},{wch:22},{wch:13},...DAYS.flatMap(()=>[{wch:9},{wch:9},{wch:6}]),{wch:6},{wch:9}];
+  const font=(o)=>({name:"Calibri",sz:10.5,color:{rgb:XC.ink},...o});const merges=[{s:{r:0,c:0},e:{r:0,c:NC-1}}];
+  for(let d=0;d<7;d++)merges.push({s:{r:2,c:3+d*3},e:{r:2,c:5+d*3}});for(const c of [0,1,2,NC-2,NC-1])merges.push({s:{r:2,c},e:{r:3,c}});
+  kinds.forEach((k,r)=>{
+    if(k==="title")xStyle(ws,X,r,0,NC-1,{font:font({sz:15,bold:true,color:{rgb:XC.greenD}})});
+    else if(k==="h1"||k==="h2")xStyle(ws,X,r,0,NC-1,{font:font({bold:true,color:{rgb:XC.white}}),fill:{fgColor:{rgb:k==="h1"?XC.green:XC.greenD}},border:xBox("2F6A26"),alignment:{horizontal:"center",vertical:"center",wrapText:true}});
+    else if(k==="rowa"||k==="rowb"){const fill=k==="rowa"?{fgColor:{rgb:"F7FBF5"}}:undefined;
+      for(let c=0;c<NC;c++){const a=X.utils.encode_cell({r,c});if(!ws[a])ws[a]={t:"s",v:""};const v=ws[a].v;const day=c>=3&&c<NC-2;const dc=day?(c-3)%3:-1;
+        const st={font:font(c===1||c===NC-1?{bold:true}:{}),border:{...xBox(),left:dc===0?{style:"medium",color:{rgb:"9DB89A"}}:xB()},alignment:{horizontal:c<3?"left":"center",vertical:"center"},fill};
+        if(v==="OFF")st.font=font({italic:true,color:{rgb:XC.muted}}),st.fill={fgColor:{rgb:XC.off}};
+        if(dc===2||c===NC-1)st.numFmt="0.0";if(c===NC-1)st.fill={fgColor:{rgb:XC.yel50}};ws[a].s=st}}});
+  ws["!merges"]=merges;ws["!rows"]=[{hpt:24},{},{hpt:18},{hpt:16}];ws["!pageSetup"]={orientation:"landscape",fitToWidth:1,fitToHeight:0};ws["!margins"]={left:0.25,right:0.25,top:0.4,bottom:0.4,header:0.2,footer:0.2};
+  const wb=X.utils.book_new();X.utils.book_append_sheet(wb,ws,"Payclock");
   const name=S.store.replace(/\s+/g,"-")+"_Payclock_Week"+weekNo(S.week,S.cfg.wkOffset)+".xlsx";X.writeFile(wb,name);toast("Downloaded "+name)}catch(e){showErr(e)}}
 
 document.addEventListener("click",async e=>{if(!e.target.closest("#cmpTog"))return;try{await backend.saveCfg({...S.cfg,needCompare:!S.cfg.needCompare});toast(S.cfg.needCompare?"Comparing to the staffing guide":"Showing totals only")}catch(x){showErr(x)}});
