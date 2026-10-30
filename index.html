@@ -1094,7 +1094,7 @@ function storeSheetRows(st,wk,shifts){const sh=shifts||{};const cv=(id,d)=>sh[id
     const ord=[...slots.values()].sort((a,b)=>toMin(a.s)-toMin(b.s)||toMin(a.e)-toMin(b.e));
     ord.forEach((r,j)=>{r.d.forEach(x=>x.sort());const n=Math.max(1,...r.d.map(x=>x.length));for(let i=0;i<n;i++)P(i?"shift":(j%2?"shift1b":"shift1"),[i?"":xt(r.s)+" - "+xt(r.e),...r.d.map(x=>x[i]||"")]);if(j%2)for(let i=K.length-n+1;i<K.length;i++)K[i]="shiftb"});
     if(!ord.length)P("note",["No shifts scheduled"]);
-    off.forEach(x=>x.sort());const no=Math.max(0,...off.map(x=>x.length));for(let i=0;i<no;i++)P(i?"off":"off1",[i?"":"OFF",...off.map(x=>x[i]||"")]);
+    
     const gT=gD.reduce((a,b)=>a+b,0);P("total",["Total hours",...gD.map(r2),r2(gT)]);P("blank",[]);
     P("ehead",["Employee","Days","Hours"]);for(const p of ps)P("emp",[p.name,per[p.id].n,r2(per[p.id].h)]);P("blank",[]);P("blank",[]);
     grand+=gT;gD.forEach((x,d)=>dayTot[d]+=x)}
