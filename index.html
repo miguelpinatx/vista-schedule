@@ -1335,6 +1335,21 @@ function goEmp(id){const p=S.staff[id];if(!p)return;S.dept=grp(p.dept);S.tab="bu
 document.addEventListener("click",e=>{const b=e.target.closest("[data-goemp]");if(!b)return;e.preventDefault();goEmp(b.dataset.goemp)});
 document.addEventListener("keydown",e=>{const b=e.target.closest&&e.target.closest("[data-goemp]");if(b&&(e.key==="Enter"||e.key===" ")){e.preventDefault();goEmp(b.dataset.goemp)}});
 
+/* ---------- Duties & notes editor (store level, from the Schedule screen) ---------- */
+function dutyGroups(){return [...new Set(Object.values(S.staff).filter(o=>o&&!o._pending&&o.store===S.store).flatMap(o=>gsetOf(o)))].sort((a,b)=>deptOrder(a)-deptOrder(b))}
+function dutiesModal(G){const gs=dutyGroups();if(!gs.length){toast("Add employees first.");return}
+  G=G&&gs.includes(G)?G:(S.dept&&S.dept!=="__all"&&gs.includes(grp(S.dept))?grp(S.dept):gs[0]);const t=tasksFor(S.store,G);
+  openModal(`<h2>Duties &amp; notes · ${esc(S.store)}</h2>
+    <label class="field"><span>Department</span><select id="dutyDept">${gs.map(x=>`<option ${x===G?"selected":""}>${esc(x)}</option>`).join("")}</select></label>
+    <p class="note">These print in a box under this department's schedule. One task per line.</p>
+    <p class="note"><b>${t._custom?esc(S.store)+" list":"Using the company list"}</b></p>
+    <div id="dutyEd">${taskEditorHTML("store",S.store,G)}</div>
+    <div class="row"><div class="spacer"></div>${t._custom?`<button class="btn" id="dutyReset">Use company list</button>`:""}<button class="btn" data-close>Cancel</button><button class="btn primary" id="dutySave">Save duties</button></div>`,true);
+  $("#dutyDept").onchange=e=>dutiesModal(e.target.value);
+  $("#dutySave").onclick=async()=>{try{await saveTasks("store",S.store,G,$("#dutyEd"));S.tasks=S.tasks||{};const v={store:S.store,dept:G};document.querySelectorAll('#dutyEd textarea[data-task="store"]').forEach(x=>v[x.dataset.k]=x.value.trim());S.tasks[taskKey(S.store,G)]=v;closeModal();toast("Duties saved for "+S.store+" · "+G);if(typeof renderPrint==="function")renderPrint()}catch(x){showErr(x)}};
+  const r=$("#dutyReset");if(r)r.onclick=async()=>{try{await backend.saveTask(taskKey(S.store,G),{store:S.store,dept:G});if(S.tasks)S.tasks[taskKey(S.store,G)]={store:S.store,dept:G};closeModal();toast("Using the company list for "+G)}catch(x){showErr(x)}}}
+document.addEventListener("click",e=>{if(e.target.closest("[data-duties]"))dutiesModal()});
+
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAYS_ES=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
 const DAYS_LONG=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -1977,7 +1992,7 @@ function basicBoard(){if(!S.store)return"";
   const cnt=G=>all.filter(p=>inGrp(p,G)).length;const ppl=all.filter(p=>grpMatch(p));
   const chips=`<div class="bchips"><button class="bchip ${S.dept==="__all"?"on":""}" data-bdept="__all">All departments<small>${all.length}</small></button>${groups.map(G=>`<button class="bchip ${S.dept!=="__all"&&grp(S.dept)===G?"on":""}" data-bdept="${esc(G)}">${esc(G)}<small>${cnt(G)}</small></button>`).join("")}</div>`;
   const wk=`<div class="bweek"><button class="btn icon" data-bwk="prevWk" aria-label="Previous week">‹</button><div><b>Week ${weekNo(S.week,S.cfg.wkOffset)}</b><span>${rangeLabel(S.week)}</span></div><button class="btn icon" data-bwk="nextWk" aria-label="Next week">›</button><button class="btn sm" data-bwk="dueWk">Week to submit</button></div>`;
-  const acts=`<div class="bacts">${S.readOnly?"":`<button class="btn" data-bwk="copyPrev">Copy last week</button>`}<button class="btn" data-bwk="printBtn">Print</button>${S.readOnly?"":`<button class="btn bclear" data-bclear>🗑 ${S.dept==="__all"?"Clear week":"Clear "+esc(grp(S.dept))}</button>`}</div>`;
+  const acts=`<div class="bacts">${S.readOnly?"":`<button class="btn" data-bwk="copyPrev">Copy last week</button>`}<button class="btn" data-bwk="printBtn">Print</button><button class="btn" data-duties>📝 Duties &amp; notes</button>${S.readOnly?"":`<button class="btn bclear" data-bclear>🗑 ${S.dept==="__all"?"Clear week":"Clear "+esc(grp(S.dept))}</button>`}</div>`;
   return `<div class="bhead"><div><h2 class="wh" style="margin:0">Schedule</h2><p class="wsub" style="margin:2px 0 0"><span>Drag a name from the Off row onto a shift.</span> <span>Drag it back to Off to remove it, or click + to pick someone.</span> <span>Red means they can't work that day.</span></p></div>${wk}</div>
   <div class="bbar">${chips}${acts}</div>${S.readOnly?"":wAlertsHTML(ppl)}<div id="wBoard">${shiftGridHTML(true)}</div>`}
 function wStep4(){
@@ -2933,7 +2948,7 @@ const ES={
 "Role / position (optional)":"Puesto (opcional)",
 "Clear week":"Borrar semana","Clear the whole week?":"¿Borrar toda la semana?","Resubmit for review":"Reenviar para revisión","RESUBMIT for review":"REENVIAR para revisión","Admin's notes:":"Notas del administrador:",
 "Primary department":"Departamento principal","Coverage departments (optional)":"Departamentos que cubre (opcional)",
-"Your steps this week":"Tus pasos esta semana","Schedule for":"Horario de","Due":"Entrega","Review your employee roster":"Revisa tu lista de empleados","Check your employees":"Revisa tus empleados","Check employee roster & edit availability":"Revisa la lista de empleados y edita la disponibilidad","Add new hires (+ Add employee), remove anyone who left. Click Edit to tick days they can't work.":"Agrega nuevos (+ Agregar empleado), quita a quien ya no trabaja. Haz clic en Editar para marcar los días que no puede trabajar.","Update availability":"Actualiza la disponibilidad","Review days & hours":"Revisa días y horas","Submit for review":"Enviar para revisión","Wait for approval":"Esperar aprobación","Post & share with employees":"Publicar y compartir con empleados",
+"Your steps this week":"Tus pasos esta semana","Schedule for":"Horario de","Due":"Entrega","Review your employee roster":"Revisa tu lista de empleados","📝 Duties & notes":"📝 Tareas y notas","Duties & notes":"Tareas y notas","Using the company list":"Usando la lista de la empresa","Use company list":"Usar lista de la empresa","Save duties":"Guardar tareas","Department":"Departamento","These print in a box under this department's schedule. One task per line.":"Se imprimen en un cuadro debajo del horario de este departamento. Una tarea por línea.","Check your employees":"Revisa tus empleados","Check employee roster & edit availability":"Revisa la lista de empleados y edita la disponibilidad","Add new hires (+ Add employee), remove anyone who left. Click Edit to tick days they can't work.":"Agrega nuevos (+ Agregar empleado), quita a quien ya no trabaja. Haz clic en Editar para marcar los días que no puede trabajar.","Update availability":"Actualiza la disponibilidad","Review days & hours":"Revisa días y horas","Submit for review":"Enviar para revisión","Wait for approval":"Esperar aprobación","Post & share with employees":"Publicar y compartir con empleados",
 "Open Employees":"Abrir Empleados","Open Schedule":"Abrir Horario","Open Summary":"Abrir Resumen","✓ Done":"✓ Listo","Undo":"Deshacer","✓ Reviewed":"✓ Revisado","Submit to admin":"Enviar al administrador","📲 Share employee link":"📲 Compartir enlace de empleados",
 "Build the schedule first.":"Primero haz el horario.","Nobody is over or under.":"Nadie tiene de más ni de menos.","Send it to the admin when it's ready.":"Envíalo al administrador cuando esté listo.","Make the admin's changes, then send it again.":"Haz los cambios del administrador y envíalo otra vez.",
 "The admin is reviewing it. You'll see the result here.":"El administrador lo está revisando. Aquí verás el resultado.","The admin asked for changes:":"El administrador pidió cambios:","After you submit, the admin approves it or asks for changes.":"Después de enviarlo, el administrador lo aprueba o pide cambios.",
