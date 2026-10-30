@@ -928,7 +928,7 @@ function lockBannerHTML(){if(!S.store||!(S.tab==="schedule"||S.tab==="build"||S.
 function renderLock(){if(LOCK)loadRev();if(TRAIN)renderTrainBar();const el=$("#lockSlot");if(el)el.innerHTML=lockBannerHTML();if(S.tab==="dash")loadSubs()}
 function submitChecks(){const out=[];const groups=new Set();for(const p of Object.values(S.staff))if(p&&!p._pending&&p.store===S.store)gsetOf(p).forEach(G=>groups.add(G));
   for(const G of [...groups].sort((a,b)=>deptOrder(a)-deptOrder(b))){const o=openByDay(G);if(o){const n=o.reduce((a,b)=>a+b,0);if(n)out.push(`<b>${esc(G)}</b>: ${n} open spot${n===1?"":"s"} vs. staffing guide`)}}
-  for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;const r=rowStats({id,...p});const m=limitMsgs(p,r.h,r.days);{const u=underMsg(p,r.h);if(u&&!m.length)out.push(`<b>${esc(p.name)}</b>: under · ${esc(u)}`)}if(m.length)out.push(`<b>${esc(p.name)}</b>: ${m.map(esc).join(", ")}`)}
+  for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;const r=rowStats({id,...p});const m=limitMsgs(p,r.h,r.days);{const u=underMsg(p,r.g);if(u&&!m.length)out.push(`<b>${esc(p.name)}</b>: under · ${esc(u)}`)}if(m.length)out.push(`<b>${esc(p.name)}</b>: ${m.map(esc).join(", ")}`)}
   return out}
 function storeGroups(){const g=new Set();for(const p of Object.values(S.staff))if(p&&!p._pending&&p.store===S.store)gsetOf(p).forEach(G=>g.add(G));return [...g].sort((a,b)=>deptOrder(a)-deptOrder(b))}
 function fixesHTML(L,cls){const f=(L&&L.fixes)||[];if(!f.length&&!(L&&L.note))return"";return `<div class="fixlist ${cls||""}">${f.map(x=>`<div class="fixrow"><b>${esc(x.dept)}</b>${x.note?` — <span translate="no">${esc(x.note)}</span>`:""}</div>`).join("")}${L.note?`<div class="revnote" translate="no">“${esc(L.note)}”</div>`:""}</div>`}
@@ -1152,7 +1152,7 @@ function startHTML(){if(!S.store)return"";const h=new Date().getHours();const gr
   const dueTxt=due.toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"long",month:"long",day:"numeric"});
   const roster=Object.entries(S.staff).filter(([id,p])=>p&&!p._pending&&p.store===S.store).map(([id,p])=>({id,...p}));
   const cant=roster.filter(p=>Object.values(p.avail||{}).some(a=>a&&a.mode==="no")).length;
-  let ov=0,un=0;for(const p of roster){const r=rowStats(p);if(limitMsgs(p,r.h,r.days).length)ov++;else if(underMsg(p,r.h))un++}
+  let ov=0,un=0;for(const p of roster){const r=rowStats(p);if(limitMsgs(p,r.h,r.days).length)ov++;else if(underMsg(p,r.g))un++}
   const sent=st==="submitted"||st==="approved",posted=st==="approved"&&isPosted(L),locked=lockedForMe();
   const steps=[
     {k:"roster",t:"Review your employee roster",sub:`${roster.length} employees. Add new hires, fix departments, remove anyone who left.`,done:!!ck.roster,btns:[["Open Employees",'data-sgo="staff"'],locked?null:[ck.roster?"Undo":"✓ Done",`data-ck="roster"`,!ck.roster]]},
@@ -1526,17 +1526,17 @@ function crew(all){
 }
 const cellVal=(sid,d)=>S.sched&&S.sched.shifts&&S.sched.shifts[sid]&&S.sched.shifts[sid][d]||null;
 function rowStats(st){
-  let h=0,days=0,bad=0;
-  for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&!v.off&&v.s){h+=hoursOf(v,S.cfg);days++;if(fit(st,d,v)==="bad")bad++}}
+  let h=0,g=0,days=0,bad=0;
+  for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&!v.off&&v.s){h+=hoursOf(v,S.cfg);g+=hoursOf(v,{...S.cfg,mealDeduct:false});days++;if(fit(st,d,v)==="bad")bad++}}
   const flags=[];
   if(isFT(st)&&h>0&&h<30)flags.push(["FT under 30",""]);
   if(isPT(st)&&h>29.99)flags.push(["PT over 29.99","bad"]);
   if(+st.maxHrs>0&&h>+st.maxHrs+1e-9)flags.push(["Over "+fmtH(+st.maxHrs)+" h cap","bad"]);
   if(h>40)flags.push(["Over 40 — OT","bad"]);
-  if(+st.target>0&&h<+st.target-1e-9)flags.push(["Under "+fmtH(+st.target)+" h target","under"]);
+  if(+st.target>0&&g<+st.target-1e-9)flags.push(["Under "+fmtH(+st.target)+" h target","under"]);
   if(days>(S.cfg.maxDays||5))flags.push([days+" days",""]);
   if(bad)flags.push([BASIC()?(bad+" can't-work day"+(bad>1?"s":"")):bad+" outside avail.","bad"]);
-  return{h,days,flags};
+  return{h,g,days,flags};
 }
 function elsewhereHTML(){
   if(!S.q)return"";
@@ -1903,7 +1903,7 @@ function wStep3(){
 function limitMsgs(p,h,days){const m=[];if(h>40)m.push(fmtH(h)+" hours: over 40 (overtime)");else if(+p.maxHrs>0&&h>+p.maxHrs+1e-9)m.push(fmtH(h)+" hours: over their "+fmtH(+p.maxHrs)+"-hour limit");else if(isPT(p)&&h>29.99)m.push(fmtH(h)+" hours: part-time must stay at 29.99 or less");
   if(days>(S.cfg.maxDays||5))m.push(days+" days: limit is "+(S.cfg.maxDays||5)+" days");return m}
 function underMsg(p,h){return +p.target>0&&h<+p.target-1e-9?fmtH(h)+" of "+fmtH(+p.target)+" target hours":null}
-function wAlertsHTML(ppl){const xs=ppl.map(p=>{const r=rowStats(p);return{p,m:limitMsgs(p,r.h,r.days),u:underMsg(p,r.h)}}).filter(x=>x.m.length||x.u);
+function wAlertsHTML(ppl){const xs=ppl.map(p=>{const r=rowStats(p);return{p,m:limitMsgs(p,r.h,r.days),u:underMsg(p,r.g)}}).filter(x=>x.m.length||x.u);
   return xs.length?`<div class="alertlist"><div class="alerthead">⚠ Check these before you finish</div>${xs.map(x=>`<div class="alertrow"><b>${esc(x.p.name)}</b> ${x.m.map(t=>`<span class="flag bad">Over · ${esc(t)}</span>`).join(" ")}${x.u?` <span class="flag under">Under · ${esc(x.u)}</span>`:""}</div>`).join("")}</div>`:""}
 function limitAlert(sid,d,nv){const st=S.staff[sid];if(!st)return;const wk=weekHours(sid,d);const m=limitMsgs(st,wk.h+hoursOf(nv,S.cfg),wk.days+1);
   if(m.length)alertBox(`<b>⚠ Check ${esc(st.name)}</b><br>${m.map(esc).join("<br>")}`)}
@@ -2614,7 +2614,7 @@ function staffEditor(id){
       <label class="field" ${FTPT()?"":"hidden"}><span>Status</span><select id="eType"><option value="FT" ${st.type==="FT"?"selected":""}>Full-time (30+ hrs)</option><option value="PT" ${st.type!=="FT"?"selected":""}>Part-time (under 30)</option></select></label>
     </div>
     <div class="formgrid">
-      <label class="field"><span>Target hours / week (optional)</span><input type="number" id="eTarget" min="1" max="60" step="0.5" value="${+st.target>0?+st.target:""}" placeholder="e.g. 30"><small class="note">Flags them as <b>Under</b> if scheduled less</small></label>
+      <label class="field"><span>Target hours / week (optional)</span><input type="number" id="eTarget" min="1" max="60" step="0.5" value="${+st.target>0?+st.target:""}" placeholder="e.g. 30"><small class="note">Count lunch in: 5 × 8-hour shifts = 40.<br>Flags them as <b>Under</b> if scheduled less</small></label>
       <label class="field" ${BASIC()?"hidden":""}><span>Max hours / week (optional)</span><input type="number" id="eMax" min="1" max="60" step="0.5" value="${+st.maxHrs>0?+st.maxHrs:""}" placeholder="e.g. 20"></label>
       <label class="field" style="grid-column:span 2"><span>Note (optional)</span><input type="text" id="eNotes" value="${esc(st.notes||"")}" placeholder="e.g. Opener, school until 3pm"></label>
     </div>
@@ -2852,7 +2852,7 @@ function renderSumTab(){const el=$("#sumTabSlot");if(!el)return;if(S.tab!=="sum"
   const part4Blocks=order.length?(order.length>1?blk("All departments",allPc,"allg"):"")+order.map(G=>blk(esc(G),D[G].pc)).join(""):"";
   el.innerHTML=`<div class="sumhead"><h2 class="sec">Summary · ${esc(S.store)}${F?" · "+esc(F):""}</h2><div class="note">Week ${weekNo(S.week,S.cfg.wkOffset)} · ${rangeLabel(S.week)}${S.cfg.mealDeduct?" · hours exclude a 30-min meal on 6h+ shifts":""}</div></div>
   <div class="dtiles" data-feat="sum_tiles"><div class="dtile"><span>Total hours</span><b>${r1(T.h)}</b></div><div class="dtile"><span>People scheduled</span><b>${T.ids.size}</b><small>of ${ppl.length} on the team</small></div></div>
-  ${(()=>{const L=ppl.map(p=>{const r=rowStats(p);return{p,r,m:limitMsgs(p,r.h,r.days),u:underMsg(p,r.h)}});const ov=L.filter(x=>x.m.length),un=L.filter(x=>x.u);
+  ${(()=>{const L=ppl.map(p=>{const r=rowStats(p);return{p,r,m:limitMsgs(p,r.h,r.days),u:underMsg(p,r.g)}});const ov=L.filter(x=>x.m.length),un=L.filter(x=>x.u);
     return `<div class="card ovun" data-feat="sum_flags"><h3 class="sec">Over / Under</h3>${!ov.length&&!un.length?`<div class="banner ok">✓ Nobody is over or under.</div>`:`<div class="ovgrid"><div><div class="ptitle bad">Over (${ov.length})</div>${ov.map(x=>`<div class="ovrow"><b>${esc(x.p.name)}</b> <span class="note">${esc(grp(x.p.dept))}</span><br><span class="flag bad">${x.m.map(esc).join(" · ")}</span></div>`).join("")||`<div class="note">Nobody</div>`}</div><div><div class="ptitle und">Under (${un.length})</div>${un.map(x=>`<div class="ovrow"><b>${esc(x.p.name)}</b> <span class="note">${esc(grp(x.p.dept))}</span><br><span class="flag under">${esc(x.u)}</span></div>`).join("")||`<div class="note">Nobody</div>`}</div></div>`}</div>`})()}
 ${(()=>{const adm=typeof LOCK!=="undefined"&&!LOCK&&S.canEdit;if(!(adm||(!BASIC()&&featOn("sum_need"))))return"";const CMP=!!S.cfg.needCompare;
     const gs=CMP?[...new Set(S.cfg.depts.map(grp))].filter(G=>(!F||G===F)&&guideRaw(S.store,G)):order.filter(G=>!F||G===F);
@@ -2896,7 +2896,7 @@ const ES={
 "Submitted · waiting for approval":"Enviado · esperando aprobación","Drag names from the Off row onto shifts. Tip: Copy last week saves time.":"Arrastra nombres de la fila Libre a los turnos. Consejo: Copiar semana pasada ahorra tiempo.",
 "Drag a name from the Off row onto a shift.":"Arrastra un nombre de la fila Libre a un turno.","Drag it back to Off to remove it, or click + to pick someone.":"Regrésalo a Libre para quitarlo, o haz clic en + para escoger a alguien.","Red means they can't work that day.":"Rojo = no puede trabajar ese día.",
 "Posted! Your team can see this schedule.":"¡Publicado! Tu equipo ya puede ver este horario.","Posted ✓":"Publicado ✓","Approved · ready to post":"Aprobado · listo para publicar","The admin approved this schedule.":"El administrador aprobó este horario.","Post it so your employees can see it on their schedule link.":"Publícalo para que tus empleados lo vean en su enlace.",
-"Basic mode":"Modo básico","Flags them as":"Los marca como","if scheduled less":"si tienen menos horas","Days they're marked off turn":"Los días marcados se ponen","if you schedule them.":"si los programas.","Under (1)":"De menos (1)",
+"Basic mode":"Modo básico","Count lunch in: 5 × 8-hour shifts = 40.":"Cuenta el almuerzo: 5 turnos de 8 horas = 40.","Flags them as":"Los marca como","if scheduled less":"si tienen menos horas","Days they're marked off turn":"Los días marcados se ponen","if you schedule them.":"si los programas.","Under (1)":"De menos (1)",
 "Schedule":"Horario","Employees":"Empleados","Over / Under":"De más / De menos","✓ Nobody is over or under.":"✓ Nadie tiene de más ni de menos.","Nobody":"Nadie","All departments":"Todos los departamentos","Copy last week":"Copiar semana pasada","Print":"Imprimir",
 "Target hours / week (optional)":"Horas meta por semana (opcional)","Can't work these days":"No puede trabajar estos días","Post to employees":"Publicar para empleados","📣 Post to employees":"📣 Publicar para empleados",
 "Things to check this week":"Cosas por revisar esta semana","Hours & days":"Horas y días","Overtime, too many days, or over someone's hour limit.":"Tiempo extra, demasiados días o más del límite de horas de alguien.","Staffing":"Personal","Fewer people than the staffing guide asks for.":"Menos personas de las que pide la guía de personal.","Go fix on the schedule":"Ir a corregir en el horario","✓ Mark as reviewed":"✓ Marcar como revisado","Undo reviewed":"Quitar revisado","See list":"Ver lista","✓ Nothing to check. Everything looks good.":"✓ Nada por revisar. Todo se ve bien.","Marked as reviewed":"Marcado como revisado",
