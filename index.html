@@ -27,7 +27,7 @@
 .gtx{flex:1;display:flex;flex-direction:column;min-width:220px}.gtx b{font-size:18px}.gstep{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8a6d00}
 .payprog{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 10px;font-size:15px}.payprog .dprog{flex:1;min-width:160px;max-width:320px}.paytab td.pck{width:34px}.paytab td.pck input,.pdchk input{width:20px;height:20px;cursor:pointer}.paytab tr.pdone td{background:#f1faf1}.paytab tr.pdone td.l b{color:var(--good-fg)}.pdchk{display:inline-flex;align-items:center;gap:8px;cursor:pointer}.hcpay{font-size:12.5px}.payhead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:10px}
 .paytab td.pin b{font-size:14px}.paytab td.pin small{display:block;color:var(--muted);font-size:11.5px}.paytab td.poff{color:#9a948a;font-weight:700;font-size:12px;background:var(--surface2)}.paytab tr.pzero td.l b{color:var(--muted)}.paytab th small{display:block;font-weight:600;color:var(--muted)}
-.torow{display:flex;gap:12px;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:6px 0;background:var(--surface)}.nchip.toffchip{background:#fdecea;border:1.5px solid #e5a49b;color:#9b2c1f;cursor:default}.nchip.toffchip .ct2{color:#9b2c1f;font-weight:700}.goemprow{cursor:pointer}tr.goemprow:hover td,.ovrow.goemprow:hover{background:#eef7ee}.ovrow.goemprow{border-radius:8px;padding:4px 6px;margin:0 -6px}.goemp{cursor:pointer;color:#2F7A22;text-decoration:underline dotted 1.5px;text-underline-offset:3px}.goemp:hover{color:#1f5e23;text-decoration-style:solid}.empflash{outline:3px solid #F47321!important;outline-offset:1px;box-shadow:0 0 0 6px rgba(244,115,33,.25)!important;animation:empf 1s ease 2}@keyframes empf{50%{box-shadow:0 0 0 10px rgba(244,115,33,.05)}}
+.lkrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid var(--line)}.lkrow b{width:90px}.lkrow input{flex:1;min-width:220px;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface2)}.torow{display:flex;gap:12px;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:6px 0;background:var(--surface)}.nchip.toffchip{background:#fdecea;border:1.5px solid #e5a49b;color:#9b2c1f;cursor:default}.nchip.toffchip .ct2{color:#9b2c1f;font-weight:700}.goemprow{cursor:pointer}tr.goemprow:hover td,.ovrow.goemprow:hover{background:#eef7ee}.ovrow.goemprow{border-radius:8px;padding:4px 6px;margin:0 -6px}.goemp{cursor:pointer;color:#2F7A22;text-decoration:underline dotted 1.5px;text-underline-offset:3px}.goemp:hover{color:#1f5e23;text-decoration-style:solid}.empflash{outline:3px solid #F47321!important;outline-offset:1px;box-shadow:0 0 0 6px rgba(244,115,33,.25)!important;animation:empf 1s ease 2}@keyframes empf{50%{box-shadow:0 0 0 10px rgba(244,115,33,.05)}}
 .trainbtn{margin-left:8px;background:#fff4d6;border-color:#f1d98a;color:#6b4d00;font-weight:700}
 #trainBar{position:sticky;top:0;z-index:50;background:repeating-linear-gradient(135deg,#f59e0b 0 18px,#f7b23b 18px 36px);color:#2b1d00;border-radius:14px;padding:12px 16px;margin:0 0 12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.15)}
 #trainBar b{font-size:17px}#trainBar .tnote{background:rgba(255,255,255,.85);border-radius:8px;padding:4px 10px;font-size:13.5px}#trainBar .btn{background:#fff}#trainBar .btn.exit{background:#2b1d00;color:#fff;border-color:#2b1d00}
@@ -775,6 +775,11 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
       <div class="note">When it's <b>off</b>, the Summary shows just the totals: how many people are scheduled in AM, Mid, PM and After 5 for each department. Turn it <b>on</b> later to show <b>scheduled / needed</b> from the Staffing guide.</div>
       <div class="gtogs"><button class="gtog" id="cmpTog" aria-pressed="false"><span>Compare to guide<small id="cmpLbl">Off</small></span><span class="sw2"></span></button></div>
     </div>
+    <div class="card" id="linkCard">
+      <h2 class="sec">Employee schedule links</h2>
+      <div class="note">Each store's link for employees (no PIN). When someone leaves, click <b>New link</b>: the old link stops working right away, and the store sends the new one to the current team.</div>
+      <div id="linkRows"></div>
+    </div>
     <div class="card" id="toffCard">
       <h2 class="sec">Time off (days off for future weeks)</h2>
       <div class="note">When it's <b>on</b>, managers get a <b>🗓 Time off</b> button on Employees to log vacation or requested days off on exact dates, weeks ahead. Those days show as <b>Time off</b> on the schedule and can't be booked by mistake. Turn on <b>Employee requests online</b> to let employees ask for days off from their schedule link; managers approve or decline them.</div>
@@ -905,7 +910,7 @@ function pubSnapshot(){const rows=[];for(const[id,p]of Object.entries(S.staff)){
   const days=DAYS.map((x,d)=>{const v=cellVal(id,d);return v&&v.off?"off":v&&v.s?(shG(p,v)!==grp(p.dept)?[v.s,v.e,shG(p,v)]:[v.s,v.e]):null});if(!days.some(x=>Array.isArray(x)))continue;rows.push({name:p.name,dept:grp(p.dept),days})}
   rows.sort((a,b)=>a.dept.localeCompare(b.dept)||a.name.localeCompare(b.name));return rows}
 function pubState(){if(!S.pub)return"none";return JSON.stringify(S.pub.rows)===JSON.stringify(pubSnapshot())?"same":"changed"}
-function staffLink(st){return location.origin+location.pathname.replace(/[^/]*$/,"")+"staff.html?store="+encodeURIComponent(st)}
+function staffLink(st){const c=((S.cfg&&S.cfg.linkCodes)||{})[st];return location.origin+location.pathname.replace(/[^/]*$/,"")+"staff.html?store="+encodeURIComponent(st)+(c?"&code="+c:"")}
 const isAdm=()=>S.canEdit&&!LOCK;
 function stState(){const L=S.lock;if(!L)return"draft";return L.state||"approved"}
 function lockedForMe(){const st=stState();return st==="approved"||(st==="submitted"&&!isAdm())}
@@ -1402,6 +1407,16 @@ function renderToffTogs(){const a=$("#toffTog"),b=$("#toffOnTog");if(!a)return;c
   a.classList.toggle("on",on);a.setAttribute("aria-pressed",String(on));$("#toffLbl").textContent=on?"On":"Off";
   b.classList.toggle("on",onl);b.setAttribute("aria-pressed",String(onl));$("#toffOnLbl").textContent=onl?"On":"Off";b.disabled=!on;b.style.opacity=on?"":".5"}
 
+/* ---------- Employee links: change a store's link (old one stops working) ---------- */
+function newLinkCode(){const A="ABCDEFGHJKMNPQRSTUVWXYZ23456789";const r=new Uint32Array(6);crypto.getRandomValues(r);return [...r].map(x=>A[x%A.length]).join("")}
+function renderLinkCard(){const box=$("#linkRows");if(!box||box.contains(document.activeElement))return;
+  box.innerHTML=(S.cfg.stores||[]).map(st=>{const l=staffLink(st),c=((S.cfg.linkCodes)||{})[st];return `<div class="lkrow"><b>${esc(st)}</b><input readonly value="${esc(l)}" aria-label="${esc(st)} employee link"><button class="btn sm" data-lkcopy="${esc(st)}">Copy</button><button class="btn sm" data-lknew="${esc(st)}">${c?"New link":"Lock with a new link"}</button></div>`}).join("")}
+document.addEventListener("click",async e=>{
+  const c=e.target.closest("[data-lkcopy]");if(c){const l=staffLink(c.dataset.lkcopy);try{await navigator.clipboard.writeText(l);toast("Link copied")}catch(x){toast(l)}return}
+  const n=e.target.closest("[data-lknew]");if(!n)return;const st=n.dataset.lknew;
+  openModal(`<h3>New employee link for ${esc(st)}?</h3><p>The current ${esc(st)} employee link stops working right away. Anyone who had it, including people who left, sees “This link has changed.”</p><p>Then send the new link to the current team and update the store’s card or poster.</p><div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button><button class="btn primary" id="lkYes">Make new link</button></div>`);
+  $("#lkYes").onclick=async()=>{try{const codes={...(S.cfg.linkCodes||{})};codes[st]=newLinkCode();await backend.saveCfg({...S.cfg,linkCodes:codes});closeModal();toast("New link ready for "+st+". Send it to the team.");renderLinkCard()}catch(x){showErr(x)}}});
+
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAYS_ES=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
 const DAYS_LONG=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -1594,7 +1609,7 @@ function attach(b){
 function resub(){if(unsubSched)unsubSched();if(!S.store)return;S.sched=null;S.pub=null;loadPub();S.sales=null;loadSales();S.lock=null;S.readOnly=false;watchLock();unsubSched=backend.subSched(key(),d=>{S.sched=d;renderGrid();renderPrint();renderWizard();updFinal()})}
 
 /* ---------- render ---------- */
-function renderAll(){if(typeof renderToffBtn==="function")setTimeout(()=>{renderToffBtn();renderToffTogs()},0);if(typeof renderChat==="function")renderChat();renderNotes();renderMode();renderBanner();renderControls();renderGrid();renderStaff();renderGuide();renderSettings();renderGoals();renderPrint();renderWizard();renderSumTab();if(S.tab==="dash"){if(DASH.week!==ymd(S.week))loadDash();else renderDash()}}
+function renderAll(){if(typeof renderToffBtn==="function")setTimeout(()=>{renderToffBtn();renderToffTogs();if(typeof renderLinkCard==="function")renderLinkCard()},0);if(typeof renderChat==="function")renderChat();renderNotes();renderMode();renderBanner();renderControls();renderGrid();renderStaff();renderGuide();renderSettings();renderGoals();renderPrint();renderWizard();renderSumTab();if(S.tab==="dash"){if(DASH.week!==ymd(S.week))loadDash();else renderDash()}}
 function renderMode(){
   $("#modeLine").textContent=S.mode==="sample"?"Sample crew — nothing is saved":S.mode==="shared"?(LOCK?LOCK+" store":"Saved for everyone with this link"):S.mode==="local"?"Saved on this device only":"Loading…";
 }
