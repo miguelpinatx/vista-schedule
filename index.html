@@ -27,7 +27,7 @@
 .gtx{flex:1;display:flex;flex-direction:column;min-width:220px}.gtx b{font-size:18px}.gstep{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#8a6d00}
 .payprog{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 10px;font-size:15px}.payprog .dprog{flex:1;min-width:160px;max-width:320px}.paytab td.pck{width:34px}.paytab td.pck input,.pdchk input{width:20px;height:20px;cursor:pointer}.paytab tr.pdone td{background:#f1faf1}.paytab tr.pdone td.l b{color:var(--good-fg)}.pdchk{display:inline-flex;align-items:center;gap:8px;cursor:pointer}.hcpay{font-size:12.5px}.payhead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:10px}
 .paytab td.pin b{font-size:14px}.paytab td.pin small{display:block;color:var(--muted);font-size:11.5px}.paytab td.poff{color:#9a948a;font-weight:700;font-size:12px;background:var(--surface2)}.paytab tr.pzero td.l b{color:var(--muted)}.paytab th small{display:block;font-weight:600;color:var(--muted)}
-.goemprow{cursor:pointer}tr.goemprow:hover td,.ovrow.goemprow:hover{background:#eef7ee}.ovrow.goemprow{border-radius:8px;padding:4px 6px;margin:0 -6px}.goemp{cursor:pointer;color:#2F7A22;text-decoration:underline dotted 1.5px;text-underline-offset:3px}.goemp:hover{color:#1f5e23;text-decoration-style:solid}.empflash{outline:3px solid #F47321!important;outline-offset:1px;box-shadow:0 0 0 6px rgba(244,115,33,.25)!important;animation:empf 1s ease 2}@keyframes empf{50%{box-shadow:0 0 0 10px rgba(244,115,33,.05)}}
+.torow{display:flex;gap:12px;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:6px 0;background:var(--surface)}.nchip.toffchip{background:#fdecea;border:1.5px solid #e5a49b;color:#9b2c1f;cursor:default}.nchip.toffchip .ct2{color:#9b2c1f;font-weight:700}.goemprow{cursor:pointer}tr.goemprow:hover td,.ovrow.goemprow:hover{background:#eef7ee}.ovrow.goemprow{border-radius:8px;padding:4px 6px;margin:0 -6px}.goemp{cursor:pointer;color:#2F7A22;text-decoration:underline dotted 1.5px;text-underline-offset:3px}.goemp:hover{color:#1f5e23;text-decoration-style:solid}.empflash{outline:3px solid #F47321!important;outline-offset:1px;box-shadow:0 0 0 6px rgba(244,115,33,.25)!important;animation:empf 1s ease 2}@keyframes empf{50%{box-shadow:0 0 0 10px rgba(244,115,33,.05)}}
 .trainbtn{margin-left:8px;background:#fff4d6;border-color:#f1d98a;color:#6b4d00;font-weight:700}
 #trainBar{position:sticky;top:0;z-index:50;background:repeating-linear-gradient(135deg,#f59e0b 0 18px,#f7b23b 18px 36px);color:#2b1d00;border-radius:14px;padding:12px 16px;margin:0 0 12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.15)}
 #trainBar b{font-size:17px}#trainBar .tnote{background:rgba(255,255,255,.85);border-radius:8px;padding:4px 10px;font-size:13.5px}#trainBar .btn{background:#fff}#trainBar .btn.exit{background:#2b1d00;color:#fff;border-color:#2b1d00}
@@ -702,7 +702,7 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
   </section>
 
   <section id="view-staff" class="panel" hidden>
-    <div class="row bigacts"><button class="btn primary big" id="addStaff">+ Add employee</button><button class="btn big" id="chgAvail">🕒 Change availability</button></div>
+    <div class="row bigacts"><button class="btn primary big" id="addStaff">+ Add employee</button><button class="btn big" id="chgAvail">🕒 Change availability</button><button class="btn big" data-toff hidden>🗓 Time off</button></div>
     <div class="row">
       <h2 class="sec" id="staffHead">Staff</h2>
       <div class="spacer"></div>
@@ -774,6 +774,11 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
       <h2 class="sec">Compare to staffing guide</h2>
       <div class="note">When it's <b>off</b>, the Summary shows just the totals: how many people are scheduled in AM, Mid, PM and After 5 for each department. Turn it <b>on</b> later to show <b>scheduled / needed</b> from the Staffing guide.</div>
       <div class="gtogs"><button class="gtog" id="cmpTog" aria-pressed="false"><span>Compare to guide<small id="cmpLbl">Off</small></span><span class="sw2"></span></button></div>
+    </div>
+    <div class="card" id="toffCard">
+      <h2 class="sec">Time off (days off for future weeks)</h2>
+      <div class="note">When it's <b>on</b>, managers get a <b>🗓 Time off</b> button on Employees to log vacation or requested days off on exact dates, weeks ahead. Those days show as <b>Time off</b> on the schedule and can't be booked by mistake. Turn on <b>Employee requests online</b> to let employees ask for days off from their schedule link; managers approve or decline them.</div>
+      <div class="gtogs"><button class="gtog" id="toffTog" aria-pressed="false"><span>Time off<small id="toffLbl">Off</small></span><span class="sw2"></span></button><button class="gtog" id="toffOnTog" aria-pressed="false"><span>Employee requests online<small id="toffOnLbl">Off</small></span><span class="sw2"></span></button></div>
     </div>
     <div class="card" id="ftptCard">
       <h2 class="sec">Full-time / part-time rules</h2>
@@ -853,6 +858,9 @@ function supaBackend(sb){
     subStaff(cb){subCol("staff",o=>cb(LOCK?Object.fromEntries(Object.entries(o).filter(([k,v])=>v&&v.store===LOCK)):o))},
     subGuides(cb){subCol("guides",o=>cb(LOCK?Object.fromEntries(Object.entries(o).filter(([k,v])=>v&&v.store===LOCK)):o))},
     subTasks(cb){subCol("tasks",cb)},
+    subTimeoff(cb){subCol("timeoff",o=>cb(LOCK?Object.fromEntries(Object.entries(o).filter(([k,v])=>v&&v.store===LOCK)):o))},
+    async saveTimeoff(id,o){try{await put("timeoff",id,o);if(caches.timeoff){caches.timeoff[id]=o;emitCol("timeoff")}}catch(e){err(e)}},
+    async delTimeoff(id){try{await del("timeoff",id);if(caches.timeoff){delete caches.timeoff[id];emitCol("timeoff")}}catch(e){err(e)}},
     subSched(k,cb){const kk="schedules/"+k;const f=d=>cb(d);(docSubs[kk]=docSubs[kk]||[]).push(f);getDoc("schedules",k).then(cb).catch(showErr);return()=>{docSubs[kk]=(docSubs[kk]||[]).filter(x=>x!==f)}},
     async saveCfg(c){if(LOCK)err({message:"Only the admin can change settings."});try{await put("config","main",c);(docSubs["config/main"]||[]).forEach(f=>f(c))}catch(e){err(e)}},
     async saveStaff(id,o){if(LOCK&&o&&o.store!==LOCK)o={...o,store:LOCK};try{await put("staff",id,o);if(caches.staff){caches.staff[id]=o;emitCol("staff")}}catch(e){err(e)}},
@@ -1180,7 +1188,7 @@ function startHTML(){if(!S.store)return"";const h=new Date().getHours();const gr
   let ov=0,un=0;for(const p of roster){const r=rowStats(p);if(limitMsgs(p,r.h,r.days).length)ov++;else if(underMsg(p,r.g))un++}
   const sent=st==="submitted"||st==="approved",posted=st==="approved"&&isPosted(L),locked=lockedForMe();
   const steps=[
-    {k:"roster",t:"Check employee roster & edit availability",sub:`${roster.length} employees. Add new hires, remove anyone who left, and mark days they can't work.${cant?` ${cant} have days marked.`:""}`,done:!!ck.roster,btns:[["Open Employees",'data-sgo="staff"'],locked?null:[ck.roster?"Undo":"✓ Done",`data-ck="roster"`,!ck.roster]]},
+    {k:"roster",t:"Check employee roster & edit availability",sub:`${roster.length} employees. Add new hires, remove anyone who left, and mark days they can't work.${cant?` ${cant} have days marked.`:""}${TOFF_ON()&&toffPending().length?` ${toffPending().length} time-off request${toffPending().length===1?"":"s"} waiting.`:""}`,done:!!ck.roster,btns:[["Open Employees",'data-sgo="staff"'],TOFF_ON()?["🗓 Time off",'data-toff']:null,locked?null:[ck.roster?"Undo":"✓ Done",`data-ck="roster"`,!ck.roster]]},
     {k:"build",t:"Build the schedule",sub:n?`${n} shifts placed. Drag names from the Off row onto shifts.`:"Drag names from the Off row onto shifts. Tip: Copy last week saves time.",done:n>0,btns:[["Open Schedule",'data-sgo="build"']]},
     {k:"review",t:"Review days & hours",sub:!n?"Build the schedule first.":(ov||un)?`${ov} over · ${un} under. Fix what you can, then mark it reviewed.`:"Nobody is over or under.",done:n>0&&revOK(),btns:n?[["Open Summary",'data-sgo="sum"'],locked?null:[revOK()?"Undo":"✓ Reviewed",revOK()?'data-ck="unreview"':'data-ck="review"',!revOK()]]:[]},
     {k:"submit",t:st==="revise"?"RESUBMIT for review":"Submit for review",rev:st==="revise",sub:sent?`Sent ${fdt(L.submittedAt||L.at)}`:st==="revise"?"The admin asked for changes. Fix these on the schedule, then resubmit.":"Send it to the admin when it's ready.",done:sent,extra:st==="revise"?`<div class="revbox"><b>Admin's notes:</b>${fixesHTML(L)}</div>`:"",btns:!sent&&n?(st==="revise"?[["Open Schedule",'data-sgo="build"'],["↩ Resubmit for review",'data-lock="submit"',true]]:[["Submit to admin",'data-lock="submit"',true]]):[]},
@@ -1235,7 +1243,9 @@ function trainingBackend(){const clone=o=>JSON.parse(JSON.stringify(o||{}));
   const mb=memoryBackend({cfg:clone(S.cfg),staff,guides:clone(S.guides),tasks:clone(S.tasks),sched:{}},null);
   const docs={locks:{},published:{},sales:{},reviews:{}};const subs={};
   const emit=k=>(subs[k]||[]).forEach(f=>f(docs.locks[k]||null));
+  const toff=clone(S.toff);const toSubs=[];const toEmit=()=>toSubs.forEach(f=>f(clone(toff)));
   return Object.assign(mb,{
+    subTimeoff(cb){toSubs.push(cb);setTimeout(()=>cb(clone(toff)),0)},async saveTimeoff(id,o){toff[id]=o;toEmit()},async delTimeoff(id){delete toff[id];toEmit()},
     async getPub(k){return docs.published[k]||null},async savePub(k,o){docs.published[k]=o},async delPub(k){delete docs.published[k]},
     async getLock(k){return docs.locks[k]||null},async saveLock(k,o){docs.locks[k]=o;emit(k)},async delLock(k){delete docs.locks[k];emit(k)},
     subLock(k,cb){(subs[k]=subs[k]||[]).push(cb);setTimeout(()=>cb(docs.locks[k]||null),0);return()=>{subs[k]=(subs[k]||[]).filter(f=>f!==cb)}},
@@ -1350,6 +1360,48 @@ function dutiesModal(G){const gs=dutyGroups();if(!gs.length){toast("Add employee
   const r=$("#dutyReset");if(r)r.onclick=async()=>{try{await backend.saveTask(taskKey(S.store,G),{store:S.store,dept:G});if(S.tasks)S.tasks[taskKey(S.store,G)]={store:S.store,dept:G};closeModal();toast("Using the company list for "+G)}catch(x){showErr(x)}}}
 document.addEventListener("click",e=>{if(e.target.closest("[data-duties]"))dutiesModal()});
 
+/* ---------- Time off (date-based days off for future weeks) ---------- */
+const TOFF_ON=()=>!!(S.cfg&&S.cfg.timeoff);
+function toffOn(sid,d){if(!TOFF_ON()||!S.toff)return null;const dt=ymd(addDays(S.week,d));
+  for(const r of Object.values(S.toff))if(r&&r.sid===sid&&r.status==="approved"&&r.from<=dt&&dt<=(r.to||r.from))return r;return null}
+function toffList(){return Object.entries(S.toff||{}).map(([id,r])=>({id,...r})).filter(r=>r&&r.store===S.store)}
+function toffPending(){return toffList().filter(r=>r.status==="pending")}
+const tfmt=d=>{if(!d)return"";const[y,m,dd]=d.split("-").map(Number);return new Date(y,m-1,dd).toLocaleDateString(LANG==="es"?"es-MX":"en-US",{weekday:"short",month:"short",day:"numeric"})};
+const trange=r=>tfmt(r.from)+(r.to&&r.to!==r.from?" – "+tfmt(r.to):"");
+function toffModal(){
+  const today=ymd(new Date());const L=toffList();
+  const pend=L.filter(r=>r.status==="pending").sort((a,b)=>a.from.localeCompare(b.from));
+  const up=L.filter(r=>r.status==="approved"&&(r.to||r.from)>=today).sort((a,b)=>a.from.localeCompare(b.from));
+  const ppl=Object.entries(S.staff).filter(([id,p])=>p&&!p._pending&&p.store===S.store).map(([id,p])=>({id,...p})).sort((a,b)=>a.name.localeCompare(b.name));
+  const row=(r,btns)=>`<div class="torow"><div><b>${esc(r.name||((S.staff[r.sid]||{}).name)||"?")}</b> <span class="note">${esc(grp((S.staff[r.sid]||{}).dept||""))}</span><br><span>${trange(r)}</span>${r.note?` <span class="note">· ${esc(r.note)}</span>`:""}<br><small class="note">${r.source==="employee"?"Asked online":"Added by manager"}</small></div><div class="dbtns">${btns}</div></div>`;
+  openModal(`<h2>Time off · ${esc(S.store)}</h2>
+    <h3 class="sec">Waiting for you (${pend.length})</h3>${pend.map(r=>row(r,`<button class="btn sm" data-tdecl="${r.id}">Decline</button><button class="btn primary sm" data-tappr="${r.id}">Approve</button>`)).join("")||`<p class="note">No requests waiting.</p>`}
+    <h3 class="sec" style="margin-top:14px">Coming up (${up.length})</h3>${up.map(r=>row(r,`<button class="btn sm" data-tdel="${r.id}">Remove</button>`)).join("")||`<p class="note">No time off coming up.</p>`}
+    <h3 class="sec" style="margin-top:14px">Add time off</h3>
+    <div class="row" style="flex-wrap:wrap;gap:10px"><label class="field" style="flex:2;min-width:180px"><span>Employee</span><select id="toWho"><option value="">—</option>${ppl.map(p=>`<option value="${p.id}">${esc(p.name)} · ${esc(grp(p.dept))}</option>`).join("")}</select></label>
+      <label class="field"><span>Start date</span><input type="date" id="toFrom" min="${today}"></label><label class="field"><span>End date</span><input type="date" id="toTo" min="${today}"></label></div>
+    <p class="note" style="margin:2px 0 8px">Start date = first day off. End date = last day off. For one day, use the same date for both. These days show as <b>Time off</b> on the schedule.</p>
+    <label class="field"><span>Note (optional)</span><input id="toNote" maxlength="80" placeholder="e.g. vacation, school, doctor"></label>
+    <div class="row"><div class="spacer"></div><button class="btn" data-close>Close</button><button class="btn primary" id="toSave">Save time off</button></div>`,true);
+  $("#toFrom").onchange=e=>{const t=$("#toTo");t.min=e.target.value;if(!t.value||t.value<e.target.value)t.value=e.target.value};
+  $("#toSave").onclick=async()=>{const sid=$("#toWho").value,from=$("#toFrom").value,to=$("#toTo").value||from;
+    if(!sid||!from){toast("Pick the employee and the start date.");return}if(to<from){toast("The end date can't be before the start date.");return}
+    const id="to"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    try{await backend.saveTimeoff(id,{store:S.store,sid,name:(S.staff[sid]||{}).name||"",from,to,note:$("#toNote").value.trim(),status:"approved",source:"manager",at:new Date().toISOString(),by:LOCK?"store":"admin"});toast("Time off saved");toffModal();renderAll()}catch(x){showErr(x)}}}
+async function toffSet(id,patch){const r=(S.toff||{})[id];if(!r)return;try{await backend.saveTimeoff(id,{...r,...patch,decidedAt:new Date().toISOString()});toffModal();renderAll()}catch(x){showErr(x)}}
+document.addEventListener("click",async e=>{
+  if(e.target.closest("[data-toff]")){toffModal();return}
+  const a=e.target.closest("[data-tappr]");if(a){toffSet(a.dataset.tappr,{status:"approved"});toast("Approved");return}
+  const d=e.target.closest("[data-tdecl]");if(d){toffSet(d.dataset.tdecl,{status:"declined"});toast("Declined");return}
+  const x=e.target.closest("[data-tdel]");if(x){try{await backend.delTimeoff(x.dataset.tdel);toast("Removed");toffModal();renderAll()}catch(y){showErr(y)}}});
+function renderToffBtn(){document.querySelectorAll("button[data-toff]").forEach(b=>{b.hidden=!TOFF_ON();const n=toffPending().length;b.textContent="🗓 Time off"+(n?" ("+n+")":"")})}
+document.addEventListener("click",async e=>{const t=e.target.closest("#toffTog,#toffOnTog");if(!t)return;
+  try{if(t.id==="toffTog"){const on=!TOFF_ON();await backend.saveCfg({...S.cfg,timeoff:on,timeoffOnline:on?!!S.cfg.timeoffOnline:false});toast(on?"Time off on":"Time off off")}
+    else{if(!TOFF_ON()){toast("Turn on Time off first.");return}const on=!S.cfg.timeoffOnline;await backend.saveCfg({...S.cfg,timeoffOnline:on});toast(on?"Employees can request online":"Online requests off")}}catch(x){showErr(x)}});
+function renderToffTogs(){const a=$("#toffTog"),b=$("#toffOnTog");if(!a)return;const on=TOFF_ON(),onl=on&&!!S.cfg.timeoffOnline;
+  a.classList.toggle("on",on);a.setAttribute("aria-pressed",String(on));$("#toffLbl").textContent=on?"On":"Off";
+  b.classList.toggle("on",onl);b.setAttribute("aria-pressed",String(onl));$("#toffOnLbl").textContent=onl?"On":"Off";b.disabled=!on;b.style.opacity=on?"":".5"}
+
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAYS_ES=["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
 const DAYS_LONG=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -1389,7 +1441,7 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 const anyAvail=()=>{const a={};for(let i=0;i<7;i++)a[i]={mode:"any"};return a};
 
 /* availability check: returns "good" | "bad" | "off" | "" */
-function availOf(st,d){return (st.avail&&st.avail[d])||{mode:"any"}}
+function availOf(st,d){const t=typeof toffOn==="function"&&st&&st.id?toffOn(st.id,d):null;if(t)return{mode:"no",toff:true,note:t.note||""};return (st.avail&&st.avail[d])||{mode:"any"}}
 function fit(st,d,v){
   if(!v)return"";
   if(v.off)return"off";
@@ -1399,7 +1451,7 @@ function fit(st,d,v){
   const[s,e]=span(v.s,v.e);const[af,at]=span(a.from||"00:00",a.to||"23:59");
   return(s>=af&&e<=at)?"good":"bad";
 }
-function availText(st,d){const a=availOf(st,d);if(a.mode==="any")return"Any time";if(a.mode==="no")return"Not available";return fmtRange(a.from,a.to)}
+function availText(st,d){const a=availOf(st,d);if(a.toff)return "Time off"+(a.note?": "+a.note:"");if(a.mode==="any")return"Any time";if(a.mode==="no")return"Not available";return fmtRange(a.from,a.to)}
 
 /* ---------- storage backends ---------- */
 function memoryBackend(seed,persistKey){
@@ -1457,7 +1509,7 @@ function dbBackend(db){
 }
 
 /* ---------- state ---------- */
-const S={cfg:{...DEFAULT_CFG},staff:{},guides:{},tasks:{},sched:null,store:null,dept:"__all",week:addDays(sundayOf(new Date()),7),tab:"build",mode:"loading",readOnly:false,canEdit:false,q:"",gDraft:null};
+const S={cfg:{...DEFAULT_CFG},staff:{},guides:{},tasks:{},toff:{},sched:null,store:null,dept:"__all",week:addDays(sundayOf(new Date()),7),tab:"build",mode:"loading",readOnly:false,canEdit:false,q:"",gDraft:null};
 const skey=s=>String(s).replace(/[^A-Za-z0-9_-]/g,"_");
 const guideId=(store,dept)=>skey(store)+"__"+skey(dept);
 const FE="Front End";
@@ -1536,12 +1588,13 @@ function attach(b){
   b.subCfg(c=>{cfgLoaded=true;S.cfg=c?{...DEFAULT_CFG,...c}:{...DEFAULT_CFG};if(!S.store||!S.cfg.stores.includes(S.store))S.store=(prefs.store&&S.cfg.stores.includes(prefs.store))?prefs.store:S.cfg.stores[0];renderAll();resub()});
   b.subStaff(o=>{const pend={};for(const[k,v]of Object.entries(S.staff))if(v&&v._pending)pend[k]=v;S.staff={...o,...pend};renderAll()});
   b.subGuides(o=>{S.guides=o;renderAll()});
+  if(b.subTimeoff)b.subTimeoff(o=>{S.toff=o||{};renderAll()});
   if(b.subTasks)b.subTasks(o=>{S.tasks=o;if(!document.activeElement||!document.activeElement.dataset||!document.activeElement.dataset.task)renderAll()});
 }
 function resub(){if(unsubSched)unsubSched();if(!S.store)return;S.sched=null;S.pub=null;loadPub();S.sales=null;loadSales();S.lock=null;S.readOnly=false;watchLock();unsubSched=backend.subSched(key(),d=>{S.sched=d;renderGrid();renderPrint();renderWizard();updFinal()})}
 
 /* ---------- render ---------- */
-function renderAll(){if(typeof renderChat==="function")renderChat();renderNotes();renderMode();renderBanner();renderControls();renderGrid();renderStaff();renderGuide();renderSettings();renderGoals();renderPrint();renderWizard();renderSumTab();if(S.tab==="dash"){if(DASH.week!==ymd(S.week))loadDash();else renderDash()}}
+function renderAll(){if(typeof renderToffBtn==="function")setTimeout(()=>{renderToffBtn();renderToffTogs()},0);if(typeof renderChat==="function")renderChat();renderNotes();renderMode();renderBanner();renderControls();renderGrid();renderStaff();renderGuide();renderSettings();renderGoals();renderPrint();renderWizard();renderSumTab();if(S.tab==="dash"){if(DASH.week!==ymd(S.week))loadDash();else renderDash()}}
 function renderMode(){
   $("#modeLine").textContent=S.mode==="sample"?"Sample crew — nothing is saved":S.mode==="shared"?(LOCK?LOCK+" store":"Saved for everyone with this link"):S.mode==="local"?"Saved on this device only":"Loading…";
 }
@@ -1655,7 +1708,7 @@ function renderGrid(){renderSum();renderPay();renderLock();renderHero();if(S.tab
         let inner,cls=f;
         if(v&&v.off){cls="offauto";inner=`<span class="t">Off</span>`}
         else if(v&&v.s){const hh=hoursOf(v,S.cfg);const og=shG(st,v);if(og===dept){dayCount[d]++;dayHrs[d]+=hh;here+=hh}inner=`<span class="t">${fmtRange(v.s,v.e)}</span>${og!==dept||f==="bad"?`<span class="h">${og!==dept?"in "+esc(og):""}${f==="bad"?(og!==dept?" · ":"")+"avail "+esc(availText(st,d)):""}</span>`:""}`}
-        else{cls="offauto"+(a.mode==="no"?" na":"");inner=`<span class="t">Off</span>${a.mode==="no"?`<span class="av">Can't work</span>`:""}`}
+        else{cls="offauto"+(a.mode==="no"?" na":"");inner=`<span class="t">Off</span>${a.mode==="no"?`<span class="av">${a.toff?"Time off":"Can't work"}</span>`:""}`}
         if(v&&v.s&&!v.off)cls=cellCls(f,v)+(shG(st,v)!==dept?" oth":"");
         h+=`<td class="cell"><button class="cbtn ${cls}" data-sid="${st.id}" data-d="${d}" data-g="${esc(dept)}" ${S.readOnly?"disabled":""} aria-label="${esc(st.name)}, ${DAYS_LONG[d]}">${inner}</button></td>`;
       }
@@ -2138,7 +2191,7 @@ function shiftGridHTML(noCov){
       h+=`</tr>`;
     });
     h+=`<tr class="cov"><td class="who"><div class="nm">Off</div><div class="meta">Drag a name up onto a shift</div></td>${offs.map((o,d)=>{const free=people.filter(st=>!cellVal(st.id,d)&&availOf(st,d).mode!=="no"&&matchQ(st.name)).sort((a,b)=>a.name.localeCompare(b.name));
-      return `<td class="scell offcell" data-drop="off" data-dept="${esc(dept)}" data-d="${d}"><div class="slist">${o.filter(st=>matchQ(st.name)).map(st=>`<button class="nchip unsched" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":`draggable="true" data-drag="req"`} title="Day off">${dot(st.id)}${hl(st.name)}${alsoTag(st,dept)}<span class="ct2">Off</span></button>`).join("")}${free.map(st=>`<button class="nchip unsched" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":`draggable="true" data-drag="off"`} title="Off (no shift yet). Drag onto a shift, or tap to pick one.">${dot(st.id)}${hl(st.name)}${alsoTag(st,dept)}<span class="ct2">Off</span></button>`).join("")}</div></td>`}).join("")}</tr>`;
+      return `<td class="scell offcell" data-drop="off" data-dept="${esc(dept)}" data-d="${d}"><div class="slist">${o.filter(st=>matchQ(st.name)).map(st=>`<button class="nchip unsched" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":`draggable="true" data-drag="req"`} title="Day off">${dot(st.id)}${hl(st.name)}${alsoTag(st,dept)}<span class="ct2">Off</span></button>`).join("")}${free.map(st=>`<button class="nchip unsched" data-g="${esc(dept)}" data-sid="${st.id}" data-d="${d}" ${S.readOnly?"disabled":`draggable="true" data-drag="off"`} title="Off (no shift yet). Drag onto a shift, or tap to pick one.">${dot(st.id)}${hl(st.name)}${alsoTag(st,dept)}<span class="ct2">Off</span></button>`).join("")}${people.filter(st=>!cellVal(st.id,d)&&availOf(st,d).toff&&matchQ(st.name)).sort((a,b)=>a.name.localeCompare(b.name)).map(st=>`<span class="nchip toffchip" data-sid="${st.id}" data-d="${d}" title="${esc(availText(st,d))}">${dot(st.id)}${hl(st.name)}<span class="ct2">Time off</span></span>`).join("")}</div></td>`}).join("")}</tr>`;
     h+=`<tr class="empsum" data-feat="emp_totals"><td class="who"><div class="nm">Days · hours</div><div class="meta">This week, per person</div></td><td colspan="7"><div class="esum">${people.filter(st=>matchQ(st.name)).map(st=>{const r=rowStats(st);const lm=limitMsgs(st,r.h,r.days);const low=isFT(st)&&r.h<30;
       return `<span class="echip ${lm.length?"bad":low?"low":""}" title="${esc(lm.length?lm.join(" · "):low?"Full-time under 30 hours":"")}">${dot(st.id)}<b>${esc(st.name)}</b><span>${r.days}d</span><span>${fmtH(r.h)}h</span></span>`}).join("")}</div></td></tr>`;
   }
@@ -2994,7 +3047,7 @@ const ES={
 "Fills the open shifts for you. You choose how, see a preview, and approve before anything saves.":"Llena los turnos abiertos por ti. Tú eliges cómo, ves una vista previa y apruebas antes de guardar.",
 "Total hours ":"Total de horas ","Problems":"Problemas","fix the red flags below":"corrige lo marcado en rojo","everything is within the rules":"todo está dentro de las reglas","Duties printed with this schedule":"Tareas que se imprimen con este horario","Schedule another department":"Programar otro departamento","See dashboard":"Ver panel","Save duties":"Guardar tareas","Cancel":"Cancelar","Use company list":"Usar lista de la compañía","Company list":"Lista de la compañía",
 "✓ Available":"✓ Disponible","⚠ Available, but goes over a limit":"⚠ Disponible, pero pasa un límite","Only pick them if you have to.":"Escógelos solo si es necesario.","✗ Not available":"✗ No disponible","They asked off or can't work this time. Tap twice to add anyway.":"Pidieron libre o no pueden a esta hora. Toca dos veces para agregarlos de todos modos.","Already working another shift this day":"Ya trabaja otro turno este día","Tap again to add anyway":"Toca otra vez para agregar de todos modos","Done":"Listo","this week":"esta semana","✗ Asked for this day off":"✗ Pidió este día libre","✗ Outside their availability":"✗ Fuera de su disponibilidad",
-"+ Add employee":"+ Agregar empleado","🕒 Change availability":"🕒 Cambiar disponibilidad","Select several":"Seleccionar varios","Paste a roster":"Pegar lista","Availability":"Disponibilidad","Edit":"Editar","Change availability":"Cambiar disponibilidad","Who do you want to update?":"¿A quién quieres actualizar?","Type a name…":"Escribe un nombre…","Any day, any time":"Cualquier día, cualquier hora",
+"+ Add employee":"+ Agregar empleado","🗓 Time off":"🗓 Días libres","Time off":"Día libre","Time-off requests":"Solicitudes de días libres","Waiting for you":"Esperando por ti","Add time off":"Agregar día libre","Employee":"Empleado","From":"Desde","To":"Hasta","Start date":"Fecha de inicio","End date":"Fecha final","Start date = first day off. End date = last day off. For one day, use the same date for both. These days show as":"Fecha de inicio = primer día libre. Fecha final = último día libre. Si es un solo día, usa la misma fecha en las dos. Estos días aparecen como","on the schedule.":"en el horario.","Pick the employee and the start date.":"Escoge al empleado y la fecha de inicio.","The end date can't be before the start date.":"La fecha final no puede ser antes de la fecha de inicio.","Note (optional)":"Nota (opcional)","Approve":"Aprobar","Decline":"Rechazar","Remove":"Quitar","Coming up":"Próximos","No time off coming up.":"No hay días libres próximos.","No requests waiting.":"No hay solicitudes pendientes.","Asked online":"Pedido en línea","Added by manager":"Agregado por el gerente","Save time off":"Guardar día libre","🕒 Change availability":"🕒 Cambiar disponibilidad","Select several":"Seleccionar varios","Paste a roster":"Pegar lista","Availability":"Disponibilidad","Edit":"Editar","Change availability":"Cambiar disponibilidad","Who do you want to update?":"¿A quién quieres actualizar?","Type a name…":"Escribe un nombre…","Any day, any time":"Cualquier día, cualquier hora",
 "Available any time":"Disponible a cualquier hora","Only those hours":"Solo esas horas","Can't work that day":"No puede ese día","Every day: any time":"Todos los días: cualquier hora","Only certain hours":"Solo ciertas horas","from":"de","to":"a","Save availability":"Guardar disponibilidad","Build schedule → Availability this week":"Hacer horario → Disponibilidad esta semana",
 "Employee summary · hours & days":"Resumen de empleados · horas y días","Hours & days summary":"Resumen de horas y días","FT under 30":"TC menos de 30","Over 40 — OT":"Más de 40 — tiempo extra","FT with no shifts":"TC sin turnos","PT over 29.99":"MT más de 29.99","Over 40":"Más de 40","Set":"Fijo","No one here yet.":"Todavía no hay nadie.",
 "Add employee":"Agregar empleado","Status":"Estado","Full-time (30+ hrs)":"Tiempo completo (30+ hrs)","Part-time (under 30)":"Medio tiempo (menos de 30)","Max hours / week (optional)":"Máx. horas / semana (opcional)","Note (optional)":"Nota (opcional)","Also works in (optional)":"También trabaja en (opcional)","Schedule type":"Tipo de horario","Rotates week to week":"Cambia cada semana","Set schedule (same every week)":"Horario fijo (igual cada semana)","Weekly availability":"Disponibilidad semanal","All days any time":"Todos los días a cualquier hora","Copy Monday to all":"Copiar lunes a todos","Between":"Entre","Not available":"No disponible","Remove employee":"Quitar empleado","Save":"Guardar","Tap again to remove":"Toca otra vez para quitar","Not set":"Sin asignar","Custom time…":"Otra hora…","Other time…":"Otra hora…","Copy Monday to weekdays":"Copiar lunes a entre semana","Set schedule":"Horario fijo",
@@ -3009,7 +3062,7 @@ const ES_RE=[
 [/^Step (\d) of (\d)$/,"Paso $1 de $2"],[/^✓ Done · Next: (.+) →$/,m=>"✓ Listo · Siguiente: "+(ES[m[1]]||m[1])+" →"],
 [/^🗑 Clear week$/,"🗑 Borrar semana"],[/^🗑 Clear (.+)$/,"🗑 Borrar $1"],[/^Clear (.+)\?$/,"¿Borrar $1?"],
 [/^Coverage · (.+)$/,"Cubre · $1"],
-[/^(\d+) employees\. Add new hires, fix departments, remove anyone who left\.$/,"$1 empleados. Agrega nuevos, corrige departamentos, quita a quien ya no trabaja."],[/^(\d+) employees\. Add new hires, remove anyone who left, and mark days they can't work\.(?: (\d+) have days marked\.)?$/,m=>m[1]+" empleados. Agrega nuevos, quita a quien ya no trabaja y marca los días que no pueden trabajar."+(m[2]?" "+m[2]+" tienen días marcados.":"")],
+[/^(\d+) employees\. Add new hires, fix departments, remove anyone who left\.$/,"$1 empleados. Agrega nuevos, corrige departamentos, quita a quien ya no trabaja."],[/^(\d+) employees\. Add new hires, remove anyone who left, and mark days they can't work\.(?: (\d+) have days marked\.)?(?: (\d+) time-off requests? waiting\.)?$/,m=>m[1]+" empleados. Agrega nuevos, quita a quien ya no trabaja y marca los días que no pueden trabajar."+(m[2]?" "+m[2]+" tienen días marcados.":"")+(m[3]?" "+m[3]+" solicitudes de días libres pendientes.":"")],
 [/^Mark the days people can't work this week \(vacation, school, requests\)\.(?: (\d+) have days marked\.)?$/,m=>"Marca los días que no pueden trabajar esta semana (vacaciones, escuela, permisos)."+(m[1]?" "+m[1]+" tienen días marcados.":"")],
 [/^(\d+) shifts placed\. Drag names from the Off row onto shifts\.$/,"$1 turnos puestos. Arrastra nombres de la fila Libre a los turnos."],
 [/^(\d+) over · (\d+) under\. Fix what you can, then mark it reviewed\.$/,"$1 de más · $2 de menos. Corrige lo que puedas y márcalo como revisado."],

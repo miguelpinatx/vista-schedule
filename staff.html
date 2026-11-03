@@ -64,6 +64,7 @@ tr.me td{background:var(--me)}
 header{background:#fff;border-radius:16px;padding:10px 14px;border-bottom:5px solid #FEC938}
 .vlogo{height:52px;width:auto;display:block}
 h1{color:var(--brand)}
+.reqc{border:2px solid #FEC938;background:#fffdf3}.reqb{border:0;background:var(--brand);color:#fff;font:700 15px var(--f-body);padding:11px 16px;border-radius:12px;cursor:pointer}.reqb2{border:1px solid var(--line);background:#fff;font:600 15px var(--f-body);padding:10px 14px;border-radius:12px;cursor:pointer}.reqf{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.reqf select,.reqf input{font:500 16px var(--f-body);padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}.reqmsg{margin-top:8px;font-weight:600;color:var(--brand)}.reqhelp{margin:0 0 12px;padding-left:20px;font-size:14px;line-height:1.45;color:var(--ink)}.reqhelp li{margin:3px 0}.rq{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-top:1px dashed var(--line);font-size:15px;font-weight:600}.rs{border-radius:999px;padding:3px 10px;font-size:13px;font-weight:800;white-space:nowrap}.rs.ok{background:#e3f4e4;color:#1f5e23}.rs.no{background:#fde3df;color:#9b2c1f}.rs.wt{background:#fff1c2;color:#6b4d00}.reqdisc{background:#fff1c2;border:1px solid #e9c45a;border-radius:10px;padding:8px 10px;font-size:13.5px;font-weight:600;color:#5a4300;margin:0 0 12px}.reqdisc.sm{margin:10px 0 0;font-size:12.5px;font-weight:500;background:none;border:0;padding:0;color:var(--muted)}@media print{.reqc{display:none}}
 .weeks button[aria-pressed=true]{box-shadow:0 3px 0 #FEC938}
 .tabs button[aria-selected=true]{background:var(--brand);border-color:var(--brand)}
 @media (max-width:620px){.vlogo{height:40px}}
@@ -82,14 +83,15 @@ h1{color:var(--brand)}
 <script>
 (function(){"use strict";
 const SUPABASE_URL="https://httiqzrqpwfqpgctlmey.supabase.co",KEY="sb_publishable_hk5V9IDwfCfQPSJKJqaBeg_Bq_QX7vi";
-const T={en:{title:"Work schedule",loading:"Loading…",week:"Week",find:"Find your name",findPh:"Type your name…",me:"Your week",notMe:"Not you?",byPerson:"Everyone",byDay:"By day",off:"OFF",none:"—",pickStore:"Which store?",noStore:"Ask your manager for your store's schedule link.",nothing:"No schedule posted yet",nothingSub:"Schedules show here once they're approved. Check back soon.",updated:"Final · updated",noneDay:"No one scheduled",days:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],daysL:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],thisWeek:"This week",nextWeek:"Next week",print:"Print",notFound:"No one with that name this week.",err:"Couldn't load the schedule. Check your connection and refresh.",nm:"Name"},
- es:{title:"Horario de trabajo",loading:"Cargando…",week:"Semana",find:"Busca tu nombre",findPh:"Escribe tu nombre…",me:"Tu semana",notMe:"¿No eres tú?",byPerson:"Todos",byDay:"Por día",off:"LIBRE",none:"—",pickStore:"¿Qué tienda?",noStore:"Pide a tu gerente el enlace del horario de tu tienda.",nothing:"Todavía no hay horario publicado",nothingSub:"Los horarios aparecen aquí cuando se aprueban. Vuelve pronto.",updated:"Final · actualizado",noneDay:"Nadie programado",days:["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"],daysL:["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"],thisWeek:"Esta semana",nextWeek:"Próxima semana",print:"Imprimir",notFound:"Nadie con ese nombre esta semana.",err:"No se pudo cargar el horario. Revisa tu conexión y actualiza.",nm:"Nombre"}};
+const T={en:{title:"Work schedule",loading:"Loading…",week:"Week",find:"Find your name",findPh:"Type your name…",me:"Your week",notMe:"Not you?",byPerson:"Everyone",byDay:"By day",off:"OFF",none:"—",pickStore:"Which store?",noStore:"Ask your manager for your store's schedule link.",reqBtn:"📅 Request a day off",reqTitle:"Request a day off",reqWho:"Your name",reqPick:"Pick your name",reqFrom:"Start date",reqTo:"End date",reqHelp:["Pick your name and your dates. Just one day? Use the same date for both.","Send it by Wednesday.","Check back here: Waiting → Approved or Declined."],reqDisc:"Days off are not guaranteed. They are approved based on the store's business needs. You're only off once it says Approved.",reqWhy:"Reason (optional)",reqWhyPh:"e.g. vacation, school, family event",reqPriv:"Don't include medical or private details.",reqSend:"Send request",reqCancel:"Close",reqSent:"Sent! Your manager will approve or decline it.",reqMine:"Your requests (sent from this phone)",reqWait:"Waiting",reqOk:"Approved",reqNo:"Declined",reqNeed:"Pick your name and the start date.",reqBad:"The end date can't be before the start date.",reqPast:"The start date can't be in the past.",reqErr:"Couldn't send. Check your connection and try again.",nothing:"No schedule posted yet",nothingSub:"Schedules show here once they're approved. Check back soon.",updated:"Final · updated",noneDay:"No one scheduled",days:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],daysL:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],thisWeek:"This week",nextWeek:"Next week",print:"Print",notFound:"No one with that name this week.",err:"Couldn't load the schedule. Check your connection and refresh.",nm:"Name"},
+ es:{title:"Horario de trabajo",loading:"Cargando…",week:"Semana",find:"Busca tu nombre",findPh:"Escribe tu nombre…",me:"Tu semana",notMe:"¿No eres tú?",byPerson:"Todos",byDay:"Por día",off:"LIBRE",none:"—",pickStore:"¿Qué tienda?",noStore:"Pide a tu gerente el enlace del horario de tu tienda.",reqBtn:"📅 Pedir un día libre",reqTitle:"Pedir un día libre",reqWho:"Tu nombre",reqPick:"Escoge tu nombre",reqFrom:"Fecha de inicio",reqTo:"Fecha final",reqHelp:["Escoge tu nombre y tus fechas. ¿Solo un día? Usa la misma fecha en las dos.","Envíala a más tardar el miércoles.","Revisa aquí: Pendiente → Aprobado o Rechazado."],reqDisc:"Los días libres no están garantizados. Se aprueban según las necesidades de la tienda. Solo tienes el día libre cuando diga Aprobado.",reqWhy:"Motivo (opcional)",reqWhyPh:"ej. vacaciones, escuela, evento familiar",reqPriv:"No incluyas detalles médicos o privados.",reqSend:"Enviar solicitud",reqCancel:"Cerrar",reqSent:"¡Enviado! Tu gerente lo aprobará o rechazará.",reqMine:"Tus solicitudes (enviadas desde este teléfono)",reqWait:"Pendiente",reqOk:"Aprobado",reqNo:"Rechazado",reqNeed:"Escoge tu nombre y la fecha de inicio.",reqBad:"La fecha final no puede ser antes de la fecha de inicio.",reqPast:"La fecha de inicio no puede ser en el pasado.",reqErr:"No se pudo enviar. Revisa tu conexión e intenta de nuevo.",nothing:"Todavía no hay horario publicado",nothingSub:"Los horarios aparecen aquí cuando se aprueban. Vuelve pronto.",updated:"Final · actualizado",noneDay:"Nadie programado",days:["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"],daysL:["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"],thisWeek:"Esta semana",nextWeek:"Próxima semana",print:"Imprimir",notFound:"Nadie con ese nombre esta semana.",err:"No se pudo cargar el horario. Revisa tu conexión y actualiza.",nm:"Nombre"}};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const ls={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const params=new URLSearchParams(location.search);const store=params.get("store");
 let lang=ls.get("vsb-lang")||((navigator.language||"").toLowerCase().startsWith("es")?"es":"en");
 let loaded=false,weeks=[],cur=null,view="person",q="",me=store?ls.get("vsb-me-"+store):null;
+let sb=null,reqOn=false,roster=[],reqOpen=false,reqMsg="",myReqs=[];
 const t=k=>T[lang][k];
 function toMin(s){const m=/^(\d{1,2}):(\d{2})/.exec(s||"");return m?+m[1]*60+ +m[2]:null}
 function fmtT(s){const m=toMin(s);if(m==null)return"";let h=Math.floor(m/60)%24,mm=m%60;const ap=h<12?"a":"p";h=h%12||12;return h+(mm?":"+String(mm).padStart(2,"0"):"")+ap}
@@ -101,13 +103,26 @@ const today=new Date();today.setHours(0,0,0,0);
 const norm=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
 function cell(v){return v==="off"?`<span class="off">${t("off")}</span>`:Array.isArray(v)?`<span class="sh ${cls(v[0])}">${fmtT(v[0])}–${fmtT(v[1])}${v[2]?`<small style="display:block;font-weight:500;font-size:11px">${esc(v[2])}</small>`:""}</span>`:`<span class="off">${t("off")}</span>`}
 function weekLabel(w){const s=pd(w.weekStart),diff=Math.round((s-addD(today,-today.getDay()))/864e5);return diff===0?t("thisWeek"):diff===7?t("nextWeek"):md(s)+" – "+md(addD(s,6))}
+const myIds=()=>{try{return JSON.parse(ls.get("vsb-req-"+store)||"[]")}catch(e){return[]}};
+const ymdL=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+function reqHTML(){if(!reqOn||!store)return"";
+  const mine=myReqs.filter(r=>(r.to||r.from)>=ymdL(today));
+  const st=r=>r.status==="approved"?`<span class="rs ok">✓ ${t("reqOk")}</span>`:r.status==="declined"?`<span class="rs no">✗ ${t("reqNo")}</span>`:`<span class="rs wt">⏳ ${t("reqWait")}</span>`;
+  const list=mine.length?`<div style="margin-top:10px"><div class="sub" style="font-weight:700;margin-bottom:4px">${t("reqMine")}</div>${mine.sort((a,b)=>a.from.localeCompare(b.from)).map(r=>`<div class="rq"><span>${md(pd(r.from))}${r.to&&r.to!==r.from?" – "+md(pd(r.to)):""}</span>${st(r)}</div>`).join("")}</div>`:"";
+  if(!reqOpen)return `<div class="card reqc"><button class="reqb" data-req="open">${t("reqBtn")}</button><div class="reqdisc sm">${esc(t("reqDisc"))}</div>${reqMsg?`<div class="reqmsg">${esc(reqMsg)}</div>`:""}${list}</div>`;
+  const min=ymdL(today);
+  return `<div class="card reqc"><h2 style="margin:0 0 8px">${t("reqTitle")}</h2><ol class="reqhelp">${t("reqHelp").map(x=>`<li>${esc(x)}</li>`).join("")}</ol><div class="reqdisc">⚠️ ${esc(t("reqDisc"))}</div><div class="reqf">
+    <label class="f">${t("reqWho")}<select id="rWho"><option value="">${t("reqPick")}</option>${roster.map(r=>`<option value="${r.id}" ${r.name===me?"selected":""}>${esc(r.name)}</option>`).join("")}</select></label>
+    <label class="f">${t("reqFrom")}<input type="date" id="rFrom" min="${min}"></label><label class="f">${t("reqTo")}<input type="date" id="rTo" min="${min}"></label>
+    <label class="f" style="grid-column:1/-1">${t("reqWhy")}<input id="rWhy" maxlength="80" placeholder="${t("reqWhyPh")}"><small style="text-transform:none;font-weight:500">${t("reqPriv")}</small></label></div>
+    ${reqMsg?`<div class="reqmsg">${esc(reqMsg)}</div>`:""}<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button class="reqb2" data-req="close">${t("reqCancel")}</button><button class="reqb" data-req="send">${t("reqSend")}</button></div>${list}</div>`}
 function render(){
   document.documentElement.lang=lang;document.querySelectorAll("[data-lang]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.lang===lang)));
   $("#title").textContent=t("title");$("#sub").textContent=store||"";document.title=(store?store+" · ":"")+t("title");
   const app=$("#app");
   if(!store){app.innerHTML=`<div class="empty"><h2>${t("pickStore")}</h2><p>${t("noStore")}</p></div>`;return}
   if(!loaded){app.innerHTML=`<div class="empty"><h2>${t("loading")}</h2></div>`;return}
-  if(!weeks.length){app.innerHTML=`<div class="empty"><h2>${t("nothing")}</h2><p>${t("nothingSub")}</p></div>`;return}
+  if(!weeks.length){app.innerHTML=reqHTML()+`<div class="empty"><h2>${t("nothing")}</h2><p>${t("nothingSub")}</p></div>`;return}
   const w=weeks.find(x=>x.weekStart===cur)||weeks[0];const s=pd(w.weekStart);
   const dayDates=[0,1,2,3,4,5,6].map(i=>addD(s,i));const tIdx=dayDates.findIndex(d=>+d===+today);
   const names=[...new Set(w.rows.map(r=>r.name))].sort();
@@ -126,16 +141,29 @@ function render(){
     h+=`<div class="dlist">${dayDates.map((d,i)=>{const on=rows.filter(r=>Array.isArray(r.days[i])).sort((a,b)=>toMin(a.days[i][0])-toMin(b.days[i][0]));
       return `<div class="dl ${i===tIdx?"today":""}"><h3>${t("daysL")[i]} · ${md(d)}</h3>${on.length?on.map(r=>`<div style="${r.name===me?"background:var(--me)":""}"><span>${esc(r.name)} <span class="meta">${esc(r.dept)}</span></span>${cell(r.days[i])}</div>`).join(""):`<p class="meta">${t("noneDay")}</p>`}</div>`}).join("")}</div>`;
   }
-  h+=`</div>`;app.innerHTML=h;
+  h+=`</div>`;app.innerHTML=reqHTML()+h;
   const qi=$("#q");if(qi){qi.oninput=e=>{q=e.target.value;const exact=names.find(n=>norm(n)===norm(q));if(exact){me=exact;ls.set("vsb-me-"+store,me)}const pos=e.target.selectionStart;render();const n=$("#q");n.focus();try{n.setSelectionRange(pos,pos)}catch(x){}}}
 }
+document.addEventListener("change",e=>{if(e.target.id==="rFrom"){const t2=$("#rTo");t2.min=e.target.value;if(!t2.value||t2.value<e.target.value)t2.value=e.target.value}
+  if(e.target.id==="rWho"){const r=roster.find(x=>x.id===e.target.value);if(r){me=r.name;ls.set("vsb-me-"+store,me)}}});
+document.addEventListener("click",async e=>{const rq=e.target.closest("[data-req]");if(!rq)return;const a=rq.dataset.req;
+  if(a==="open"){reqOpen=true;reqMsg="";render();return}if(a==="close"){reqOpen=false;reqMsg="";render();return}
+  if(a==="send"){const sid=$("#rWho").value,from=$("#rFrom").value,to=$("#rTo").value||from,note=$("#rWhy").value.trim();
+    if(!sid||!from){reqMsg=t("reqNeed");render();return}if(to<from){reqMsg=t("reqBad");render();return}if(from<ymdL(today)){reqMsg=t("reqPast");render();return}
+    const r=roster.find(x=>x.id===sid);const id="to"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    const data={store,sid,name:r?r.name:"",from,to,note,status:"pending",source:"employee",at:new Date().toISOString()};
+    rq.disabled=true;try{const{error}=await sb.from("docs").insert({collection:"timeoff",id,data,updated_at:new Date().toISOString()});if(error)throw error;
+      myReqs.push({id,from,to,status:"pending"});ls.set("vsb-req-"+store,JSON.stringify([...myIds(),id].slice(-30)));me=data.name;ls.set("vsb-me-"+store,me);reqOpen=false;reqMsg=t("reqSent");render()}catch(x){reqMsg=t("reqErr");render()}}});
 document.addEventListener("click",e=>{const l=e.target.closest("[data-lang]");if(l){lang=l.dataset.lang;ls.set("vsb-lang",lang);render();return}
   const w=e.target.closest("[data-week]");if(w){cur=w.dataset.week;render();return}
   const v=e.target.closest("[data-view]");if(v){view=v.dataset.view;render();return}
   if(e.target.closest("[data-notme]")){me=null;q="";ls.set("vsb-me-"+store,"");render();setTimeout(()=>{const n=$("#q");if(n)n.focus()},0)}});
 async function load(){
   if(!store){render();return}
-  try{const sb=window.supabase.createClient(SUPABASE_URL,KEY);
+  try{sb=window.supabase.createClient(SUPABASE_URL,KEY);
+    try{const c=await sb.from("docs").select("data").eq("collection","config").eq("id","main").maybeSingle();const cd=c.data&&c.data.data||{};reqOn=!!(cd.timeoff&&cd.timeoffOnline);
+      if(reqOn){const r=await sb.from("docs").select("id,name:data->>name").eq("collection","staff").eq("data->>store",store);roster=(r.data||[]).filter(x=>x.name).sort((a,b)=>a.name.localeCompare(b.name));
+        const ids=myIds();if(ids.length){const q2=await sb.from("docs").select("id,from:data->>from,to:data->>to,status:data->>status").eq("collection","timeoff").in("id",ids);myReqs=(q2.data||[]).filter(x=>x&&x.from)}}}catch(x){reqOn=false}
     const {data,error}=await sb.from("docs").select("data").eq("collection","published").eq("data->>store",store);if(error)throw error;
     const ws=addD(today,-today.getDay());const min=+addD(ws,-7);
     weeks=data.map(r=>r.data).filter(w=>w&&w.weekStart&&+pd(w.weekStart)>=min).sort((a,b)=>a.weekStart.localeCompare(b.weekStart));
