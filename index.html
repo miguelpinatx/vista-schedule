@@ -251,7 +251,8 @@ tr.cov td.who{font-size:12px;color:var(--muted);font-weight:600;text-transform:u
 .cv.over{background:var(--warn-bg);color:var(--warn-fg)}
 .cv.none{color:var(--muted)}
 body.nf-home_totals [data-feat~="home_totals"],body.nf-card_stats [data-feat~="card_stats"],body.nf-home_summary [data-feat~="home_summary"],body.nf-store_stats [data-feat~="store_stats"],body.nf-emp_totals [data-feat~="emp_totals"],body.nf-issues [data-feat~="issues"],body.nf-sum_tab [data-feat~="sum_tab"],body.nf-sum_tiles [data-feat~="sum_tiles"],body.nf-sum_dept [data-feat~="sum_dept"],body.nf-sum_day [data-feat~="sum_day"],body.nf-sum_shift [data-feat~="sum_shift"],body.nf-sum_emp [data-feat~="sum_emp"]{display:none!important}
-details.exact{margin-top:10px}.stab.needs td.ok{background:#e9f6ea;color:#1f5e23}.stab.needs td.z{color:#c9c3b6}.stab.needs tr.needtot td{border-top:2px solid var(--line);font-weight:800}.stab.needs td small{display:inline;margin-left:3px}.rt.role{background:#fff4d6;color:#6b4d00;border-color:#f1d98a}.rt.role.ov{background:#F47321;color:#fff;border-color:#F47321}.rolerow input{flex:1;min-width:0}.btn.bclear{color:var(--bad-fg);border-color:var(--bad-line)}.rt.cov{background:#e3effa;color:#0d4a75;border-color:#b9d6ef}@media (max-width:640px){.lockban{flex-wrap:wrap}.lockban .spacer{display:none}}
+details.exact{margin-top:10px}.stab.needs td.ok{background:#e9f6ea;color:#1f5e23}.stab.needs td.z{color:#c9c3b6}.stab.needs tr.needtot td{border-top:2px solid var(--line);font-weight:800}.stab.needs td small{display:inline;margin-left:3px}.rt.role{background:#fff4d6;color:#6b4d00;border-color:#f1d98a}.pv .sn{font-weight:800;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em}.pv .rl{font-weight:700;font-size:10.5px}.pv td .rl{font-style:normal}
+.rt.role.ov{background:#F47321;color:#fff;border-color:#F47321}.rolerow input{flex:1;min-width:0}.btn.bclear{color:var(--bad-fg);border-color:var(--bad-line)}.rt.cov{background:#e3effa;color:#0d4a75;border-color:#b9d6ef}@media (max-width:640px){.lockban{flex-wrap:wrap}.lockban .spacer{display:none}}
 .flag.under{background:#e3effa;color:#0d4a75}.ptitle.bad{color:var(--bad-fg)}.ptitle.und{color:#0d4a75}
 .ovgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.ovrow{padding:6px 0;border-bottom:1px solid var(--line)}@media (max-width:640px){.ovgrid{grid-template-columns:1fr}}
 .cwdays{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}.cw{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--line);border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer;user-select:none}.cw input{width:18px;height:18px}.cw.on{border-color:var(--bad-fg);background:var(--bad-bg);color:var(--bad-fg)}
@@ -2650,6 +2651,8 @@ function pageHead(G,sub){const wk=weekNo(S.week,S.cfg.wkOffset);
   return `<div class="ph"><div><h1>${esc(G)}</h1><div>Vista Markets · ${esc(S.store)} · ${sub}</div></div><div style="text-align:right"><b style="font-size:18px">Week / Semana ${wk}</b><br>${rangeLabel(S.week)}</div></div>`}
 const pageFoot=``;
 function dayHead(first){let h=`<thead><tr><th style="text-align:left;width:${first}">`;return h}
+function shiftName(G,v){if(!v||!v.s)return"";const{g,slots}=slotsFor(G);const x=((g&&g.extra)||[]).find(o=>o.start===v.s&&o.end===v.e);if(x)return x.label;
+  const sl=slots.find(o=>o.start===v.s&&o.end===v.e);if(sl)return sl.label;if(g&&g.parts){const i=slotOf(g,v);if(i>=0&&g.slots[i])return g.slots[i].label}return""}
 function printHTML(){
   const{list,groups}=printGroups();if(!groups.length)return `<div class="pv"><div class="pg">No employees</div></div>`;
   return `<div class="pv">`+groups.map(G=>{const ppl=list.filter(s=>inGrp(s,G)).sort((a,b)=>a.name.localeCompare(b.name));
@@ -2657,7 +2660,7 @@ function printHTML(){
     for(let d=0;d<7;d++){const dt=addDays(S.week,d);h+=`<th>${DAYS[d]} / ${DAYS_ES[d]}<br>${dt.getMonth()+1}/${dt.getDate()}</th>`}
     h+=`<th>Hrs</th></tr></thead><tbody>`;let gt=0;const gd=[0,0,0,0,0,0,0];
     for(const st of ppl){let tot=0;h+=`<tr><td class="n">${esc(st.name)}${st.role?` <span style="font-weight:400;font-size:12px">· ${esc(st.role)}</span>`:""}${grp(st.dept)!==st.dept?` <span style="font-weight:400;font-size:10.5px">· ${esc(st.dept)}</span>`:""}</td>`;
-      for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&v.s&&!v.off&&shG(st,v)===G){const x=hoursOf(v,S.cfg);tot+=x;gd[d]+=x;h+=`<td>${fmtRange(v.s,v.e)}${v.role&&v.role!==st.role?`<br><span style="font-weight:600;font-size:10.5px">${esc(v.role)}</span>`:""}</td>`}else if(v&&v.s&&!v.off)h+=`<td class="o">${esc(shG(st,v))}</td>`;else h+=`<td class="o">OFF</td>`}
+      for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&v.s&&!v.off&&shG(st,v)===G){const x=hoursOf(v,S.cfg);tot+=x;gd[d]+=x;const sn=shiftName(G,v);h+=`<td>${sn?`<span class="sn">${esc(sn)}</span><br>`:""}${fmtRange(v.s,v.e)}${v.role&&v.role!==st.role?`<br><span class="rl">${esc(v.role)}</span>`:""}</td>`}else if(v&&v.s&&!v.off)h+=`<td class="o">${esc(shG(st,v))}</td>`;else h+=`<td class="o">OFF</td>`}
       gt+=tot;h+=`<td>${fmtH(tot)}</td></tr>`}
     h+=`<tr class="tot"><td class="n">Total hrs</td>${gd.map(x=>`<td>${fmtH(x)}</td>`).join("")}<td>${fmtH(gt)}</td></tr></tbody></table>`;
     return h+dutiesBox(S.store,G)+pageFoot+`</div>`}).join("")+`</div>`;
@@ -2674,9 +2677,9 @@ function printShiftHTML(){
     let h=`<div class="pg">`+pageHead(G,"Horario por turno / Schedule by shift")+`<table class="ps"><thead><tr><th style="text-align:left;width:11%">Time / Hora</th>`;
     for(let d=0;d<7;d++){const dt=addDays(S.week,d);h+=`<th>${DAYS[d]} / ${DAYS_ES[d]}<br>${dt.getMonth()+1}/${dt.getDate()}</th>`}
     h+=`</tr></thead><tbody>`;
-    for(const r of ordered){h+=`<tr><td class="n">${fmtRange(r.s,r.e)}</td>`;
+    for(const r of ordered){const sn=shiftName(G,{s:r.s,e:r.e});h+=`<tr><td class="n">${sn?`<span class="sn">${esc(sn)}</span><br>`:""}${fmtRange(r.s,r.e)}</td>`;
       for(let d=0;d<7;d++){const xs=r.d[d].sort((a,c)=>roleCmp(a,c)||a.name.localeCompare(c.name));
-        h+=xs.length?`<td class="names">${xs.map(st=>`<div>${esc(st.name)}${grp(st.dept)!==st.dept?` <span class="ct">· ${esc(st.dept)}</span>`:""}${st.role?` <span class="ct">· ${esc(st.role)}</span>`:""}</div>`).join("")}</td>`:`<td class="e"></td>`}
+        h+=xs.length?`<td class="names">${xs.map(st=>`<div>${esc(st.name)}${grp(st.dept)!==st.dept?` <span class="ct">· ${esc(st.dept)}</span>`:""}${st.role?` <span class="ct rl">· ${esc(st.role)}</span>`:""}</div>`).join("")}</td>`:`<td class="e"></td>`}
       h+=`</tr>`}
     if(!ordered.length)h+=`<tr><td colspan="8">No shifts scheduled</td></tr>`;
     h+=`<tr class="tot"><td class="n">Total hrs<br><b>${fmtH(pH.reduce((a,b)=>a+b,0))}</b></td>${pH.map(x=>`<td><b>${fmtH(x)}</b></td>`).join("")}</tr></tbody></table>`;
