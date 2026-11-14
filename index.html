@@ -1108,11 +1108,11 @@ function storeSheetRows(st,wk,shifts){const sh=shifts||{};const cv=(id,d)=>sh[id
   for(const G of groups){const ps=ppl.filter(p=>inGrp(p,G)).sort((a,b)=>a.name.localeCompare(b.name));const gD=[0,0,0,0,0,0,0];
     const slots=new Map();const off=[[],[],[],[],[],[],[]];const per={};
     for(const p of ps){per[p.id]={n:0,h:0};for(let d=0;d<7;d++){const v=cv(p.id,d);
-      if(v&&v.s&&!v.off){if(shG(p,v)!==G)continue;const k=v.s+"-"+v.e;if(!slots.has(k))slots.set(k,{s:v.s,e:v.e,d:[[],[],[],[],[],[],[]]});slots.get(k).d[d].push(roleOf(p,v)?p.name+" ("+roleOf(p,v)+")":p.name);const x=hoursOf(v,S.cfg);gD[d]+=x;per[p.id].n++;per[p.id].h+=x}
+      if(v&&v.s&&!v.off){if(shG(p,v)!==G)continue;const nm=shiftName(G,v);const k=v.s+"-"+v.e+"|"+nm;if(!slots.has(k))slots.set(k,{s:v.s,e:v.e,nm,d:[[],[],[],[],[],[],[]]});slots.get(k).d[d].push(roleOf(p,v)?p.name+" ("+roleOf(p,v)+")":p.name);const x=hoursOf(v,S.cfg);gD[d]+=x;per[p.id].n++;per[p.id].h+=x}
       else off[d].push(p.name)}}
     P("dept",[G]);P("head",["Shift",...dates,"Week"]);
-    const ord=[...slots.values()].sort((a,b)=>toMin(a.s)-toMin(b.s)||toMin(a.e)-toMin(b.e));
-    ord.forEach((r,j)=>{r.d.forEach(x=>x.sort());const n=Math.max(1,...r.d.map(x=>x.length));for(let i=0;i<n;i++)P(i?"shift":(j%2?"shift1b":"shift1"),[i?"":xt(r.s)+" - "+xt(r.e),...r.d.map(x=>x[i]||"")]);if(j%2)for(let i=K.length-n+1;i<K.length;i++)K[i]="shiftb"});
+    const ord=[...slots.values()].sort((a,b)=>toMin(a.s)-toMin(b.s)||toMin(a.e)-toMin(b.e)||String(a.nm||"").localeCompare(String(b.nm||"")));
+    ord.forEach((r,j)=>{r.d.forEach(x=>x.sort());const n=Math.max(1,...r.d.map(x=>x.length));for(let i=0;i<n;i++)P(i?"shift":(j%2?"shift1b":"shift1"),[i?"":(r.nm?r.nm+"  ":"")+xt(r.s)+" - "+xt(r.e),...r.d.map(x=>x[i]||"")]);if(j%2)for(let i=K.length-n+1;i<K.length;i++)K[i]="shiftb"});
     if(!ord.length)P("note",["No shifts scheduled"]);
     
     const gT=gD.reduce((a,b)=>a+b,0);P("total",["Total hours",...gD.map(r2),r2(gT)]);P("blank",[]);
@@ -2209,7 +2209,7 @@ function shiftGridHTML(noCov){
         const list=buckets[i][d];const need=fromGuide?(+(sl.need&&sl.need[d])||0):null;
         const shown=list.filter(x=>matchQ(x.st.name));
         const stc=need==null?"":list.length<need?"short":list.length>need?"over":"ok";
-        const chips=shown.sort((a,b)=>String(roleOf(a.st,a.v)||"~").localeCompare(String(roleOf(b.st,b.v)||"~"))||a.st.name.localeCompare(b.st.name)).map(({st,v})=>{const f=fit(st,d,v);const custom=v.s!==sl.start||v.e!==sl.end;const xl=custom?((g&&g.extra)||[]).find(x=>x.start===v.s&&x.end===v.e):null;
+        const chips=shown.sort((a,b)=>String(a.v.n||"").localeCompare(String(b.v.n||""))||String(roleOf(a.st,a.v)||"~").localeCompare(String(roleOf(b.st,b.v)||"~"))||a.st.name.localeCompare(b.st.name)).map(({st,v})=>{const f=fit(st,d,v);const named=v.n&&v.n!==sl.label;const custom=named||v.s!==sl.start||v.e!==sl.end;const xl=v.n?(named?{label:v.n}:null):(custom?((g&&g.extra)||[]).find(x=>x.start===v.s&&x.end===v.e):null);
           return `<button class="nchip ${cellCls(f,v)}" data-sid="${st.id}" data-d="${d}" data-g="${esc(dept)}" ${S.readOnly?"disabled":`draggable="true" data-drag="shift"`} title="${esc(st.name)} ${fmtRange(v.s,v.e)}${f==="bad"?" — outside availability ("+esc(availText(st,d))+")":""}"><span class="nn">${dot(st.id)}${hl(st.name)}${roleTagV(st,v)}${alsoTag(st,dept)}</span>${custom?`<span class="ct2">${xl?esc(xl.label)+" · ":""}${fmtRange(v.s,v.e)}</span>`:""}</button>`}).join("");
         h+=`<td class="scell" data-drop="slot" data-dept="${esc(dept)}" data-slot="${i}" data-d="${d}"><div class="slist">${!noCov&&need!=null&&stc&&stc!=="ok"?`<span class="cvmini ${stc}">${list.length<need?"Need "+(need-list.length):"+"+(list.length-need)+" over"}</span>`:""}${chips}${S.readOnly?"":`<button class="addp" data-add="${esc(dept)}" data-slot="${i}" data-d="${d}" aria-label="Add someone to ${esc(dept)} ${esc(sl.label)} ${DAYS_LONG[d]}">+</button>`}</div></td>`;
       }
@@ -2234,7 +2234,7 @@ function addPicker(dept,i,d,xi){
   const tchoice=rx.length?`<div class="tchoice" role="group" aria-label="Shift time"><span class="note">Time:</span><button class="tbtn ${pickX?"":"on"}" data-tx="">${esc(row.label)} ${fmtRange(row.start,row.end)}</button>${rx.map(o=>`<button class="tbtn ${pickX&&pickX.k===o.k?"on":""}" data-tx="${o.k}">${esc(o.x.label)} ${fmtRange(o.x.start,o.x.end)}</button>`).join("")}</div>`:"";
   const people=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&inGrp(s,grp(dept)));
   const rows=people.map(st=>{const cur=cellVal(st.id,d);const wk=weekHours(st.id,d);const after=wk.h+sh;
-    const f=fit(st,d,v);const busy=cur&&cur.s&&!cur.off;const same=busy&&cur.s===sl.start&&cur.e===sl.end;
+    const f=fit(st,d,v);const busy=cur&&cur.s&&!cur.off;const same=busy&&cur.s===sl.start&&cur.e===sl.end&&(cur.n||"")===(pickX?pickX.x.label:"");
     const warn=[];if(isPT(st)&&after>29.99)warn.push("PT over 29.99");if(+st.maxHrs>0&&after>+st.maxHrs+1e-9)warn.push("Over "+fmtH(+st.maxHrs)+" cap");if(after>40)warn.push("Over 40");if(wk.days+1>(S.cfg.maxDays||5))warn.push((wk.days+1)+" days");
     const pm=st.pref&&st.pref!=="any"?(prefIdx[st.pref]===partIdx(v.s)?0:1):0.5;
     return{st,f,busy,same,cur,after,warn,pm,rank:same?9:busy?5:(f==="good"?(warn.length?2:0):(warn.length?4:3))}}).filter(r=>!r.same).sort((a,b)=>a.rank-b.rank||a.pm-b.pm||a.after-b.after||a.st.name.localeCompare(b.st.name));
@@ -2249,7 +2249,7 @@ function addPicker(dept,i,d,xi){
     <div class="row"><div class="spacer"></div><button class="btn" data-close>Done</button></div>`,true);
   $("#pickQ").oninput=e=>{const q=norm(e.target.value);document.querySelectorAll("#pickList .prow").forEach(b=>{b.hidden=q&&!norm(b.textContent).includes(q)})};
   document.querySelectorAll("[data-tx]").forEach(b=>b.onclick=()=>addPicker(dept,i,d,b.dataset.tx===""?null:+b.dataset.tx));
-  document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{if(b.dataset.confirm&&!b.dataset.armed){b.dataset.armed="1";const n=b.querySelector(".pnote");if(n)n.innerHTML="<b>Tap again to add anyway</b>";return}setCell(b.dataset.pick,d,{s:sl.start,e:sl.end});closeModal();toast(S.staff[b.dataset.pick].name+" added to "+sl.label)});
+  document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{if(b.dataset.confirm&&!b.dataset.armed){b.dataset.armed="1";const n=b.querySelector(".pnote");if(n)n.innerHTML="<b>Tap again to add anyway</b>";return}setCell(b.dataset.pick,d,pickX?{s:sl.start,e:sl.end,n:pickX.x.label}:{s:sl.start,e:sl.end});closeModal();toast(S.staff[b.dataset.pick].name+" added to "+sl.label)});
 }
 /* ---------- colors ---------- */
 const PCOL=8;
@@ -2651,8 +2651,8 @@ function pageHead(G,sub){const wk=weekNo(S.week,S.cfg.wkOffset);
   return `<div class="ph"><div><h1>${esc(G)}</h1><div>Vista Markets · ${esc(S.store)} · ${sub}</div></div><div style="text-align:right"><b style="font-size:18px">Week / Semana ${wk}</b><br>${rangeLabel(S.week)}</div></div>`}
 const pageFoot=``;
 function dayHead(first){let h=`<thead><tr><th style="text-align:left;width:${first}">`;return h}
-function shiftName(G,v){if(!v||!v.s)return"";const{g,slots}=slotsFor(G);const x=((g&&g.extra)||[]).find(o=>o.start===v.s&&o.end===v.e);if(x)return x.label;
-  const sl=slots.find(o=>o.start===v.s&&o.end===v.e);if(sl)return sl.label;if(g&&g.parts){const i=slotOf(g,v);if(i>=0&&g.slots[i])return g.slots[i].label}return""}
+function shiftName(G,v){if(!v||!v.s)return"";if(v.n)return v.n;const{g,slots}=slotsFor(G);
+  const sl=slots.find(o=>o.start===v.s&&o.end===v.e);if(sl)return sl.label;const x=((g&&g.extra)||[]).find(o=>o.start===v.s&&o.end===v.e);if(x)return x.label;if(g&&g.parts){const i=slotOf(g,v);if(i>=0&&g.slots[i])return g.slots[i].label}return""}
 function printHTML(){
   const{list,groups}=printGroups();if(!groups.length)return `<div class="pv"><div class="pg">No employees</div></div>`;
   return `<div class="pv">`+groups.map(G=>{const ppl=list.filter(s=>inGrp(s,G)).sort((a,b)=>a.name.localeCompare(b.name));
@@ -2672,12 +2672,12 @@ function printShiftHTML(){
     const rows=new Map();const rk=(a,b)=>a+"-"+b;
     if(fromGuide&&!(guideFor(S.store,G)||{}).parts)slots.forEach(sl=>{if((sl.need||[]).some(n=>+n>0))rows.set(rk(sl.start,sl.end),{s:sl.start,e:sl.end,d:[[],[],[],[],[],[],[]]})});
     const pH=[0,0,0,0,0,0,0];
-    for(const st of people)for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&v.s&&!v.off&&shG(st,v)===G){pH[d]+=hoursOf(v,S.cfg);const k=rk(v.s,v.e);if(!rows.has(k))rows.set(k,{s:v.s,e:v.e,d:[[],[],[],[],[],[],[]]});rows.get(k).d[d].push(v.role?{...st,role:v.role}:st)}}
-    const ordered=[...rows.values()].sort((a,b)=>toMin(a.s)-toMin(b.s)||toMin(a.e)-toMin(b.e));
+    for(const st of people)for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&v.s&&!v.off&&shG(st,v)===G){pH[d]+=hoursOf(v,S.cfg);const nm=shiftName(G,v);const k=rk(v.s,v.e)+"|"+nm;if(!rows.has(k))rows.set(k,{s:v.s,e:v.e,nm,d:[[],[],[],[],[],[],[]]});rows.get(k).d[d].push(v.role?{...st,role:v.role}:st)}}
+    const ordered=[...rows.values()].sort((a,b)=>toMin(a.s)-toMin(b.s)||toMin(a.e)-toMin(b.e)||String(a.nm||"").localeCompare(String(b.nm||"")));
     let h=`<div class="pg">`+pageHead(G,"Horario por turno / Schedule by shift")+`<table class="ps"><thead><tr><th style="text-align:left;width:11%">Time / Hora</th>`;
     for(let d=0;d<7;d++){const dt=addDays(S.week,d);h+=`<th>${DAYS[d]} / ${DAYS_ES[d]}<br>${dt.getMonth()+1}/${dt.getDate()}</th>`}
     h+=`</tr></thead><tbody>`;
-    for(const r of ordered){const sn=shiftName(G,{s:r.s,e:r.e});h+=`<tr><td class="n">${sn?`<span class="sn">${esc(sn)}</span><br>`:""}${fmtRange(r.s,r.e)}</td>`;
+    for(const r of ordered){const sn=r.nm!=null?r.nm:shiftName(G,{s:r.s,e:r.e});h+=`<tr><td class="n">${sn?`<span class="sn">${esc(sn)}</span><br>`:""}${fmtRange(r.s,r.e)}</td>`;
       for(let d=0;d<7;d++){const xs=r.d[d].sort((a,c)=>roleCmp(a,c)||a.name.localeCompare(c.name));
         h+=xs.length?`<td class="names">${xs.map(st=>`<div>${esc(st.name)}${grp(st.dept)!==st.dept?` <span class="ct">· ${esc(st.dept)}</span>`:""}${st.role?` <span class="ct rl">· ${esc(st.role)}</span>`:""}</div>`).join("")}</td>`:`<td class="e"></td>`}
       h+=`</tr>`}
@@ -2715,7 +2715,7 @@ function closeModal(){$("#modalSlot").innerHTML="";CTXG=null}
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
 
 function meta(){return{store:S.store,weekStart:ymd(S.week)}}
-function stampDept(sid,v){if(!v||!v.s||v.off)return v;const st=S.staff[sid];if(!st)return v;const G=CTXG||(S.dept!=="__all"?grp(S.dept):null)||v.dept||null;const n={s:v.s,e:v.e};if(G&&G!==grp(st.dept)&&inGrp(st,G))n.dept=G;if(v.role&&v.role!==st.role)n.role=v.role;return n}
+function stampDept(sid,v){if(!v||!v.s||v.off)return v;const st=S.staff[sid];if(!st)return v;const G=CTXG||(S.dept!=="__all"?grp(S.dept):null)||v.dept||null;const n={s:v.s,e:v.e};if(G&&G!==grp(st.dept)&&inGrp(st,G))n.dept=G;if(v.role&&v.role!==st.role)n.role=v.role;if(v.n)n.n=String(v.n).slice(0,20);return n}
 function setCell(sid,d,v){if(S.readOnly){toast("This week is approved and locked. Ask the admin to unlock it.");return}const nv=stampDept(sid,v);if(nv&&nv.s&&!nv.off&&$("#modalSlot").innerHTML)limitAlert(sid,d,nv);backend.setCell(key(),meta(),sid,d,nv).catch(showErr)}
 
 function shiftPicker(sid,d){
@@ -2743,11 +2743,11 @@ function shiftPicker(sid,d){
   const kr=o=>cur&&cur.role?{...o,role:cur.role}:o;
   document.querySelectorAll("[data-pi]").forEach(b=>b.onclick=()=>{const p=S.cfg.presets[+b.dataset.pi];setCell(sid,d,kr({s:p.start,e:p.end}));closeModal()});
   document.querySelectorAll("[data-gs]").forEach(b=>b.onclick=()=>{const p=g.slots[+b.dataset.gs];setCell(sid,d,kr({s:p.start,e:p.end}));closeModal()});
-  document.querySelectorAll("[data-xs]").forEach(b=>b.onclick=()=>{const p=g.extra[+b.dataset.xs];setCell(sid,d,kr({s:p.start,e:p.end}));closeModal()});
+  document.querySelectorAll("[data-xs]").forEach(b=>b.onclick=()=>{const p=g.extra[+b.dataset.xs];setCell(sid,d,kr({s:p.start,e:p.end,n:p.label}));closeModal()});
   $("#cApply").onclick=()=>{const s=$("#cS").value,e=$("#cE").value;if(!s||!e||s===e){toast("Enter a start and end time.");return}setCell(sid,d,kr({s,e}));closeModal()};
   if($("#pRoleSet"))$("#pRoleSet").onclick=()=>{let rl=$("#pRole").value.trim().replace(/\s+/g," ");if(rl)rl=rl.replace(/\b\w/g,c=>c.toUpperCase());
     const days=$("#pRoleAll").checked?[0,1,2,3,4,5,6]:[d];let n=0;
-    for(const dd of days){const v=cellVal(sid,dd);if(!v||!v.s||v.off)continue;const nv={s:v.s,e:v.e};if(v.dept)nv.dept=v.dept;if(rl&&rl!==st.role)nv.role=rl;CTXG=v.dept||grp(st.dept);setCell(sid,dd,nv);n++}
+    for(const dd of days){const v=cellVal(sid,dd);if(!v||!v.s||v.off)continue;const nv={s:v.s,e:v.e};if(v.dept)nv.dept=v.dept;if(v.n)nv.n=v.n;if(rl&&rl!==st.role)nv.role=rl;CTXG=v.dept||grp(st.dept);setCell(sid,dd,nv);n++}
     CTXG=null;closeModal();toast(rl&&rl!==st.role?st.name+" is "+rl+(n>1?" on "+n+" shifts":" on "+DAYS[d]):st.name+" back to usual role"+(n>1?" on "+n+" shifts":""))};
   $("#cOff").onclick=()=>{setCell(sid,d,{off:true});closeModal()};
 }
@@ -2882,7 +2882,7 @@ function shiftTimesModal(dept){
       if($("#stMove").checked&&!S.readOnly){
         for(const[id,st]of Object.entries(S.staff)){if(st._pending||st.store!==S.store||!inGrp(st,GD))continue;
           for(let d=0;d<7;d++){const v=cellVal(id,d);if(!v||!v.s||v.off||shG({id,...st},v)!==GD)continue;const i=partIdx(v.s);const o=base[i],nw=n[i];
-            if(v.s===o.start&&v.e===o.end&&(nw.start!==o.start||nw.end!==o.end)){CTXG=GD;setCell(id,d,{s:nw.start,e:nw.end})}}}
+            if(v.s===o.start&&v.e===o.end&&(!v.n||v.n===o.label)&&(nw.start!==o.start||nw.end!==o.end)){CTXG=GD;setCell(id,d,{s:nw.start,e:nw.end})}}}
       }
       await backend.saveGuide(guideId(S.store,GD),{store:S.store,dept:GD,parts:true,slots:cleanParts(n),...(xt.length?{extra:xt}:{})});
       closeModal();toast(GD+" shift times saved");renderAll();
@@ -3024,7 +3024,7 @@ document.addEventListener("drop",e=>{const td=e.target.closest&&e.target.closest
     openModal(`<h3>Which time for ${esc(st.name)}?</h3><div class="ctx">${esc(G)} · ${esc(sl.label)} row · ${DAYS_LONG[d]}</div>
       <div class="presets">${opts.map((o,k)=>{const f=fit({id:D.sid,...st},d,{s:o.start,e:o.end});return `<button class="pbtn ${f}" data-dtx="${k}"><span class="pl">${esc(o.label)}</span><span class="pt">${fmtRange(o.start,o.end)}</span><span class="why">${f==="good"?"Fits availability":"Outside availability"} · ${fmtH(hoursOf({s:o.start,e:o.end},S.cfg))} h</span></button>`}).join("")}</div>
       <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button></div>`);
-    document.querySelectorAll("[data-dtx]").forEach(b=>b.onclick=()=>{const o=opts[+b.dataset.dtx];nv={s:o.start,e:o.end};closeModal();start()});return}
+    document.querySelectorAll("[data-dtx]").forEach(b=>b.onclick=()=>{const k=+b.dataset.dtx;const o=opts[k];nv=k>0?{s:o.start,e:o.end,n:o.label}:{s:o.start,e:o.end};closeModal();start()});return}
   start()});
 /* ---------- Summary tab ---------- */
 const PART4=[["AM","starts before 10a"],["Mid","starts 10a–2p"],["PM","starts 2p–5p"],["After 5","starts 5p or later"]];
