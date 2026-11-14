@@ -2996,7 +2996,8 @@ document.addEventListener("dragover",e=>{const td=e.target.closest&&e.target.clo
 document.addEventListener("drop",e=>{const td=e.target.closest&&e.target.closest("td[data-drop]");if(!td||!DRAG||!dndCanDrop(td))return;e.preventDefault();
   const D=DRAG;DRAG=null;dndClear();const st=S.staff[D.sid];const d=+td.dataset.d;
   if(td.dataset.drop==="off"){setCell(D.sid,d,null);toast(st.name+" is off "+DAYS_LONG[d]);return}
-  const G=td.dataset.dept;const {slots}=slotsFor(G);const sl=slots[+td.dataset.slot];const nv={s:sl.start,e:sl.end};
+  const G=td.dataset.dept;const {g:G0,slots}=slotsFor(G);const si=+td.dataset.slot;const sl=slots[si];let nv={s:sl.start,e:sl.end};
+  const rx=((G0&&G0.extra)||[]).filter(x=>partIdx(x.start)===si);
   const cur=cellVal(D.sid,d);const move=D.kind==="shift"&&D.d!==d;
   const go=()=>{if(move)setCell(D.sid,D.d,null);
     const wk=weekHours(D.sid,d);let h=wk.h+hoursOf(nv,S.cfg),days=wk.days+1;if(move){const ov=cellVal(D.sid,D.d);if(ov&&ov.s&&!ov.off){h-=hoursOf(ov,S.cfg);days--}}
@@ -3004,8 +3005,14 @@ document.addEventListener("drop",e=>{const td=e.target.closest&&e.target.closest
     const msgs=limitMsgs(st,h,days);const a=availOf(st,d);if(fit({id:D.sid,...st},d,nv)==="bad")msgs.unshift(a.mode==="no"?"Can't work on "+DAYS_LONG[d]+"s":"Only available "+fmtRange(a.from,a.to));
     if(cur&&cur.s&&!cur.off&&!(cur.s===nv.s&&cur.e===nv.e)&&D.d!==d)msgs.push("Replaced their "+fmtRange(cur.s,cur.e)+" shift that day");
     if(msgs.length)alertBox(`<b>⚠ Check ${esc(st.name)}</b><br>${msgs.map(esc).join("<br>")}`);else toast(st.name+" · "+DAYS[d]+" "+fmtRange(nv.s,nv.e))};
-  if(cur&&cur.off){openModal(`<h3>${esc(st.name)} is marked OFF on ${DAYS_LONG[d]}</h3><div class="ctx">Schedule them anyway?</div><div class="row"><div class="spacer"></div><button class="btn" data-close>No, keep them off</button><button class="btn primary" id="dndYes">Yes, schedule them</button></div>`);$("#dndYes").onclick=()=>{closeModal();go()};return}
-  go()});
+  const start=()=>{if(cur&&cur.off){openModal(`<h3>${esc(st.name)} is marked OFF on ${DAYS_LONG[d]}</h3><div class="ctx">Schedule them anyway?</div><div class="row"><div class="spacer"></div><button class="btn" data-close>No, keep them off</button><button class="btn primary" id="dndYes">Yes, schedule them</button></div>`);$("#dndYes").onclick=()=>{closeModal();go()};return}
+    go()};
+  if(rx.length){const opts=[{label:sl.label,start:sl.start,end:sl.end},...rx];
+    openModal(`<h3>Which time for ${esc(st.name)}?</h3><div class="ctx">${esc(G)} · ${esc(sl.label)} row · ${DAYS_LONG[d]}</div>
+      <div class="presets">${opts.map((o,k)=>{const f=fit({id:D.sid,...st},d,{s:o.start,e:o.end});return `<button class="pbtn ${f}" data-dtx="${k}"><span class="pl">${esc(o.label)}</span><span class="pt">${fmtRange(o.start,o.end)}</span><span class="why">${f==="good"?"Fits availability":"Outside availability"} · ${fmtH(hoursOf({s:o.start,e:o.end},S.cfg))} h</span></button>`}).join("")}</div>
+      <div class="row"><div class="spacer"></div><button class="btn" data-close>Cancel</button></div>`);
+    document.querySelectorAll("[data-dtx]").forEach(b=>b.onclick=()=>{const o=opts[+b.dataset.dtx];nv={s:o.start,e:o.end};closeModal();start()});return}
+  start()});
 /* ---------- Summary tab ---------- */
 const PART4=[["AM","starts before 10a"],["Mid","starts 10a–2p"],["PM","starts 2p–5p"],["After 5","starts 5p or later"]];
 const part4=v=>{const m=toMin(v.s);return m<600?0:m<840?1:m<1020?2:3};
