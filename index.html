@@ -43,7 +43,7 @@ body.training .top{outline:4px solid #f59e0b;outline-offset:2px}
 .revbox{margin-top:6px;background:#fff;border:1px solid var(--bad-line);border-radius:10px;padding:8px 10px}.revbox .fixlist{margin-top:4px}
 @media (max-width:640px){.dstep{flex-wrap:wrap}.dbtns{width:100%;justify-content:flex-start}.dwr{font-size:22px}}
 body.basic:not(.adm) #storeNav #tab-start{order:0}
-body.basic #storeNav .navsp{display:none}body.basic #selBtn,body.basic #pasteBtn,body.basic #chgAvail{display:none!important}body.basic [data-collapsed] .chips,body.basic [data-collapsed] .note{display:none}body.basic [data-collapsed]>span{cursor:pointer}body.basic [data-collapsed]>span::after{content:" ▸ click to add";font-weight:500;color:var(--muted);text-transform:none;letter-spacing:0}body.basic:not(.adm) #storeNav #tab-staff{order:1}body.basic:not(.adm) #storeNav #tab-build{order:2}body.basic:not(.adm) #storeNav #tab-sum{order:3}
+body.basic #storeNav .navsp{display:none}body.basic #selBtn,body.basic #pasteBtn,body.basic #chgAvail{display:none!important}body.basic [data-collapsed] .chips,body.basic [data-collapsed] .note{display:none}body.basic [data-collapsed]>span{cursor:pointer}body.basic [data-collapsed]>span::after{content:" ▸ click to add";font-weight:500;color:var(--muted);text-transform:none;letter-spacing:0}body.basic:not(.adm) #storeNav #tab-staff{order:1}body.basic:not(.adm) #storeNav #tab-build{order:2}body.basic:not(.adm) #storeNav #tab-sum{order:3}body.basic:not(.adm) #storeNav #tab-ana{order:4}
 #featCard.dim .gtogs{opacity:.45;pointer-events:none}.hcard.st-posted{border-top-color:#2E7D32;background:#f6fbf6}.hcard.st-approved{border-top-color:#8bc34a}
 .lockban.topost{border-color:var(--brand);background:#eef7ee}.lockban.posted{border-color:var(--good-line);background:var(--good-bg)}
 .hello h2{font-family:var(--f-display);font-size:30px;margin:4px 0 12px}
@@ -80,12 +80,42 @@ body.adm .lockban .btn{font-size:16px;padding:11px 18px;min-height:46px}body.adm
 .stcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin:0 0 14px}.stcard{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;cursor:pointer;text-align:left;font:inherit;color:inherit}.stcard:hover{border-color:var(--brand)}.stcard h3{margin:0;font-size:20px}.stcard .note{margin:0}.stcard.sub{border-color:#e0a800;background:#fffbea}
 .homehead{display:flex;align-items:flex-end;gap:12px;margin:0 0 10px}.homehead h2{margin:0}
 details.dsumwrap{margin-top:6px}details.dsumwrap>summary{cursor:pointer;font-weight:700;font-size:16px;padding:10px 0;list-style:revert}
+
+/* Analytics tab */
+#view-ana .card{margin-bottom:12px}
+.an-head h2{margin:0}.an-head .note{margin:2px 0 12px}
+.an-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.an-kpi{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
+.an-ic{flex:none;width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:#e8f3e6;color:var(--brand)}
+.an-ic svg{width:22px;height:22px}.an-ic.y{background:#fff4cf;color:#8a6200}.an-ic.o{background:#fdeadd;color:#b4470f}.an-ic.b{background:#e6eefa;color:#2f5ea8}
+.an-kpi small{display:block;color:var(--muted);font-weight:600;font-size:13px}.an-kpi b{display:block;font-family:var(--f-display);font-size:28px;line-height:1.1}.an-kpi span{color:var(--muted);font-size:13px}
+.an-g2{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:12px}
+.an-g2>.card{margin-bottom:0}.an-g2{margin-bottom:12px}
+.an-t{display:flex;align-items:center;gap:10px;margin:0 0 2px}.an-t h3{margin:0;font-family:var(--f-display);font-size:21px}.an-t .an-ic{width:32px;height:32px;border-radius:9px}.an-t .an-ic svg{width:18px;height:18px}
+.an-card .note{margin:0 0 10px}
+.an-dr{display:grid;grid-template-columns:22px 118px minmax(0,1fr) 116px;align-items:center;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line);font-variant-numeric:tabular-nums}
+.an-dr:last-child{border-bottom:0}.an-rk{color:var(--muted);font-weight:700;font-size:13px}.an-dn{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.an-trk{background:var(--surface2);border-radius:6px;height:20px;position:relative}.an-fil{height:100%;border-radius:6px;background:#5aa15d}.an-fil.t{background:var(--brand)}
+.an-trk em{position:absolute;left:8px;top:1px;font-style:normal;font-size:12.5px;font-weight:700;color:#fff}
+.an-dv{text-align:right}.an-dv b{display:block}.an-dv small{color:var(--muted);font-size:12px;white-space:nowrap}
+.an-days{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}.an-days button{font:inherit;font-weight:600;font-size:13px;padding:4px 10px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--ink)}.an-days button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.an-lg{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin:2px 0 4px}.an-lg i{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin-right:4px}
+.an-pk{margin-top:10px}.an-pk h4{margin:0 0 4px;font-family:var(--f-display);font-size:17px}
+.an-pr{display:grid;grid-template-columns:44px 1fr auto;gap:8px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:14px;font-variant-numeric:tabular-nums}.an-pr:last-child{border-bottom:0}.an-pr span:last-child{color:var(--muted)}
+.an-hm{border-collapse:separate;border-spacing:3px;width:100%;min-width:640px;font-variant-numeric:tabular-nums}
+.an-hm th{font-size:12px;color:var(--muted);font-weight:600}.an-hm th.d{text-align:left;color:var(--ink);font-size:13px;padding-right:4px}
+.an-hm td{height:30px;border-radius:5px;text-align:center;font-size:12px;font-weight:700}.an-hm td.pk{outline:2.5px solid var(--sun);outline-offset:-2px}.an-hm td.lo{outline:2.5px dashed #c2410c;outline-offset:-2px}.an-hm td.z{background:var(--surface2);color:#b7b19a;font-weight:500}
+.an-key{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-top:8px;flex-wrap:wrap}.an-key .grad{display:inline-block;width:110px;height:10px;border-radius:5px;background:linear-gradient(90deg,#eef6ea,#2E7D32,#103d14)}
+.an-key .kb{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px}
+.an-ins{display:grid;gap:8px}.an-in{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:10px;background:var(--surface2)}
+.an-in .an-ic{width:32px;height:32px;border-radius:9px;background:#fff}.an-in .an-ic svg{width:18px;height:18px}.an-in.w{background:#fff3e8}.an-in.g{background:#eef6ea}
+@media(max-width:900px){.an-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.an-g2{grid-template-columns:1fr}.an-dr{grid-template-columns:20px 92px minmax(0,1fr) 80px}.an-kpi b{font-size:24px}.an-kpi{flex-direction:column;gap:8px;padding:12px}.an-trk em{font-size:11px;left:5px}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
 <script>const SUPABASE_URL="https://httiqzrqpwfqpgctlmey.supabase.co";const SUPABASE_ANON_KEY="sb_publishable_hk5V9IDwfCfQPSJKJqaBeg_Bq_QX7vi";
 window.SUPABASE_URL=SUPABASE_URL;window.SUPABASE_ANON_KEY=SUPABASE_ANON_KEY;</script>
 </head><body>
-<!-- vsb-build 2026-11-15b --><title>Vista Schedule Builder</title>
+<!-- vsb-build 2026-11-16a --><title>Vista Schedule Builder</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
@@ -650,6 +680,7 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
       <button role="tab" id="tab-build" aria-selected="false" data-tab="build" class="navbig"><span class="ni" aria-hidden="true">✏️</span>Build schedule</button>
       <button role="tab" id="tab-staff" aria-selected="false" data-tab="staff" class="navbig"><span class="ni" aria-hidden="true">👥</span>Staff &amp; availability</button>
       <button role="tab" id="tab-sum" aria-selected="false" data-tab="sum" class="navbig" data-feat="sum_tab"><span class="ni" aria-hidden="true">📊</span>Summary</button>
+      <button role="tab" id="tab-ana" aria-selected="false" data-tab="ana" class="navbig" data-feat="ana_tab"><span class="ni" aria-hidden="true">📈</span>Analytics</button>
       <span class="navsp"></span>
       <button role="tab" id="tab-dash" aria-selected="false" data-tab="dash" class="navsm">Dashboard</button>
       <button role="tab" id="tab-guide" aria-selected="false" data-tab="guide" class="navsm">Staffing guide</button>
@@ -730,6 +761,7 @@ tr.empsum td{background:#fbfaf6;border-top:2px solid var(--line)}
   <section id="view-start" class="panel" hidden><div id="startSlot"></div></section>
   <section id="view-pay" class="panel" hidden><div id="payViewSlot"></div></section>
   <section id="view-sum" class="panel" hidden><div id="sumTabSlot"></div></section>
+  <section id="view-ana" class="panel" hidden><div id="anaSlot"></div></section>
 
   <section id="view-dash" class="panel" hidden>
     <div id="subSlot"></div>
@@ -1163,7 +1195,7 @@ function storeHeroHTML(){if(!S.store)return"";const adm=isAdm();const st=stState
     <div class="sh-wk"><b>Week ${weekNo(S.week,S.cfg.wkOffset)}</b> · ${rangeLabel(S.week)}</div></div>
     <div class="sh-stats" data-feat="store_stats" ${adm?"hidden":""}><div><b>${roster.length}</b><span>employees</span></div><div><b>${working}</b><span>working</span></div><div><b>${fmtH(Math.round(hrs*10)/10)}</b><span>hours</span></div><div><b class="sh-due">${dueTxt}</b><span>due</span></div></div>
     <div class="sh-st"><button class="btn sh-link" data-final="link">📲 Employee link</button><span class="spill ${lab[1]} ${late?"sp-late":""}">${lab[0]}</span></div></div>`}
-function renderHero(){const el=$("#storeHero");if(!el)return;const show=["schedule","build","staff","sum","start"].includes(S.tab)&&!!S.store;el.hidden=!show;if(!show)return;
+function renderHero(){const el=$("#storeHero");if(!el)return;const show=["schedule","build","staff","sum","ana","start"].includes(S.tab)&&!!S.store;el.hidden=!show;if(!show)return;
   if(el.contains(document.activeElement))return;el.innerHTML=storeHeroHTML();const sv=$("#svStore");if(sv)sv.onchange=()=>{S.store=sv.value;S.dept="__all";savePrefs();renderAll();resub()}}
 
 /* ---------- employee link buttons ---------- */
@@ -1558,11 +1590,12 @@ const grpMatch=s=>S.dept==="__all"||gsetOf(s).some(selHas);
 const FEATS=[["Home page",[["home_totals","People scheduled · Total hours · Waiting for you","The 3 boxes under the week banner"],["card_stats","People · hours (store cards)","Numbers on each store card"],["home_summary","Staffing summary","Whole section below the store cards"]]],
   ["Staffing summary (Home, after you pick a store)",[["ds_text","Written summary","Paragraph at the top"],["ds_tiles","Hours · People working · Shift mix · Hour problems","The 4 boxes"],["ds_daychart","People working each day","Bar chart"],["ds_checks","Hour checks","List of hour problems"],["ds_dept","By department","Table"],["ds_traffic","Customer traffic","BRdata transactions"],["ds_details","Show details","Hours & people breakdown"],["hs_heat","Hours by department, every store","Shows when All stores is picked"]]],
   ["Store pages",[["store_stats","Employees · Working · Hours · Due","Boxes in the green store banner"],["emp_totals","Days · hours","Row under each department on the full schedule"],["issues","Issues to review","Admin list above the schedule"]]],
+  ["Analytics tab",[["ana_tab","Analytics","Hours by department, staff on the floor by hour, coverage heatmap"]]],
   ["Summary tab",[["sum_tab","Summary","The tab itself"],["sum_tiles","Total hours · People scheduled","The 2 boxes at the top"],["sum_need","Staffing needs","Scheduled vs. needed per department (AM · Mid · PM · After 5)"],["sum_shift","By shift","AM · Mid · PM · After 5"],["sum_exact","Compared to the staffing guide (short / over)","Under By shift · called Exact shift times when the guide is off"],["sum_dept","By department","Table"],["sum_day","By day","Table"],["sum_emp","By employee","Table"]]]];
 const BASIC=()=>!!(S.cfg&&S.cfg.basic!==false);
-const BASIC_ON=new Set(["sum_need","sum_tab","sum_tiles","sum_flags","sum_dept","sum_day","sum_emp","emp_totals","card_stats","home_totals"]);
+const BASIC_ON=new Set(["ana_tab","sum_need","sum_tab","sum_tiles","sum_flags","sum_dept","sum_day","sum_emp","emp_totals","card_stats","home_totals"]);
 const featOn=k=>BASIC()?BASIC_ON.has(k):!((S.cfg&&S.cfg.featOff)||{})[k];
-function applyFeats(){let css="";for(const[,list]of FEATS)for(const[k]of list)if(!featOn(k))css+=`[data-feat~="${k}"]{display:none!important}`;let el=document.getElementById("featCss");if(!el){el=document.createElement("style");el.id="featCss";document.head.appendChild(el)}if(el.textContent!==css)el.textContent=css;if(!featOn("sum_tab")&&S.tab==="sum")S.tab="schedule"}
+function applyFeats(){let css="";for(const[,list]of FEATS)for(const[k]of list)if(!featOn(k))css+=`[data-feat~="${k}"]{display:none!important}`;let el=document.getElementById("featCss");if(!el){el=document.createElement("style");el.id="featCss";document.head.appendChild(el)}if(el.textContent!==css)el.textContent=css;if(!featOn("sum_tab")&&S.tab==="sum")S.tab="schedule";if(!featOn("ana_tab")&&S.tab==="ana")S.tab="schedule"}
 const FTPT=()=>!!(S.cfg&&S.cfg.ftpt);
 const isFT=x=>FTPT()&&!!x&&x.type==="FT";const isPT=x=>FTPT()&&!!x&&(x.type||"PT")==="PT";
 const ftPill=x=>FTPT()?`<span class="pill ${isFT(x)?"ft":""}">${x.type||"PT"}</span>`:"";
@@ -1648,7 +1681,7 @@ function renderControls(){applyFeats();
   $("#jumpDate").value=ymd(S.week);
   document.querySelectorAll(".tabs button[data-tab]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));
   if(!S.canEdit&&(S.tab==="guide"||S.tab==="settings"))S.tab="build";if(LOCK&&S.tab==="dash")S.tab="build";$("#tab-dash").hidden=!!LOCK;
-  ["build","schedule","staff","sum","dash","guide","settings","start"].forEach(t=>{const v=$("#view-"+t);if(v)v.hidden=t!==S.tab});
+  ["build","schedule","staff","sum","ana","dash","guide","settings","start"].forEach(t=>{const v=$("#view-"+t);if(v)v.hidden=t!==S.tab});
   $("#tab-guide").hidden=!S.canEdit;$("#tab-settings").hidden=!S.canEdit;
   $("#mainBar").hidden=S.tab==="build"||S.tab==="start";
   document.querySelector('#storeSel').closest('.field').hidden=S.tab==="dash";document.querySelector('#deptSel').closest('.field').hidden=S.tab==="dash";
@@ -1658,13 +1691,13 @@ function renderControls(){applyFeats();
    $("#tab-schedule").hidden=B;const lab=(id,t,ic)=>{const b=$("#"+id);if(!b)return;if(!b.dataset.orig)b.dataset.orig=b.innerHTML;b.innerHTML=B?`<span class="ni" aria-hidden="true">${ic}</span>${t}`:b.dataset.orig};
    lab("tab-build","Schedule","📅");lab("tab-staff","Employees","👥");
    const ga=document.querySelector('[data-atab="guide"]');if(ga)ga.hidden=false;["chgAvail","selBtn","pasteBtn"].forEach(id=>{const x=$("#"+id);if(x)x.hidden=B});
-   document.querySelectorAll('.tabs button[data-tab]').forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));$("#tab-pay").hidden=!isAdm();if(S.tab==="pay"&&!isAdm())S.tab="build";["build","schedule","staff","sum","dash","guide","settings","start","pay"].forEach(t=>{const v=$("#view-"+t);if(v)v.hidden=t!==S.tab});renderGuideBar();renderPayView();$("#mainBar").hidden=S.tab==="build"||S.tab==="start"||(S.tab==="dash"&&isAdm());}{const fs=$("#finalSlot");if(fs)fs.hidden=!!LOCK}renderStart();
-  {const adm=isAdm(),inStore=["schedule","build","staff","sum","pay"].includes(S.tab);$("#admNav").hidden=!adm;if(inStore)S._lastStoreTab=S.tab;document.body.classList.toggle("adm",adm);
+   document.querySelectorAll('.tabs button[data-tab]').forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));$("#tab-pay").hidden=!isAdm();if(S.tab==="pay"&&!isAdm())S.tab="build";["build","schedule","staff","sum","ana","dash","guide","settings","start","pay"].forEach(t=>{const v=$("#view-"+t);if(v)v.hidden=t!==S.tab});renderGuideBar();renderPayView();$("#mainBar").hidden=S.tab==="build"||S.tab==="start"||(S.tab==="dash"&&isAdm());}{const fs=$("#finalSlot");if(fs)fs.hidden=!!LOCK}renderStart();
+  {const adm=isAdm(),inStore=["schedule","build","staff","sum","ana","pay"].includes(S.tab);$("#admNav").hidden=!adm;if(inStore)S._lastStoreTab=S.tab;document.body.classList.toggle("adm",adm);
    $("#storeNav").hidden=adm&&!inStore;if(adm&&S.tab==="dash")$("#mainBar").hidden=true;$("#storeNav").classList.toggle("subnav",adm);
    renderHero();if((adm&&inStore)||LOCK){document.querySelector('#storeSel').closest('.field').hidden=true}
    ["tab-dash","tab-guide","tab-settings"].forEach(id=>{if(adm)$("#"+id).hidden=true});
    document.querySelectorAll("[data-atab]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.atab===(inStore?"store":S.tab))))}
-  $("#weekField").hidden=S.tab!=="schedule"&&S.tab!=="dash"&&S.tab!=="sum";$("#schedActions").hidden=S.tab!=="schedule";
+  $("#weekField").hidden=S.tab!=="schedule"&&S.tab!=="dash"&&S.tab!=="sum"&&S.tab!=="ana";$("#schedActions").hidden=S.tab!=="schedule";
   ["genBtn","copyPrev","clearWeek"].forEach(id=>$("#"+id).disabled=S.readOnly);
 }
 function crew(all){
@@ -1708,7 +1741,7 @@ function renderSum(){const el=$("#sumSlot");if(!el)return;el.innerHTML="";return
     .sort((a,b)=>deptOrder(grp(a.dept))-deptOrder(grp(b.dept))||grp(a.dept).localeCompare(grp(b.dept))||a.name.localeCompare(b.name));
   el.innerHTML=`<div style="margin-top:12px">${summaryHTML(ppl,allish())}</div>`;
   const t=el.querySelector(".ptitle");if(t)t.textContent="Employee summary · hours & days"+(S.dept==="__all"?"":" · "+grp(S.dept));}
-function renderGrid(){renderSum();renderPay();renderLock();renderHero();if(S.tab==="start")renderStart();if(S.tab==="pay")renderPayView();if(S.gstep)renderGuideBar();if(S.tab==="sum")renderSumTab();
+function renderGrid(){renderSum();renderPay();renderLock();renderHero();if(S.tab==="start")renderStart();if(S.tab==="pay")renderPayView();if(S.gstep)renderGuideBar();if(S.tab==="sum")renderSumTab();if(S.tab==="ana")renderAnaTab();
   const slot=$("#gridSlot");if(!S.store){slot.innerHTML="";return}
   document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.view===S.view)));
   document.querySelectorAll("[data-color]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.color===S.colorBy)));
@@ -3053,6 +3086,79 @@ function sumData(){const ppl=Object.entries(S.staff).map(([id,s])=>({id,...s})).
     const S2=R.slots[sk]=R.slots[sk]||{lbl,i,cnt:[0,0,0,0,0,0,0]};S2.cnt[d]++}
   const order=Object.keys(D).sort((a,b)=>deptOrder(a)-deptOrder(b));
   return{D,T,order,ppl:ppl.filter(p=>!FS||gsetOf(p).some(g=>FS.includes(g))),F,FS}}
+/* ---------- Analytics tab ---------- */
+const ANA_IC={
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ shifts:'<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4M7.5 14h3M13.5 14h3M7.5 17h3"/>',
+ up:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
+ down:'<path d="M3 7l6 6 4-4 8 8"/><path d="M15 17h6v-6"/>',
+ bars:'<path d="M4 20h16"/><rect x="5" y="11" width="3" height="7" rx="1"/><rect x="10.5" y="6" width="3" height="12" rx="1"/><rect x="16" y="13" width="3" height="5" rx="1"/>',
+ people:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2A5 5 0 0 1 21 19"/>',
+ grid:'<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/>',
+ alert:'<path d="M12 4L2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.3"/>',
+ check:'<circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.7 2.7L16.2 9.5"/>',
+ pie:'<path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/>',
+ bulb:'<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/>'};
+const anaIc=(k,c)=>`<span class="an-ic ${c||""}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ANA_IC[k]}</svg></span>`;
+function anaData(){const base=sumData();const FS=base.FS;
+  const cnt=Array.from({length:7},()=>Array(24).fill(0)),tgt=Array.from({length:7},()=>Array(24).fill(0));
+  for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;
+    for(let d=0;d<7;d++){const v=cellVal(id,d);if(!(v&&v.s&&!v.off&&v.e))continue;const G=shG({id,...p},v);if(FS&&!FS.includes(G))continue;
+      const[a,b]=span(v.s,v.e);for(let h=0;h<24;h++){const m=h*60+30;if(a<=m&&b>m)cnt[d][h]++}}}
+  let hasT=false;const groups=FS?FS:base.order;
+  for(const G of groups){let r;try{r=slotsFor(G)}catch(e){continue}if(!r||!r.fromGuide)continue;
+    for(const sl of r.slots||[]){if(!sl||!sl.start||!sl.end||!sl.need)continue;const[a,b]=span(sl.start,sl.end);
+      for(let d=0;d<7;d++){const n=+sl.need[d]||0;if(!n)continue;hasT=true;for(let h=0;h<24;h++){const m=h*60+30;if(a<=m&&b>m)tgt[d][h]+=n}}}}
+  let lo=24,hi=-1;for(let d=0;d<7;d++)for(let h=0;h<24;h++)if(cnt[d][h]||tgt[d][h]){lo=Math.min(lo,h);hi=Math.max(hi,h)}
+  if(hi<0){lo=6;hi=21}const H=[];for(let h=lo;h<=hi;h++)H.push(h);
+  return{...base,cnt,tgt,hasT,H}}
+function renderAnaTab(){const el=$("#anaSlot");if(!el)return;if(S.tab!=="ana"||!S.store){el.innerHTML="";return}
+  const A=anaData();const {D,T,order,F,cnt,tgt,hasT,H}=A;const r1=x=>fmtH(Math.round(x*10)/10);const rng=h=>h12(h)+"–"+h12(h+1);
+  const head=`<div class="an-head"><h2 class="sec">Analytics · ${esc(S.store)}${F?" · "+esc(F):""}</h2><div class="note">Week ${weekNo(S.week,S.cfg.wkOffset)} · ${rangeLabel(S.week)} · where your hours go and how many people are on the floor each hour.</div></div>`;
+  if(!T.n){el.innerHTML=head+`<div class="card"><div class="empty"><h2>No shifts scheduled this week yet</h2><p>Analytics fills in as you build the schedule. Pick another week with the arrows to look back.</p></div></div>`;return}
+  // busiest / thinnest (thinnest = within each day's open hours)
+  let pk={v:-1},th={v:1e9};
+  for(let d=0;d<7;d++){const row=cnt[d];const on=H.filter(h=>row[h]>0);if(!on.length)continue;const a=on[0],b=on[on.length-1];
+    for(let h=a;h<=b;h++){if(row[h]>pk.v)pk={v:row[h],d,h};if(row[h]<th.v)th={v:row[h],d,h}}}
+  const kpi=(ic,c,l,v,sub)=>`<div class="an-kpi">${anaIc(ic,c)}<div><small>${l}</small><b>${v}</b><span>${sub}</span></div></div>`;
+  const kpis=`<div class="an-kpis">${kpi("clock","","Scheduled hours",r1(T.h)+" hrs",`${T.ids.size} people`)}${kpi("shifts","b","Shifts scheduled",T.n.toLocaleString(),`across ${order.length} department${order.length===1?"":"s"}`)}${kpi("up","y","Busiest hour",pk.v+" people",DAYS[pk.d]+" "+rng(pk.h))}${kpi("down","o","Thinnest hour (open)",th.v+" "+(th.v===1?"person":"people"),th.d==null?"—":DAYS[th.d]+" "+rng(th.h))}</div>`;
+  // departments
+  const ds=order.map(G=>({G,R:D[G]})).sort((a,b)=>b.R.h-a.R.h);const mx=ds.length?ds[0].R.h:1;
+  const dept=`<div class="card an-card"><div class="an-t">${anaIc("bars")}<h3>Hours by department</h3></div><p class="note">Ranked by scheduled hours. % = share of ${F?"these":"the store's"} total hours.</p>
+    ${ds.map((x,i)=>{const pc=T.h?Math.round(x.R.h/T.h*100):0;const w=mx?x.R.h/mx*100:0;return `<div class="an-dr"><span class="an-rk">${i+1}</span><span class="an-dn" title="${esc(x.G)}">${esc(x.G)}</span><div class="an-trk"><div class="an-fil${i<3?" t":""}" style="width:${w.toFixed(1)}%"></div>${w>32?`<em>${pc}%</em>`:""}</div><span class="an-dv"><b>${r1(x.R.h)} hrs</b><small>${x.R.n} shift${x.R.n===1?"":"s"} · ${x.R.ids.size} ppl</small></span></div>`}).join("")}</div>`;
+  // day chart
+  const today=new Date();let dd=S.anaDay;if(dd==null||dd<0||dd>6){dd=DAYS.findIndex((x,d)=>ymd(addDays(S.week,d))===ymd(today));if(dd<0)dd=pk.d==null?0:pk.d}
+  const row=cnt[dd],tr=tgt[dd];const W=520,HH=240,L=30,B=24,TP=16,bw=(W-L-4)/H.length;const ymax=Math.max(5,...H.map(h=>Math.max(row[h],tr[h])));const top=Math.ceil(ymax/5)*5;const y=v=>HH-B-v/top*(HH-B-TP);
+  let sv="";const step=top<=10?2:top<=25?5:10;for(let g=0;g<=top;g+=step)sv+=`<line x1="${L}" x2="${W}" y1="${y(g)}" y2="${y(g)}" stroke="#e7e2cc"/><text x="${L-6}" y="${y(g)+4}" font-size="11" text-anchor="end" fill="#5d6858">${g}</text>`;
+  const rmx=Math.max(...H.map(h=>row[h]));const lstep=H.length>14?2:1;
+  H.forEach((h,i)=>{const v=row[h],x=L+i*bw+2,bwi=Math.max(3,bw-5);const under=hasT&&tr[h]>0&&v<tr[h];
+    if(v)sv+=`<rect x="${x}" y="${y(v)}" width="${bwi}" height="${HH-B-y(v)}" rx="3" fill="${v===rmx?"#1b5e20":under?"#e8a87c":"#7fb77e"}"><title>${DAYS_LONG[dd]} ${rng(h)}: ${v} on${hasT&&tr[h]?`, guide ${tr[h]}`:""}</title></rect>`;
+    if(i%lstep===0)sv+=`<text x="${x+bwi/2}" y="${HH-7}" font-size="11" text-anchor="middle" fill="#5d6858">${h12(h)}</text>`;
+    if(v&&v===rmx)sv+=`<text x="${x+bwi/2}" y="${y(v)-5}" font-size="12" font-weight="700" text-anchor="middle" fill="#1b5e20">${v}</text>`});
+  if(hasT)sv+=`<polyline fill="none" stroke="#1f2a1c" stroke-width="2" stroke-linejoin="round" points="${H.map((h,i)=>`${L+i*bw+2+Math.max(3,bw-5)/2},${y(tr[h])}`).join(" ")}"/>`;
+  const peaks=DAYS.map((x,d)=>{const r=cnt[d];let bi=-1,bv=-1;for(let i=0;i<H.length-1;i++){const v=r[H[i]]+r[H[i+1]];if(v>bv){bv=v;bi=i}}const tot=r.reduce((a,b)=>a+b,0);return{d,bi,tot,top:bi<0?0:Math.max(r[H[bi]],r[H[bi+1]])}});
+  const chart=`<div class="card an-card"><div class="an-t">${anaIc("people")}<h3>Staff on the floor by hour</h3></div><p class="note">People working each hour${hasT?". Line = staffing-guide target":""}.</p>
+    <div class="an-days">${DAYS.map((x,d)=>`<button type="button" data-anaday="${d}" class="${d===dd?"on":""}">${x}</button>`).join("")}</div>
+    <div class="an-lg"><span><i style="background:#1b5e20"></i>Busiest hour</span><span><i style="background:#7fb77e"></i>On the floor</span>${hasT?`<span><i style="background:#e8a87c"></i>Under target</span>`:""}</div>
+    <svg viewBox="0 0 ${W} ${HH}" width="100%" role="img" aria-label="People working each hour on ${DAYS_LONG[dd]}">${sv}</svg>
+    <div class="an-pk"><h4>Busiest stretch each day</h4>${peaks.map(p=>`<div class="an-pr"><b>${DAYS[p.d]}</b><span>${p.tot&&p.bi>=0?`${h12(H[p.bi])}–${h12(H[p.bi]+2)} · up to ${p.top} people`:`<span class="note">No shifts</span>`}</span><span>${p.tot} people-hrs</span></div>`).join("")}</div></div>`;
+  // heatmap
+  const col=v=>{const t=Math.min(1,v/Math.max(1,pk.v));const a=[238,246,234],b=[46,125,50],c=[16,61,20];const m=(p,q,k)=>Math.round(p+(q-p)*k);const [p,q,k]=t<.6?[a,b,t/.6]:[b,c,(t-.6)/.4];return `rgb(${m(p[0],q[0],k)},${m(p[1],q[1],k)},${m(p[2],q[2],k)})`};
+  const hm=`<div class="card an-card"><div class="an-t">${anaIc("grid")}<h3>Weekly coverage heatmap</h3></div><p class="note">Number of people working at each hour. Darker = more people.</p>
+    <div style="overflow-x:auto"><table class="an-hm"><thead><tr><th></th>${H.map(h=>`<th>${h12(h)}</th>`).join("")}<th>Hrs</th></tr></thead><tbody>${DAYS.map((x,d)=>`<tr><th class="d">${x}</th>${H.map(h=>{const v=cnt[d][h];const c=d===pk.d&&h===pk.h?"pk":d===th.d&&h===th.h?"lo":"";return v?`<td class="${c}" style="background:${col(v)};color:${v/Math.max(1,pk.v)>.45?"#fff":"#1f2a1c"}" title="${DAYS_LONG[d]} ${rng(h)}: ${v} on">${v}</td>`:`<td class="z">·</td>`}).join("")}<th>${cnt[d].reduce((a,b)=>a+b,0)}</th></tr>`).join("")}</tbody></table></div>
+    <div class="an-key"><span>Fewer</span><span class="grad"></span><span>More</span><span style="margin-left:10px"><span class="kb" style="outline:2.5px solid var(--sun);outline-offset:-2px"></span> Busiest</span><span><span class="kb" style="outline:2.5px dashed #c2410c;outline-offset:-2px"></span> Thinnest while open</span></div></div>`;
+  // things to look at (max 3)
+  const ins=[];
+  if(hasT){let w=null;const daysOk=[];for(let d=0;d<7;d++){let ok=true;for(const h of H){const t=tgt[d][h];if(t>0&&cnt[d][h]<t){ok=false;const gap=t-cnt[d][h];if(!w||gap>w.gap)w={d,h,gap,v:cnt[d][h],t}}}if(ok&&cnt[d].some(x=>x))daysOk.push(d)}
+    if(w)ins.push(["w","alert","o",`<b>${DAYS[w.d]} ${rng(w.h)} is short ${w.gap}</b> · ${w.v} on, guide calls for ${w.t}.`]);
+    ins.push([daysOk.length===7?"g":"","check","",`<b>${daysOk.length} of 7 days fully covered</b>${daysOk.length&&daysOk.length<7?` · ${daysOk.map(d=>DAYS[d]).join(", ")}`:""}.`])}
+  else if(th.d!=null)ins.push(["w","down","o",`<b>Thinnest: ${DAYS[th.d]} ${rng(th.h)}</b> · only ${th.v} ${th.v===1?"person":"people"} on.`]);
+  if(ds.length>1&&T.h)ins.push(["","pie","b",`<b>${esc(ds[0].G)} is ${Math.round(ds[0].R.h/T.h*100)}% of hours</b> · your biggest department this week.`]);
+  if(ins.length<3){const bd=peaks.slice().sort((a,b)=>b.tot-a.tot)[0];if(bd&&bd.tot)ins.push(["","up","y",`<b>${DAYS_LONG[bd.d]} is your busiest day</b> · ${bd.tot} people-hrs.`])}
+  const look=`<div class="card an-card"><div class="an-t">${anaIc("bulb")}<h3>Things to look at</h3></div><div class="an-ins" style="margin-top:8px">${ins.slice(0,3).map(([c,ic,ic2,t])=>`<div class="an-in ${c}">${anaIc(ic,ic2)}<span>${t}</span></div>`).join("")}</div></div>`;
+  el.innerHTML=head+kpis+look+`<div class="an-g2">${dept}${chart}</div>`+hm}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-anaday]");if(!b)return;S.anaDay=+b.dataset.anaday;renderAnaTab()});
+
 function renderSumTab(){const el=$("#sumTabSlot");if(!el)return;if(S.tab!=="sum"||!S.store){el.innerHTML="";return}
   const {D,T,order,ppl,F,FS}=sumData();const r1=x=>fmtH(Math.round(x*10)/10);const cell=(h,n)=>h?`<b>${r1(h)}</b><small>${n} ${n===1?"person":"people"}</small>`:`<span class="note">—</span>`;
   const dh=DAYS.map((x,d)=>{const dt=addDays(S.week,d);return `<th>${x}<small>${dt.getMonth()+1}/${dt.getDate()}</small></th>`}).join("");
