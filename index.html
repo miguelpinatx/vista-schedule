@@ -115,7 +115,7 @@ details.dsumwrap{margin-top:6px}details.dsumwrap>summary{cursor:pointer;font-wei
 <script>const SUPABASE_URL="https://httiqzrqpwfqpgctlmey.supabase.co";const SUPABASE_ANON_KEY="sb_publishable_hk5V9IDwfCfQPSJKJqaBeg_Bq_QX7vi";
 window.SUPABASE_URL=SUPABASE_URL;window.SUPABASE_ANON_KEY=SUPABASE_ANON_KEY;</script>
 </head><body>
-<!-- vsb-build 2026-11-16a --><title>Vista Schedule Builder</title>
+<!-- vsb-build 2026-11-16b --><title>Vista Schedule Builder</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
@@ -3105,10 +3105,7 @@ function anaData(){const base=sumData();const FS=base.FS;
   for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;
     for(let d=0;d<7;d++){const v=cellVal(id,d);if(!(v&&v.s&&!v.off&&v.e))continue;const G=shG({id,...p},v);if(FS&&!FS.includes(G))continue;
       const[a,b]=span(v.s,v.e);for(let h=0;h<24;h++){const m=h*60+30;if(a<=m&&b>m)cnt[d][h]++}}}
-  let hasT=false;const groups=FS?FS:base.order;
-  for(const G of groups){let r;try{r=slotsFor(G)}catch(e){continue}if(!r||!r.fromGuide)continue;
-    for(const sl of r.slots||[]){if(!sl||!sl.start||!sl.end||!sl.need)continue;const[a,b]=span(sl.start,sl.end);
-      for(let d=0;d<7;d++){const n=+sl.need[d]||0;if(!n)continue;hasT=true;for(let h=0;h<24;h++){const m=h*60+30;if(a<=m&&b>m)tgt[d][h]+=n}}}}
+  const hasT=false;// staffing-guide targets intentionally not used
   let lo=24,hi=-1;for(let d=0;d<7;d++)for(let h=0;h<24;h++)if(cnt[d][h]||tgt[d][h]){lo=Math.min(lo,h);hi=Math.max(hi,h)}
   if(hi<0){lo=6;hi=21}const H=[];for(let h=lo;h<=hi;h++)H.push(h);
   return{...base,cnt,tgt,hasT,H}}
