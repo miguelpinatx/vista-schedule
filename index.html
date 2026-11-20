@@ -115,7 +115,7 @@ details.dsumwrap{margin-top:6px}details.dsumwrap>summary{cursor:pointer;font-wei
 <script>const SUPABASE_URL="https://httiqzrqpwfqpgctlmey.supabase.co";const SUPABASE_ANON_KEY="sb_publishable_hk5V9IDwfCfQPSJKJqaBeg_Bq_QX7vi";
 window.SUPABASE_URL=SUPABASE_URL;window.SUPABASE_ANON_KEY=SUPABASE_ANON_KEY;</script>
 </head><body>
-<!-- vsb-build 2026-11-16b --><title>Vista Schedule Builder</title>
+<!-- vsb-build 2026-11-19a --><title>Vista Schedule Builder</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
@@ -899,7 +899,7 @@ function supaBackend(sb){
     loadCol(col).then(o=>{caches[col]=o;emitCol(col)}).catch(showErr)}
   const err=e=>{throw{code:"unavailable",message:e&&e.message||String(e)}};
   return{
-    subCfg(cb0){const cb=c=>cb0(LOCK&&c?{...c,stores:[LOCK]}:c);const k="config/main";(docSubs[k]=docSubs[k]||[]).push(cb);getDoc("config","main").then(cb).catch(showErr)},
+    subCfg(cb0){const cb=c=>cb0(LOCK&&c?{...c,stores:[LOCK],allStores:c.stores}:c);const k="config/main";(docSubs[k]=docSubs[k]||[]).push(cb);getDoc("config","main").then(cb).catch(showErr)},
     subStaff(cb){subCol("staff",o=>cb(LOCK?Object.fromEntries(Object.entries(o).filter(([k,v])=>v&&v.store===LOCK)):o))},
     subGuides(cb){subCol("guides",o=>cb(LOCK?Object.fromEntries(Object.entries(o).filter(([k,v])=>v&&v.store===LOCK)):o))},
     subTasks(cb){subCol("tasks",cb)},
@@ -947,10 +947,13 @@ function signOut(){try{localStorage.removeItem("vsb-pin")}catch(e){}location.rel
 
 /* ---------- Final schedules for employees (GitHub version) ---------- */
 function pubSnapshot(){const rows=[];for(const[id,p]of Object.entries(S.staff)){if(!p||p._pending||p.store!==S.store)continue;
-  const days=DAYS.map((x,d)=>{const v=cellVal(id,d);return v&&v.off?"off":v&&v.s?(shG(p,v)!==grp(p.dept)?[v.s,v.e,shG(p,v)]:[v.s,v.e]):null});if(!days.some(x=>Array.isArray(x)))continue;rows.push({name:p.name,dept:grp(p.dept),days})}
+  const days=DAYS.map((x,d)=>{const v=cellVal(id,d);return v&&v.off?"off":v&&v.s?(shG(p,v)!==grp(p.dept)?[v.s,v.e,shG(p,v)]:[v.s,v.e]):null});if(!days.some(x=>Array.isArray(x)))continue;rows.push(S.store===MGR&&p.role?{name:p.name,dept:grp(p.dept),days,role:p.role}:{name:p.name,dept:grp(p.dept),days})}
   rows.sort((a,b)=>a.dept.localeCompare(b.dept)||a.name.localeCompare(b.name));return rows}
 function pubState(){if(!S.pub)return"none";return JSON.stringify(S.pub.rows)===JSON.stringify(pubSnapshot())?"same":"changed"}
-function staffLink(st){const c=((S.cfg&&S.cfg.linkCodes)||{})[st];return location.origin+location.pathname.replace(/[^/]*$/,"")+"staff.html?store="+encodeURIComponent(st)+(c?"&code="+c:"")}
+function staffLink(st,loc){const c=((S.cfg&&S.cfg.linkCodes)||{})[st];return location.origin+location.pathname.replace(/[^/]*$/,"")+"staff.html?store="+encodeURIComponent(st)+(loc?"&loc="+encodeURIComponent(loc):"")+(c?"&code="+c:"")}
+const mgrLocs=()=>(S.cfg.allStores||S.cfg.stores||[]).filter(x=>x!=="Managers");
+function mgrLinkRows(){return mgrLocs().map(l=>{const u=staffLink("Managers",l);return `<div class="lkrow"><b>${esc(l)}</b><input readonly value="${esc(u)}" aria-label="${esc(l)} managers link"><button class="btn sm" data-copyurl="${esc(u)}">Copy</button><a class="btn sm" href="${esc(u)}" target="_blank" rel="noopener">Open</a></div>`}).join("")}
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-copyurl]");if(!b)return;const u=b.dataset.copyurl;try{await navigator.clipboard.writeText(u);toast("Link copied")}catch(x){toast(u)}});
 const isAdm=()=>S.canEdit&&!LOCK;
 function stState(){const L=S.lock;if(!L)return"draft";return L.state||"approved"}
 function lockedForMe(){const st=stState();return st==="approved"||(st==="submitted"&&!isAdm())}
@@ -964,6 +967,7 @@ function finalBtnHTML(){if(!backend||!backend.getPub)return"";const st=stState()
 function updFinal(){const el=$("#finalSlot");if(el)el.innerHTML=finalBtnHTML()}
 async function loadPub(){if(!backend||!backend.getPub)return;const k=key();try{const d=await backend.getPub(k);if(k===key()){S.pub=d;updFinal();if(W&&W.step===5)renderWizard()}}catch(e){}}
 function shareModal(msg){const link=staffLink(S.store);
+  if(S.store==="Managers"){openModal(`<h3>${msg||"Managers schedule links"}</h3><div class="ctx">Managers · Week ${weekNo(S.week,S.cfg.wkOffset)} (${rangeLabel(S.week)})</div><p class="note">One link per store. Each shows only the managers working at that store, day by day. Regular employees never see these. No PIN needed.</p><div class="lkrows">${mgrLinkRows()}</div><div class="row" style="margin-top:10px">${S.canEdit&&!LOCK?`<button class="btn" data-final="unpub">Take this week down</button>`:""}<div class="spacer"></div><a class="btn" href="${esc(link)}" target="_blank" rel="noopener">All stores view</a><button class="btn" data-close>Done</button></div>`);return}
   openModal(`<h3>${msg||"Schedule shared"}</h3><div class="ctx">${esc(S.store)} · Week ${weekNo(S.week,S.cfg.wkOffset)} (${rangeLabel(S.week)})</div>
   <p class="note">Employees open this link to see every week marked final for ${esc(S.store)}. No PIN needed. It updates each time the admin approves a week.</p>
   <div class="row"><input type="text" readonly value="${esc(link)}" id="shareLink" style="flex:1;min-width:0"><button class="btn primary" data-final="copy">Copy link</button></div>
@@ -1060,7 +1064,7 @@ function subsHTML(){const due=dueOf(S.week),now=new Date();const pill={draft:["N
 document.addEventListener("click",e=>{if(e.target.closest("[data-subsref]")){loadSubs(true);if(typeof loadDash==="function")loadDash(true)}
   const w=e.target.closest("[data-hwk]");if(w){const t=document.getElementById(w.dataset.hwk);if(t)t.click();return}
   const s=e.target.closest("[data-dsum]");if(s){DASH.store=s.dataset.dsum;renderDash();const h=document.getElementById("sumHead");if(h)h.scrollIntoView({behavior:"smooth"})}});
-function homeAllHTML(){const stores=S.cfg.stores.map(st=>({st,r:storeStats(st,DASH.docs[st])}));const groups=[...new Set(S.cfg.depts.map(grp))];const maxCell=Math.max(1,...stores.flatMap(x=>groups.map(G=>x.r.dept[G]||0)));
+function homeAllHTML(){const stores=S.cfg.stores.map(st=>({st,r:storeStats(st,DASH.docs[st])}));const groups=[...new Set(DL().map(grp))];const maxCell=Math.max(1,...stores.flatMap(x=>groups.map(G=>x.r.dept[G]||0)));
   return `<div class="card" data-feat="hs_heat"><div class="ptitle">Hours by department, every store <span class="note">· darker = more hours · click a number for that store</span></div>
   <div style="overflow-x:auto;margin-top:4px"><table class="dtable heat"><thead><tr><th style="text-align:left">Department</th>${stores.map(x=>`<th>${esc(x.st)}</th>`).join("")}<th>Total</th></tr></thead><tbody>
   ${groups.map(G=>{const row=stores.map(x=>x.r.dept[G]||0);const tot=row.reduce((a,b)=>a+b,0);if(!tot)return"";
@@ -1450,7 +1454,7 @@ function renderToffTogs(){const a=$("#toffTog"),b=$("#toffOnTog");if(!a)return;c
 /* ---------- Employee links: change a store's link (old one stops working) ---------- */
 function newLinkCode(){const A="ABCDEFGHJKMNPQRSTUVWXYZ23456789";const r=new Uint32Array(6);crypto.getRandomValues(r);return [...r].map(x=>A[x%A.length]).join("")}
 function renderLinkCard(){const box=$("#linkRows");if(!box||box.contains(document.activeElement))return;
-  box.innerHTML=(S.cfg.stores||[]).map(st=>{const l=staffLink(st),c=((S.cfg.linkCodes)||{})[st];return `<div class="lkrow"><b>${esc(st)}</b><input readonly value="${esc(l)}" aria-label="${esc(st)} employee link"><button class="btn sm" data-lkcopy="${esc(st)}">Copy</button><button class="btn sm" data-lknew="${esc(st)}">${c?"New link":"Lock with a new link"}</button></div>`}).join("")}
+  box.innerHTML=(S.cfg.stores||[]).map(st=>{const l=staffLink(st),c=((S.cfg.linkCodes)||{})[st];return `<div class="lkrow"><b>${esc(st)}</b><input readonly value="${esc(l)}" aria-label="${esc(st)} employee link"><button class="btn sm" data-lkcopy="${esc(st)}">Copy</button><button class="btn sm" data-lknew="${esc(st)}">${c?"New link":"Lock with a new link"}</button></div>`+(st==="Managers"?`<div class="note" style="margin:2px 0 4px 8px">Managers link for each store (uses the Managers lock):</div>${mgrLinkRows()}`:"")}).join("")}
 document.addEventListener("click",async e=>{
   const c=e.target.closest("[data-lkcopy]");if(c){const l=staffLink(c.dataset.lkcopy);try{await navigator.clipboard.writeText(l);toast("Link copied")}catch(x){toast(l)}return}
   const n=e.target.closest("[data-lknew]");if(!n)return;const st=n.dataset.lknew;
@@ -1570,10 +1574,12 @@ const guideId=(store,dept)=>skey(store)+"__"+skey(dept);
 const FE="Front End";
 const FE_RE=/cashier|cajer|office|oficina/i;
 const isFE=d=>!!d&&(d===FE||FE_RE.test(d)||(S.cfg.frontEnd||[]).includes(d));
-const feList=()=>S.cfg.depts.filter(isFE);
+const MGR="Managers";const isMgr=()=>S.store===MGR;
+function DL(){return S.store===MGR?(S.cfg.allStores||S.cfg.stores||[]).filter(x=>x!==MGR):(S.cfg.depts||[])}
+const feList=()=>DL().filter(isFE);
 const FEALL="__feall",FEALL_L="Front End (all)";
 const grp=d=>d===FEALL?FEALL_L:isFE(d)?FE:d;
-const feAllSet=()=>{const a=[FE];for(const d of S.cfg.depts){const g=grp(d);if(/pricing|precio|stock|receiv|recib/i.test(g)&&!a.includes(g))a.push(g)}return a};
+const feAllSet=()=>{const a=[FE];for(const d of DL()){const g=grp(d);if(/pricing|precio|stock|receiv|recib/i.test(g)&&!a.includes(g))a.push(g)}return a};
 const allish=()=>S.dept==="__all"||S.dept===FEALL;
 const selSet=()=>S.dept==="__all"?null:S.dept===FEALL?feAllSet():[grp(S.dept)];
 const selHas=G=>{const z=selSet();return !z||z.includes(G)};
@@ -1583,7 +1589,7 @@ const gsetOf=s=>{const a=[grp(s.dept)];for(const d of (s.also||[])){const g=grp(
 const inGrp=(s,G)=>gsetOf(s).includes(G);
 const shG=(s,v)=>v&&v.dept&&inGrp(s,v.dept)?v.dept:grp(s.dept);
 const alsoTag=(st,G)=>G&&grp(st.dept)!==G?`<span class="rt cov" title="Primary department: ${esc(grp(st.dept))}">Coverage · ${esc(grp(st.dept))}</span>`:"";
-const deptOrder=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i};
+const deptOrder=x=>{const i=DL().findIndex(d=>grp(d)===x);return i<0?99:i};
 let CTXG=null;
 const deptMatch=s=>S.dept==="__all"||(S.dept===FEALL&&gsetOf(s).some(selHas))||s.dept===S.dept||(s.also||[]).includes(S.dept)||(S.dept===FE&&inGrp(s,FE));
 const grpMatch=s=>S.dept==="__all"||gsetOf(s).some(selHas);
@@ -1675,8 +1681,8 @@ function renderBanner(){
 }
 function renderControls(){applyFeats();
   const ss=$("#storeSel");ss.innerHTML=S.cfg.stores.map(s=>`<option ${s===S.store?"selected":""}>${esc(s)}</option>`).join("");
-  const ds=$("#deptSel");ds.innerHTML=`<option value="__all">All departments</option><option value="${FE}" ${S.dept===FE?"selected":""}>Front End (cashiers, head cashier &amp; office)</option><option value="${FEALL}" ${S.dept===FEALL?"selected":""}>Front End (all): + pricing, stockers &amp; receiving</option>`+S.cfg.depts.map(d=>`<option ${d===S.dept?"selected":""}>${esc(d)}</option>`).join("");
-  if(S.dept!=="__all"&&S.dept!==FE&&S.dept!==FEALL&&!S.cfg.depts.includes(S.dept))S.dept="__all";ds.value=S.dept;
+  const ds=$("#deptSel");{const sp=ds.closest(".field").querySelector("span");if(sp)sp.textContent=isMgr()?"Store":"Department"}if(isMgr()&&(S.dept===FE||S.dept===FEALL))S.dept="__all";ds.innerHTML=(isMgr()?`<option value="__all">All stores</option>`:`<option value="__all">All departments</option><option value="${FE}" ${S.dept===FE?"selected":""}>Front End (cashiers, head cashier &amp; office)</option><option value="${FEALL}" ${S.dept===FEALL?"selected":""}>Front End (all): + pricing, stockers &amp; receiving</option>`)+DL().map(d=>`<option ${d===S.dept?"selected":""}>${esc(d)}</option>`).join("");
+  if(S.dept!=="__all"&&S.dept!==FE&&S.dept!==FEALL&&!DL().includes(S.dept))S.dept="__all";ds.value=S.dept;
   $("#weekLbl").innerHTML=`Week ${weekNo(S.week,S.cfg.wkOffset)}<small>${rangeLabel(S.week)}</small>`;
   $("#jumpDate").value=ymd(S.week);
   document.querySelectorAll(".tabs button[data-tab]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));
@@ -1703,7 +1709,7 @@ function renderControls(){applyFeats();
 function crew(all){
   return Object.entries(S.staff).map(([id,s])=>({id,...s}))
     .filter(s=>!s._pending&&s.store===S.store&&deptMatch(s)&&(all||matchQ(s.name)))
-    .sort((a,b)=>{const ia=S.cfg.depts.indexOf(a.dept),ib=S.cfg.depts.indexOf(b.dept);return (ia<0?99:ia)-(ib<0?99:ib)||String(a.dept).localeCompare(b.dept)||roleCmp(a,b)||a.name.localeCompare(b.name)});
+    .sort((a,b)=>{const ia=DL().indexOf(a.dept),ib=DL().indexOf(b.dept);return (ia<0?99:ia)-(ib<0?99:ib)||String(a.dept).localeCompare(b.dept)||roleCmp(a,b)||a.name.localeCompare(b.name)});
 }
 const cellVal=(sid,d)=>S.sched&&S.sched.shifts&&S.sched.shifts[sid]&&S.sched.shifts[sid][d]||null;
 function rowStats(st){
@@ -1794,7 +1800,7 @@ function hourTotals(){
     for(let d=0;d<7;d++){const v=cellVal(st.id,d);if(v&&v.s&&!v.off){const G=shG(st,v);if(!selHas(G))continue;const b=by[G]=by[G]||{h:0,day:[0,0,0,0,0,0,0],n:0,ids:new Set()};const h=hoursOf(v,S.cfg);b.h+=h;b.day[d]+=h;b.ids.add(st.id);day[d]+=h;heads[d]++;total+=h;any=true}}
     if(any)ppl++}
   for(const b of Object.values(by))b.n=b.ids.size;
-  const order=Object.keys(by).sort((a,b)=>{const f=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i};return f(a)-f(b)});
+  const order=Object.keys(by).sort((a,b)=>{const f=x=>{const i=DL().findIndex(d=>grp(d)===x);return i<0?99:i};return f(a)-f(b)});
   return{by,order,day,heads,total,ppl};
 }
 function totalsBar(){
@@ -1841,7 +1847,7 @@ function breakdown(storeSel){
     for(const[id,p]of Object.entries(S.staff)){if(p._pending||p.store!==st)continue;
       for(let d=0;d<7;d++){const v=sh[id]&&sh[id][d];if(!(v&&v.s&&!v.off))continue;const G=shG(p,v);const h=hoursOf(v,S.cfg),k=partOf(v);
         for(const R of[(rows[G]=rows[G]||tot()),T]){R.ppl.add(id);R.hrs+=h;R.day[d].h+=h;R.day[d].p.add(id);R.part[k].h+=h;R.part[k].p.add(id);R.part[k].n++;R.dp[d][k].h+=h;R.dp[d][k].p.add(id)}}}}
-  const order=Object.keys(rows).sort((a,b)=>{const f=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i};return f(a)-f(b)});
+  const order=Object.keys(rows).sort((a,b)=>{const f=x=>{const i=DL().findIndex(d=>grp(d)===x);return i<0?99:i};return f(a)-f(b)});
   return{rows,order,T};
 }
 function breakdownHTML(){
@@ -1942,7 +1948,7 @@ function dashAll(){
   const stores=S.cfg.stores.map(st=>({st,doc:DASH.docs[st],r:storeStats(st,DASH.docs[st])}));
   const T={hrs:0,ppl:0,flags:0,open:0};stores.forEach(({r})=>{T.hrs+=r.hrs;T.ppl+=r.ppl;T.flags+=r.ptOver.length+r.ot.length+r.capOver.length;T.open+=r.open});
   const maxH=Math.max(1,...stores.map(x=>x.r.hrs));
-  const groups=[...new Set(S.cfg.depts.map(grp))];const maxCell=Math.max(1,...stores.flatMap(x=>groups.map(G=>x.r.dept[G]||0)));
+  const groups=[...new Set(DL().map(grp))];const maxCell=Math.max(1,...stores.flatMap(x=>groups.map(G=>x.r.dept[G]||0)));
   return `<div class="dtiles">
     <div class="dtile"><span>Total hours</span><b>${Math.round(T.hrs).toLocaleString()}</b><small>all ${stores.length} stores</small></div>
     <div class="dtile"><span>People working</span><b>${T.ppl}</b><small>${stores.filter(x=>x.r.ppl).length} stores have a schedule</small></div>
@@ -1998,7 +2004,7 @@ const prefIdx={am:0,mid:1,pm:2,late:3};
 const W={step:0};
 const WSTEPS=["Week & department","Your team","Set or rotating","Availability this week","Place shifts","Review & print"];
 function wPeople(){return Object.entries(S.staff).map(([id,o])=>({id,...o})).filter(o=>!o._pending&&o.store===S.store&&!allish()&&inGrp(o,grp(S.dept))).sort((a,b)=>a.name.localeCompare(b.name))}
-function wGroups(){return [...new Set(S.cfg.depts.map(grp))]}
+function wGroups(){return [...new Set(DL().map(grp))]}
 function renderWizard(){
   const slot=$("#wizSlot");if(!slot||S.tab!=="build")return;
   const ae=document.activeElement;if(ae&&ae.dataset&&ae.dataset.task&&slot.contains(ae))return;
@@ -2020,7 +2026,7 @@ function wStep0(){
   <div class="wq">${typeof LOCK!=="undefined"&&LOCK?"2. Department":"3. Department"}</div><div class="wchoices">${groups.map(G=>{const n=cnt(G);return `<button class="wchoice ${grp(S.dept)===G&&S.dept!=="__all"?"on":""}" data-wdept="${esc(G)}">${esc(G)}<small>${n} ${n===1?"person":"people"}</small></button>`}).join("")}</div>`;
 }
 function wStep1(){
-  const ppl=wPeople();const roles=grp(S.dept)===FE?S.cfg.depts.filter(d=>grp(d)===FE):[grp(S.dept)];
+  const ppl=wPeople();const roles=grp(S.dept)===FE?DL().filter(d=>grp(d)===FE):[grp(S.dept)];
   return `<h2 class="wh">Who's on your ${esc(grp(S.dept))} team?</h2><p class="wsub">Remove anyone who no longer works here and add new people. Set full-time or part-time, and a weekly hour limit if someone needs one.</p>
   <div class="wlist">${ppl.map(p=>`<div class="wrow"><div class="wname"><b>${esc(p.name)}</b>${roleTag(p)}${alsoTag(p,grp(S.dept))}</div>
     ${FTPT()?`<div class="seg sm">${["FT","PT"].map(t=>`<button class="${(p.type||"PT")===t?"on":""}" data-wtype="${p.id}" data-v="${t}">${t==="FT"?"Full-time":"Part-time"}</button>`).join("")}</div>`:""}
@@ -2111,7 +2117,7 @@ function basicBoard(){if(!S.store)return"";
   const all=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store);
   const groups=[...new Set(all.flatMap(p=>gsetOf(p)))].sort((a,b)=>deptOrder(a)-deptOrder(b));
   const cnt=G=>all.filter(p=>inGrp(p,G)).length;const ppl=all.filter(p=>grpMatch(p));
-  const chips=`<div class="bchips"><button class="bchip ${S.dept==="__all"?"on":""}" data-bdept="__all">All departments<small>${all.length}</small></button>${groups.filter(G=>feAllSet().includes(G)).length>1?`<button class="bchip ${S.dept===FEALL?"on":""}" data-bdept="${FEALL}" title="Front End + Pricing + Stockers + Receiving together">${FEALL_L}<small>${all.filter(o=>gsetOf(o).some(g=>feAllSet().includes(g))).length}</small></button>`:""}${groups.map(G=>`<button class="bchip ${!allish()&&grp(S.dept)===G?"on":""}" data-bdept="${esc(G)}">${esc(G)}<small>${cnt(G)}</small></button>`).join("")}</div>`;
+  const chips=`<div class="bchips"><button class="bchip ${S.dept==="__all"?"on":""}" data-bdept="__all">${S.store==="Managers"?"All stores":"All departments"}<small>${all.length}</small></button>${groups.filter(G=>feAllSet().includes(G)).length>1?`<button class="bchip ${S.dept===FEALL?"on":""}" data-bdept="${FEALL}" title="Front End + Pricing + Stockers + Receiving together">${FEALL_L}<small>${all.filter(o=>gsetOf(o).some(g=>feAllSet().includes(g))).length}</small></button>`:""}${groups.map(G=>`<button class="bchip ${!allish()&&grp(S.dept)===G?"on":""}" data-bdept="${esc(G)}">${esc(G)}<small>${cnt(G)}</small></button>`).join("")}</div>`;
   const wk=`<div class="bweek"><button class="btn icon" data-bwk="prevWk" aria-label="Previous week">‹</button><div><b>Week ${weekNo(S.week,S.cfg.wkOffset)}</b><span>${rangeLabel(S.week)}</span></div><button class="btn icon" data-bwk="nextWk" aria-label="Next week">›</button><button class="btn sm" data-bwk="dueWk">Week to submit</button></div>`;
   const acts=`<div class="bacts">${S.readOnly?"":`<button class="btn" data-bwk="copyPrev">Copy last week</button>`}<button class="btn" data-bwk="printBtn">Print</button><button class="btn" data-duties>📝 Duties &amp; notes</button>${S.readOnly?"":`<button class="btn bclear" data-bclear>🗑 ${S.dept==="__all"?"Clear week":"Clear "+esc(grp(S.dept))}</button>`}</div>`;
   return `<div class="bhead"><div><h2 class="wh" style="margin:0">Schedule</h2><p class="wsub" style="margin:2px 0 0"><span>Drag a name from the Off row onto a shift.</span> <span>Drag it back to Off to remove it, or click + to pick someone.</span> <span>Red means they can't work that day.</span></p></div>${wk}</div>
@@ -2232,7 +2238,7 @@ function slotsFor(dept){
 function renderShiftGrid(){$("#gridSlot").innerHTML=shiftGridHTML()}
 function shiftGridHTML(noCov){
   const all=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&grpMatch(s)).sort((a,b)=>a.name.localeCompare(b.name));
-  const depts=[...new Set(all.flatMap(s=>selGs(s)))].sort((a,b)=>{const f=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i};return f(a)-f(b)});
+  const depts=[...new Set(all.flatMap(s=>selGs(s)))].sort((a,b)=>{const f=x=>{const i=DL().findIndex(d=>grp(d)===x);return i<0?99:i};return f(a)-f(b)});
   const today=ymd(new Date());
   let h=elsewhereHTML()+`<div class="gridbox"><table class="grid sgrid dnd"><thead><tr><th class="who">Shift</th>`;
   for(let d=0;d<7;d++){const dt=addDays(S.week,d);h+=`<th class="${ymd(dt)===today?"today":""}">${DAYS[d]}<span class="d">${dt.getMonth()+1}/${dt.getDate()}</span></th>`}
@@ -2486,7 +2492,7 @@ const chatTools=()=>[
   {name:"stage_new_employee",description:"Stage adding a new employee (available any time by default; follow with stage_availability using the returned temp id if the user gave their hours). Needs user approval.",
    inputSchema:{type:"object",properties:{name:{type:"string"},department:{type:"string"},status:{type:"string",enum:["FT","PT"]},store:{type:"string"}},required:["name","department"]},
    execute:(i)=>{const name=String(i.name||"").trim();if(!name)throw new Error("name required");
-     const dept=S.cfg.depts.find(x=>norm(x)===norm(i.department));if(!dept)throw new Error("Unknown department '"+i.department+"'. Departments: "+S.cfg.depts.join(", "));
+     const dept=DL().find(x=>norm(x)===norm(i.department));if(!dept)throw new Error("Unknown department '"+i.department+"'. Departments: "+DL().join(", "));
      const store=i.store?S.cfg.stores.find(x=>norm(x)===norm(i.store)):S.store;if(!store)throw new Error("Unknown store. Stores: "+S.cfg.stores.join(", "));
      const id="new_"+uid();S.staff[id]={name,store,dept,type:i.status==="FT"?"FT":"PT",avail:anyAvail(),notes:"",_pending:true};
      stage({k:"new|"+id,type:"new",id,label:`Add ${name}`,note:`${store} · ${dept} · ${i.status==="FT"?"Full-time":"Part-time"}`});return{id,message:"Staged new employee "+name}}}
@@ -2498,7 +2504,7 @@ function chatPrompt(text){
 Your job: turn what they say into days off, availability and weekly hour caps (e.g. "Teresa max 20 hours") using your tools. Always look people up with find_employees first, then stage changes. Staged changes appear in a list the manager approves with an Apply button, so say "I've lined up…" rather than claiming it's saved.
 If a name is ambiguous or a detail is missing (which date, what hours), ask one short question instead of guessing. Days off are specific dates; "every Tuesday" or "can't work mornings" is availability. "Available after 3" means times from 15:00 to 23:00 unless they say an end. Keep replies to 1-3 short sentences.
 
-Today: ${DAYS_LONG[new Date().getDay()]} ${ymd(new Date())}. Week on screen: Week ${weekNo(S.week,S.cfg.wkOffset)}, ${ymd(S.week)} (Sun) to ${ymd(sat)} (Sat). Current store: ${S.store}${S.dept!=="__all"?", department "+S.dept:""}. Departments: ${S.cfg.depts.join(", ")}.
+Today: ${DAYS_LONG[new Date().getDay()]} ${ymd(new Date())}. Week on screen: Week ${weekNo(S.week,S.cfg.wkOffset)}, ${ymd(S.week)} (Sun) to ${ymd(sat)} (Sat). Current store: ${S.store}${S.dept!=="__all"?", department "+S.dept:""}. Departments: ${DL().join(", ")}.
 ${CH.staged.length?"Already staged (not yet applied): "+CH.staged.map(x=>x.label+(x.note?" ("+x.note+")":"")).join("; ")+"\n":""}${hist?"\nConversation so far:\n"+hist+"\n":""}
 Manager: ${text}`;
 }
@@ -2589,7 +2595,7 @@ function renderGuide(){
     slot.innerHTML=`<div class="row"><h2 class="sec">${esc(S.store)} staffing guide</h2><div class="spacer"></div>${lockNote}</div>
       <div class="note">Corporate sets the shifts and recommended headcount for each department. The schedule then shows scheduled vs. recommended under each department, and the department's shifts become the first buttons in the shift picker. Pick a department to ${S.canEdit?"set it up":"see it"}.</div>
       ${S.canEdit?`<div class="row"><div class="spacer"></div><button class="btn" id="gClearAll" style="color:var(--bad-fg)">🗑 Clear all departments for ${esc(S.store)}</button></div>`:""}
-      <div class="gsum">${[...new Set(S.cfg.depts.map(grp))].map(d=>{const g=guideRaw(S.store,d);return `<button class="card" data-gdept="${esc(d)}"><span class="nm">${esc(d)}</span>${d===FE?`<span class="note">Counts everyone in: ${esc(feList().join(", "))}</span>`:""}<span class="note">${g?fmtH(guideHours(g))+" recommended hrs/week":"Not set up yet"}</span><span class="note">${g?g.slots.map(sl=>esc(sl.label)+" "+Math.max(...(sl.need||[0]).map(n=>+n||0))+"/day").join(" · "):""}</span></button>`}).join("")}</div>`;
+      <div class="gsum">${[...new Set(DL().map(grp))].map(d=>{const g=guideRaw(S.store,d);return `<button class="card" data-gdept="${esc(d)}"><span class="nm">${esc(d)}</span>${d===FE?`<span class="note">Counts everyone in: ${esc(feList().join(", "))}</span>`:""}<span class="note">${g?fmtH(guideHours(g))+" recommended hrs/week":"Not set up yet"}</span><span class="note">${g?g.slots.map(sl=>esc(sl.label)+" "+Math.max(...(sl.need||[0]).map(n=>+n||0))+"/day").join(" · "):""}</span></button>`}).join("")}</div>`;
     return;
   }
   const GD=grp(S.dept);const id=guideId(S.store,GD);
@@ -2676,7 +2682,7 @@ function renderNotes(){
   const slot=$("#notesSlot");if(!slot)return;
   const ae=document.activeElement;if(ae&&ae.dataset&&ae.dataset.task&&slot.contains(ae))return;
   if(!S.store||S.tab!=="schedule"){slot.innerHTML="";return}
-  const groups=allish()?[...new Set(Object.values(S.staff).filter(o=>!o._pending&&o.store===S.store).flatMap(o=>selGs(o)||gsetOf(o)))].sort((a,b)=>{const f=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i};return f(a)-f(b)}):[grp(S.dept)];
+  const groups=allish()?[...new Set(Object.values(S.staff).filter(o=>!o._pending&&o.store===S.store).flatMap(o=>selGs(o)||gsetOf(o)))].sort((a,b)=>{const f=x=>{const i=DL().findIndex(d=>grp(d)===x);return i<0?99:i};return f(a)-f(b)}):[grp(S.dept)];
   if(!groups.length){slot.innerHTML="";return}
   slot.innerHTML=`<div class="row"><h2 class="sec">Notes &amp; duties · ${esc(S.store)}</h2><div class="spacer"></div><span class="note">These print under each department's schedule.</span></div>
   <div class="ngrid">${groups.map(G=>{const t=tasksFor(S.store,G);const box=dutiesBox(S.store,G);const ed=NOTE.edit===G;
@@ -2687,7 +2693,7 @@ function renderNotes(){
 /* ---------- print: one page per department ---------- */
 function printGroups(){
   const list=Object.entries(S.staff).map(([id,s])=>({id,...s})).filter(s=>!s._pending&&s.store===S.store&&grpMatch(s));
-  const order=x=>{const i=S.cfg.depts.findIndex(d=>grp(d)===x);return i<0?99:i};
+  const order=x=>{const i=DL().findIndex(d=>grp(d)===x);return i<0?99:i};
   if(S.dept===FEALL)return{list,groups:list.length?[FEALL_L]:[]};
   const groups=[...new Set(list.flatMap(s=>selGs(s)))].sort((a,b)=>order(a)-order(b));
   return{list,groups};
@@ -2801,7 +2807,7 @@ function shiftPicker(sid,d){
   $("#cOff").onclick=()=>{setCell(sid,d,{off:true});closeModal()};
 }
 function staffEditor(id){
-  const isNew=!id;const st=isNew?{name:"",store:S.store,dept:!allish()?S.dept:S.cfg.depts[0],type:"PT",avail:anyAvail(),notes:""}:{...S.staff[id],avail:JSON.parse(JSON.stringify(S.staff[id].avail||anyAvail()))};
+  const isNew=!id;const st=isNew?{name:"",store:S.store,dept:!allish()?S.dept:DL()[0],type:"PT",avail:anyAvail(),notes:""}:{...S.staff[id],avail:JSON.parse(JSON.stringify(S.staff[id].avail||anyAvail()))};
   const avRows=DAYS_LONG.map((dn,d)=>{const a=st.avail[d]||{mode:"any"};return `<div class="dn">${dn}</div><div class="ctrl"><select id="am${d}"><option value="any" ${a.mode==="any"?"selected":""}>Any time</option><option value="times" ${a.mode==="times"?"selected":""}>Between</option><option value="no" ${a.mode==="no"?"selected":""}>Not available</option></select><input type="time" id="af${d}" value="${a.from||"06:00"}" ${a.mode!=="times"?"hidden":""}><input type="time" id="at${d}" value="${a.to||"14:00"}" ${a.mode!=="times"?"hidden":""}></div>`}).join("");
   const fxOpts=(()=>{const seen=new Set(),o=[];const add=(s,e,l)=>{const k=s+"-"+e;if(seen.has(k))return;seen.add(k);o.push({k,l:(l?l+" ":"")+fmtRange(s,e)})};
     const g=guideRaw(st.store||S.store,grp(st.dept));if(g)g.slots.forEach(sl=>add(sl.start,sl.end,sl.label));(S.cfg.presets||[]).forEach(p=>add(p.start,p.end,p.label));
@@ -2812,9 +2818,9 @@ function staffEditor(id){
     <div class="formgrid">
       <label class="field"><span>Name</span><input type="text" id="eName" value="${esc(st.name)}"></label>
       <label class="field" ${typeof LOCK!=="undefined"&&LOCK?"hidden":""}><span>Store</span><select id="eStore">${S.cfg.stores.map(s=>`<option ${s===st.store?"selected":""}>${esc(s)}</option>`).join("")}</select></label>
-      <label class="field"><span>Primary department</span><select id="eDept">${S.cfg.depts.map(s=>`<option ${s===st.dept?"selected":""}>${esc(s)}</option>`).join("")}</select></label>
-      <div class="field" style="grid-column:1/-1" ${BASIC()&&!(st.also||[]).length?'data-collapsed="1"':""}><span>Coverage departments (optional)</span><div class="chips" id="eAlso">${[...new Set(S.cfg.depts.map(grp))].map(G=>`<label class="chip" data-covg="${esc(G)}" style="display:${G===grp(st.dept)?"none":"inline-flex"};gap:6px;align-items:center;cursor:pointer"><input type="checkbox" value="${esc(G)}" ${(st.also||[]).map(grp).includes(G)?"checked":""}>${esc(G)}</label>`).join("")}</div><div class="note">Departments they sometimes cover. They show up there too, tagged <b>Coverage</b>. Hours count toward the department of each shift.</div></div>
-      <label class="field"><span>Role / position (optional)</span><input type="text" id="eRole" list="eRoleList" value="${esc(st.role||"")}" placeholder="e.g. Meat Cutter, Wrapper, Counter, Suplente" maxlength="30"><datalist id="eRoleList">${[...new Set(Object.values(S.staff).filter(o=>o&&o.role&&o.store===(st.store||S.store)).map(o=>o.role))].sort().map(r=>`<option value="${esc(r)}">`).join("")}</datalist></label>
+      <label class="field"><span>${isMgr()?"Home store":"Primary department"}</span><select id="eDept">${DL().map(s=>`<option ${s===st.dept?"selected":""}>${esc(s)}</option>`).join("")}</select></label>
+      <div class="field" style="grid-column:1/-1" ${BASIC()&&!(st.also||[]).length?'data-collapsed="1"':""}><span>${isMgr()?"Also works at these stores (optional)":"Coverage departments (optional)"}</span><div class="chips" id="eAlso">${[...new Set(DL().map(grp))].map(G=>`<label class="chip" data-covg="${esc(G)}" style="display:${G===grp(st.dept)?"none":"inline-flex"};gap:6px;align-items:center;cursor:pointer"><input type="checkbox" value="${esc(G)}" ${(st.also||[]).map(grp).includes(G)?"checked":""}>${esc(G)}</label>`).join("")}</div><div class="note">Departments they sometimes cover. They show up there too, tagged <b>Coverage</b>. Hours count toward the department of each shift.</div></div>
+      <label class="field"><span>Role / position (optional)</span><input type="text" id="eRole" list="eRoleList" value="${esc(st.role||"")}" placeholder="${isMgr()?"e.g. Store Manager, Asst Manager, Hot Deli Manager":"e.g. Meat Cutter, Wrapper, Counter, Suplente"}" maxlength="30"><datalist id="eRoleList">${[...new Set(Object.values(S.staff).filter(o=>o&&o.role&&o.store===(st.store||S.store)).map(o=>o.role))].sort().map(r=>`<option value="${esc(r)}">`).join("")}</datalist></label>
       <label class="field" ${FTPT()?"":"hidden"}><span>Status</span><select id="eType"><option value="FT" ${st.type==="FT"?"selected":""}>Full-time (30+ hrs)</option><option value="PT" ${st.type!=="FT"?"selected":""}>Part-time (under 30)</option></select></label>
     </div>
     <div class="formgrid">
@@ -2864,7 +2870,7 @@ function rosterPaste(){
     const lines=$("#rText").value.split(/\n/).map(l=>l.trim()).filter(Boolean);if(!lines.length){toast("Paste at least one line.");return}
     const newDepts=[];let n=0;
     for(const l of lines){const p=l.split(/\t|,/).map(x=>x.trim());const name=p[0];if(!name)continue;
-      let dept=p[1]||(!allish()?S.dept:S.cfg.depts[0]);const match=S.cfg.depts.find(x=>x.toLowerCase()===dept.toLowerCase());
+      let dept=p[1]||(!allish()?S.dept:DL()[0]);const match=DL().find(x=>x.toLowerCase()===dept.toLowerCase());
       if(match)dept=match;else if(!newDepts.includes(dept))newDepts.push(dept);
       const type=/^f/i.test(p[2]||"")?"FT":"PT";
       await backend.saveStaff(uid(),{name,store:S.store,dept,type,notes:"",avail:anyAvail()}).catch(showErr);n++}
@@ -3118,10 +3124,10 @@ function renderAnaTab(){const el=$("#anaSlot");if(!el)return;if(S.tab!=="ana"||!
   for(let d=0;d<7;d++){const row=cnt[d];const on=H.filter(h=>row[h]>0);if(!on.length)continue;const a=on[0],b=on[on.length-1];
     for(let h=a;h<=b;h++){if(row[h]>pk.v)pk={v:row[h],d,h};if(row[h]<th.v)th={v:row[h],d,h}}}
   const kpi=(ic,c,l,v,sub)=>`<div class="an-kpi">${anaIc(ic,c)}<div><small>${l}</small><b>${v}</b><span>${sub}</span></div></div>`;
-  const kpis=`<div class="an-kpis">${kpi("clock","","Scheduled hours",r1(T.h)+" hrs",`${T.ids.size} people`)}${kpi("shifts","b","Shifts scheduled",T.n.toLocaleString(),`across ${order.length} department${order.length===1?"":"s"}`)}${kpi("up","y","Busiest hour",pk.v+" people",DAYS[pk.d]+" "+rng(pk.h))}${kpi("down","o","Thinnest hour (open)",th.v+" "+(th.v===1?"person":"people"),th.d==null?"—":DAYS[th.d]+" "+rng(th.h))}</div>`;
+  const kpis=`<div class="an-kpis">${kpi("clock","","Scheduled hours",r1(T.h)+" hrs",`${T.ids.size} people`)}${kpi("shifts","b","Shifts scheduled",T.n.toLocaleString(),`across ${order.length} ${isMgr()?"store":"department"}${order.length===1?"":"s"}`)}${kpi("up","y","Busiest hour",pk.v+" people",DAYS[pk.d]+" "+rng(pk.h))}${kpi("down","o","Thinnest hour (open)",th.v+" "+(th.v===1?"person":"people"),th.d==null?"—":DAYS[th.d]+" "+rng(th.h))}</div>`;
   // departments
   const ds=order.map(G=>({G,R:D[G]})).sort((a,b)=>b.R.h-a.R.h);const mx=ds.length?ds[0].R.h:1;
-  const dept=`<div class="card an-card"><div class="an-t">${anaIc("bars")}<h3>Hours by department</h3></div><p class="note">Ranked by scheduled hours. % = share of ${F?"these":"the store's"} total hours.</p>
+  const dept=`<div class="card an-card"><div class="an-t">${anaIc("bars")}<h3>Hours by ${isMgr()?"store":"department"}</h3></div><p class="note">Ranked by scheduled hours. % = share of ${F?"these":"the store's"} total hours.</p>
     ${ds.map((x,i)=>{const pc=T.h?Math.round(x.R.h/T.h*100):0;const w=mx?x.R.h/mx*100:0;return `<div class="an-dr"><span class="an-rk">${i+1}</span><span class="an-dn" title="${esc(x.G)}">${esc(x.G)}</span><div class="an-trk"><div class="an-fil${i<3?" t":""}" style="width:${w.toFixed(1)}%"></div>${w>32?`<em>${pc}%</em>`:""}</div><span class="an-dv"><b>${r1(x.R.h)} hrs</b><small>${x.R.n} shift${x.R.n===1?"":"s"} · ${x.R.ids.size} ppl</small></span></div>`}).join("")}</div>`;
   // day chart
   const today=new Date();let dd=S.anaDay;if(dd==null||dd<0||dd>6){dd=DAYS.findIndex((x,d)=>ymd(addDays(S.week,d))===ymd(today));if(dd<0)dd=pk.d==null?0:pk.d}
@@ -3150,7 +3156,7 @@ function renderAnaTab(){const el=$("#anaSlot");if(!el)return;if(S.tab!=="ana"||!
     if(w)ins.push(["w","alert","o",`<b>${DAYS[w.d]} ${rng(w.h)} is short ${w.gap}</b> · ${w.v} on, guide calls for ${w.t}.`]);
     ins.push([daysOk.length===7?"g":"","check","",`<b>${daysOk.length} of 7 days fully covered</b>${daysOk.length&&daysOk.length<7?` · ${daysOk.map(d=>DAYS[d]).join(", ")}`:""}.`])}
   else if(th.d!=null)ins.push(["w","down","o",`<b>Thinnest: ${DAYS[th.d]} ${rng(th.h)}</b> · only ${th.v} ${th.v===1?"person":"people"} on.`]);
-  if(ds.length>1&&T.h)ins.push(["","pie","b",`<b>${esc(ds[0].G)} is ${Math.round(ds[0].R.h/T.h*100)}% of hours</b> · your biggest department this week.`]);
+  if(ds.length>1&&T.h)ins.push(["","pie","b",`<b>${esc(ds[0].G)} is ${Math.round(ds[0].R.h/T.h*100)}% of hours</b> · your biggest ${isMgr()?"store":"department"} this week.`]);
   if(ins.length<3){const bd=peaks.slice().sort((a,b)=>b.tot-a.tot)[0];if(bd&&bd.tot)ins.push(["","up","y",`<b>${DAYS_LONG[bd.d]} is your busiest day</b> · ${bd.tot} people-hrs.`])}
   const look=`<div class="card an-card"><div class="an-t">${anaIc("bulb")}<h3>Things to look at</h3></div><div class="an-ins" style="margin-top:8px">${ins.slice(0,3).map(([c,ic,ic2,t])=>`<div class="an-in ${c}">${anaIc(ic,ic2)}<span>${t}</span></div>`).join("")}</div></div>`;
   el.innerHTML=head+kpis+look+`<div class="an-g2">${dept}${chart}</div>`+hm}
@@ -3173,7 +3179,7 @@ function renderSumTab(){const el=$("#sumTabSlot");if(!el)return;if(S.tab!=="sum"
   ${(()=>{const L=ppl.map(p=>{const r=rowStats(p);return{p,r,m:limitMsgs(p,r.h,r.days),u:underMsg(p,r.g)}});const ov=L.filter(x=>x.m.length),un=L.filter(x=>x.u);
     return `<div class="card ovun" data-feat="sum_flags"><h3 class="sec">Over / Under</h3>${!ov.length&&!un.length?`<div class="banner ok">✓ Nobody is over or under.</div>`:`<div class="ovgrid"><div><div class="ptitle bad">Over (${ov.length})</div>${ov.map(x=>`<div class="ovrow goemprow" data-goemp="${x.p.id}" title="Open on the schedule"><b class="goemp" tabindex="0" role="button">${esc(x.p.name)}</b> <span class="note">${esc(grp(x.p.dept))}</span><br><span class="flag bad">${x.m.map(esc).join(" · ")}</span></div>`).join("")||`<div class="note">Nobody</div>`}</div><div><div class="ptitle und">Under (${un.length})</div>${un.map(x=>`<div class="ovrow goemprow" data-goemp="${x.p.id}" title="Open on the schedule"><b class="goemp" tabindex="0" role="button">${esc(x.p.name)}</b> <span class="note">${esc(grp(x.p.dept))}</span><br><span class="flag under">${esc(x.u)}</span></div>`).join("")||`<div class="note">Nobody</div>`}</div></div>`}</div>`})()}
 ${(()=>{const adm=typeof LOCK!=="undefined"&&!LOCK&&S.canEdit;if(!(adm||(!BASIC()&&featOn("sum_need"))))return"";const CMP=!!S.cfg.needCompare;
-    const gs=CMP?[...new Set(S.cfg.depts.map(grp))].filter(G=>(!FS||FS.includes(G))&&guideRaw(S.store,G)):order.filter(G=>!FS||FS.includes(G));
+    const gs=CMP?[...new Set(DL().map(grp))].filter(G=>(!FS||FS.includes(G))&&guideRaw(S.store,G)):order.filter(G=>!FS||FS.includes(G));
     if(!gs.length&&!CMP)return"";
     if(!gs.length)return adm?`<div class="card" data-feat="sum_need"><h3 class="sec">Staffing needs</h3><div class="note">No staffing needs set for ${esc(S.store)} yet. Enter them in <b>Staffing guide</b> (AM / Mid / PM / After 5 per day).</div></div>`:"";
     const cellC=(h,n)=>!n&&!h?`<td class="z">—</td>`:CMP?`<td><b>${h}</b><small> / ${n}</small></td>`:`<td><b>${h}</b></td>`;
